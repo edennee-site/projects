@@ -1040,3 +1040,35 @@ button, input, select, textarea { font: inherit; color: inherit; letter-spacing:
   .is-simple .explode__pin { padding: 80px 0 70px; gap: 0; }
   .is-simple .explode__head { margin-bottom: 30px; }
 }
+/* ---------- телефоны: этапы производства и детали — слайдеры ---------- */
+@media (max-width: 860px) {
+  .prod__grid { margin: 0; }
+  .prod__aside { padding-left: 0; padding-right: 0; }
+  .prod__steps { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin: 0 calc(-1 * var(--pad)); padding: 24px var(--pad) 6px; scroll-padding-left: var(--pad); }
+  .prod__steps::-webkit-scrollbar { display: none; }
+  .pstep { flex: none; width: 84vw; scroll-snap-align: start; grid-template-rows: 300px 1fr; }
+  .pstep__viz { min-height: 0; }
+  .pstep__fact b { font-size: 46px; }
+  .pstep__fact span { font-size: 13px; }
+  .pstep__body { padding: 22px 20px 24px; gap: 18px; }
+  .pstep__body h3 { font-size: 26px; }
+
+  .ds__list { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin: 0 calc(-1 * var(--pad)); padding: 0 var(--pad) 6px; scroll-padding-left: var(--pad); }
+  .ds__list::-webkit-scrollbar { display: none; }
+  .ds__item, .ds__item:first-child { flex: none; width: 84vw; scroll-snap-align: start; border: 0; padding: 0 0 22px; background: var(--mist); }
+  .ds__item > *:not(.ds__mimg) { margin-left: 20px; margin-right: 20px; }
+  .ds__mimg { margin-bottom: 18px; }
+  .ds__n { font-size: 44px; }
+  .ds__item h3 { font-size: 28px; margin-top: 12px; }
+  .ds__spec div { grid-template-columns: 110px 1fr; }
+
+  .swipe-hint { display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: 13px; color: var(--steel); }
+  .dark .swipe-hint, .prod .swipe-hint { color: rgba(205,218,228,.6); }
+  .swipe-hint::after { content: ""; width: 34px; height: 1px; background: currentColor; }
+}
+.swipe-hint { display: none; }
+@media (max-width: 860px) { .swipe-hint { display: flex; } }
+@media (max-width: 860px) { .ds__tags span { background: #fff; } }
+.pstep__fact b { white-space: nowrap; }
