@@ -1,0 +1,1134 @@
+<title>Daud Textile — производство одежды полного цикла</title>
+<meta name="description" content="Фабрика полного цикла в Ташкентской области с 2012 года: собственная ткань, пошив детской, ясельной и взрослой одежды под ваш бренд.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Daud Textile — производство одежды полного цикла">
+<meta property="og:description" content="Собственная ткань, пошив и упаковка на одной фабрике. Поставки в Россию, СНГ и Европу.">
+<meta property="og:type" content="website">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2716%27%20fill%3D%27%23315383%27/%3E%3Ctext%20x%3D%2732%27%20y%3D%2745%27%20text-anchor%3D%27middle%27%20font-family%3D%27Georgia%2CTimes%20New%20Roman%2Cserif%27%20font-size%3D%2740%27%20fill%3D%27%23fff%27%3ED%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#F0F2F5">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap">
+<style>
+/* Layout: calm, strictly aligned 12-col grid; equal-height rounded cards on soft grey; brand navy from the logo as the only accent */
+:root{
+  --bg:#F0F2F5;
+  --card:#FFFFFF;
+  --ink:#132033;
+  --muted:#667386;
+  --line:#E1E5EB;
+  --navy:#315383;
+  --navy-dark:#1A2D4A;
+  --navy-soft:#E3EAF4;
+  --on-navy:#F2F5F9;
+  --on-navy-muted:#A7B4C7;
+  --font:"Onest","Helvetica Neue",Arial,system-ui,sans-serif;
+  --r:24px; --r-lg:32px; --r-sm:14px;
+  --gap:16px;
+  --pad:clamp(24px,2.6vw,36px);
+  --gl:max(clamp(16px,2vw,32px), env(safe-area-inset-left, 0px));
+  --gr:max(clamp(16px,2vw,32px), env(safe-area-inset-right, 0px));
+  --ease:cubic-bezier(.22,.7,.2,1);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+a{color:inherit}
+h1,h2,h3{margin:0;font-weight:500;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--navy);outline-offset:3px;border-radius:8px}
+
+.wrap{padding-left:var(--gl);padding-right:var(--gr)}
+.inner{max-width:1760px;margin:0 auto}
+.sec{padding-block:clamp(72px,8vw,120px)}
+.eyebrow{font-size:14px;font-weight:500;color:var(--navy);display:inline-flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:24px;height:1.5px;background:currentColor}
+.on-navy .eyebrow{color:var(--on-navy-muted)}
+.h2{font-size:clamp(32px,3.8vw,54px);line-height:1.08;letter-spacing:-.03em}
+.lead{font-size:clamp(17px,1.25vw,19px);color:var(--muted);max-width:50ch}
+.on-navy .lead{color:var(--on-navy-muted)}
+.head{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;margin-bottom:clamp(36px,4.5vw,64px)}
+@media(min-width:900px){.head{grid-template-columns:minmax(0,7fr) minmax(0,5fr);align-items:end;column-gap:var(--gap)}}
+.head__t{display:grid;gap:18px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;border:0;cursor:pointer;text-decoration:none;font-weight:500;font-size:16px;line-height:1;border-radius:999px;padding:18px 28px;transition:background .3s,color .3s,box-shadow .3s}
+.btn svg{width:16px;height:16px;transition:transform .35s var(--ease)}
+.btn:hover svg{transform:translateX(3px)}
+.btn--navy{background:var(--navy);color:#fff}
+.btn--navy:hover{background:var(--navy-dark)}
+.btn--white{background:#fff;color:var(--ink)}
+.btn--white:hover{background:var(--navy-soft)}
+.btn--ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+.btn--ghost:hover{box-shadow:inset 0 0 0 1px #fff}
+
+.card{background:var(--card);border-radius:var(--r);padding:var(--pad);min-width:0}
+.grid{display:grid;gap:var(--gap)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1000px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}}
+
+/* calm reveal (only for elements below the first screen) */
+.pre{opacity:0;transform:translateY(28px)}
+.rv.rv{transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.ph{position:relative;overflow:hidden;border-radius:var(--r);background:var(--navy-soft)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.4s var(--ease)}
+.ph.pre img{transform:scale(1.08)}
+
+/* ============ PRELOADER ============ */
+.pl{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;clip-path:inset(0 0 0 0);transition:clip-path 1s var(--ease) .15s,visibility 0s 1.2s}
+.pl.done{clip-path:inset(0 0 100% 0);visibility:hidden}
+.pl__in{display:grid;justify-items:center;gap:22px;transition:opacity .5s,transform .7s var(--ease)}
+.pl.done .pl__in{opacity:0;transform:translateY(-30px)}
+.pl img{width:190px;height:auto;animation:up .9s var(--ease) both}
+.pl__bar{width:180px;height:2px;border-radius:2px;background:var(--line);overflow:hidden}
+.pl__bar i{display:block;height:100%;background:var(--navy);transform:scaleX(0);transform-origin:left}
+.pl span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+html:not(.ready) .anim-up>*,html:not(.ready) .hero__r,html:not(.ready) .hero__float,html:not(.ready) .hero__l{animation-play-state:paused}
+/* ============ HEADER ============ */
+.hdr-wrap{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(240,242,245,.97);transition:box-shadow .4s}
+.hdr-wrap.shadow{box-shadow:0 1px 0 var(--line)}
+.hdr{height:84px;display:flex;align-items:center;gap:20px}
+.logo{flex:none}
+.logo img{height:50px;width:auto}
+.nav{position:relative;display:flex;gap:2px;padding:6px;border-radius:999px;background:var(--card);margin-inline:auto}
+.nav a{position:relative;z-index:1;text-decoration:none;font-size:15px;padding:10px 18px;border-radius:999px;transition:color .3s}
+.nav a.hov{color:#fff}
+.nav__ind{position:absolute;top:6px;bottom:6px;left:0;width:0;border-radius:999px;background:var(--navy);opacity:0;transition:transform .45s var(--ease),width .45s var(--ease),opacity .3s}
+.hdr__right{display:flex;align-items:center;gap:20px;flex:none}
+.hdr__phone{display:grid;line-height:1.25;text-align:right}
+.hdr__phone b{font-weight:500;font-size:15.5px;white-space:nowrap}
+.hdr__phone span{font-size:13px;color:var(--muted)}
+.btn-ar{padding:7px 7px 7px 22px;gap:14px}
+.btn-ar .ar{width:40px;height:40px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;transition:transform .4s var(--ease)}
+.btn-ar:hover .ar{transform:rotate(-45deg)}
+.btn-ar .ar svg{width:15px;height:15px}
+.btn-ar:hover svg{transform:none}
+.burger{display:none;margin-left:auto;height:52px;padding:0 8px 0 20px;border-radius:999px;border:0;background:var(--card);cursor:pointer;align-items:center;gap:14px;font-size:15px}
+.burger i{width:38px;height:38px;border-radius:50%;background:var(--navy);display:grid;place-items:center}
+.burger i span{width:16px;height:1.5px;background:#fff;box-shadow:0 5px 0 #fff,0 -5px 0 #fff;transition:box-shadow .3s,transform .3s}
+body.menu-open .burger i span{box-shadow:none;transform:rotate(45deg)}
+.burger i span{position:relative}
+body.menu-open .burger i span::after{content:"";position:absolute;left:0;top:0;width:100%;height:100%;background:#fff;transform:rotate(90deg)}
+.shop{display:inline-flex;align-items:center;gap:10px;height:54px;padding:0 20px 0 16px;border-radius:999px;background:var(--card);text-decoration:none;font-size:15px;font-weight:500;white-space:nowrap;transition:background .3s,color .3s}
+.shop svg{width:22px;height:22px;color:var(--navy);transition:transform .4s var(--ease)}
+.shop:hover{background:var(--navy-soft)}
+.shop:hover svg{transform:translateY(-2px)}
+@media(max-width:1700px){.hdr__phone{display:none}}
+@media(max-width:1480px){.shop{width:54px;padding:0;justify-content:center}.shop span{display:none}.nav a{padding:10px 13px}}
+@media(max-width:1240px){.nav,.hdr__right{display:none}.burger{display:flex}}
+
+.menu{position:fixed;inset:0;z-index:49;background:var(--navy-dark);color:var(--on-navy);padding:calc(env(safe-area-inset-top,0px) + 108px) var(--gr) 32px var(--gl);overflow:auto;clip-path:inset(0 0 100% 0 round 0 0 32px 32px);transition:clip-path .7s var(--ease);visibility:hidden}
+.menu.open{clip-path:inset(0 0 0 0 round 0);visibility:visible}
+body.menu-open .hdr-wrap{background:transparent;box-shadow:none}
+body.menu-open .hdr-wrap .logo img{filter:brightness(0) invert(1)}
+.menu__in{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--gap);max-width:1640px;margin:0 auto;min-height:100%}
+.menu__nav{display:flex;flex-direction:column}
+.menu__nav a{display:flex;align-items:baseline;gap:20px;font-size:clamp(30px,4.4vw,64px);letter-spacing:-.03em;line-height:1.1;text-decoration:none;padding:12px 0;border-bottom:1px solid rgba(167,180,199,.16);opacity:0;transform:translateY(24px);transition:opacity .5s,transform .6s var(--ease),color .3s}
+.menu__nav a span{font-size:14px;color:var(--on-navy-muted);letter-spacing:0;min-width:28px}
+.menu__nav a:hover{color:#B9CBE6}
+.menu.open .menu__nav a{opacity:1;transform:none}
+.menu.open .menu__nav a:nth-child(1){transition-delay:.15s}.menu.open .menu__nav a:nth-child(2){transition-delay:.2s}.menu.open .menu__nav a:nth-child(3){transition-delay:.25s}.menu.open .menu__nav a:nth-child(4){transition-delay:.3s}.menu.open .menu__nav a:nth-child(5){transition-delay:.35s}.menu.open .menu__nav a:nth-child(6){transition-delay:.4s}
+.menu__side{display:flex;flex-direction:column;gap:var(--gap)}
+.menu__side .ph{flex:1;min-height:220px;background:#24395A}
+.menu__c{display:grid;gap:6px;color:var(--on-navy-muted)}
+.menu__c b{color:#fff;font-weight:500;font-size:22px}
+@media(max-width:820px){.menu__in{grid-template-columns:minmax(0,1fr)}.menu__side .ph{display:none}}
+
+/* ============ 1. HERO ============ */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--gap);min-height:clamp(640px,calc(100svh - 100px),980px)}
+.hero__l{background:var(--card);border-radius:var(--r-lg);padding:clamp(28px,3.4vw,60px);display:flex;flex-direction:column;justify-content:space-between;gap:40px;min-width:0;position:relative;overflow:hidden}
+.hero__l::before{content:"";position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,var(--navy-soft),transparent 70%)}
+.hero__top{display:grid;gap:28px;position:relative}
+.hero__badge{display:inline-flex;align-items:center;gap:10px;justify-self:start;font-size:14px;padding:9px 16px 9px 10px;border-radius:999px;background:var(--bg)}
+.hero__badge i{width:22px;height:22px;border-radius:50%;background:var(--navy);display:grid;place-items:center}
+.hero__badge i::after{content:"";width:6px;height:6px;border-radius:50%;background:#fff}
+.hero h1{font-size:clamp(40px,4.4vw,80px);line-height:1;letter-spacing:-.04em}
+.hero h1 .hl{color:var(--navy);position:relative;white-space:nowrap}
+.hero h1 .hl svg{position:absolute;left:0;right:0;bottom:-.1em;width:100%;height:.28em;overflow:visible}
+.hero h1 .hl path{stroke:var(--navy);stroke-width:3;fill:none;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1.4s .9s var(--ease) forwards;opacity:.5}
+@keyframes draw{to{stroke-dashoffset:0}}
+.hero__l p{font-size:clamp(17px,1.25vw,19px);color:var(--muted);max-width:44ch}
+.hero__btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn--soft{background:var(--bg);color:var(--ink)}
+.btn--soft:hover{background:var(--navy-soft)}
+.hero__stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line);position:relative}
+.hs{padding:20px 0 0;display:grid;gap:4px}
+.hs:nth-child(even){padding-left:24px;border-left:1px solid var(--line)}
+.hs:nth-child(n+3){border-top:1px solid var(--line);margin-top:20px}
+.hs b{font-weight:500;font-size:clamp(28px,2.4vw,40px);letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hs b small{font-size:.55em;color:var(--navy);margin-left:3px}
+.hs>span{color:var(--muted);font-size:14.5px}
+.anim-up>*{animation:up 1s var(--ease) both}
+.anim-up>*:nth-child(2){animation-delay:.08s}.anim-up>*:nth-child(3){animation-delay:.16s}.anim-up>*:nth-child(4){animation-delay:.24s}
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+.hero__r{position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--navy-dark);perspective:1500px;animation:fadeIn 1.4s .2s var(--ease) both;min-height:560px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.hero__r::before,.hero__r::after{content:"";position:absolute;left:0;right:0;height:140px;z-index:2;pointer-events:none}
+.hero__r::before{top:0;background:linear-gradient(var(--navy-dark),transparent)}
+.hero__r::after{bottom:0;background:linear-gradient(transparent,var(--navy-dark))}
+.vig{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 70% 70% at 50% 50%,transparent 55%,rgba(26,45,74,.7) 100%)}
+.wall{position:absolute;left:50%;top:50%;width:150%;height:185%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;transform:translate(-50%,-50%) rotateX(24deg) rotateZ(-16deg)}
+.col{min-width:0}
+.col__track{display:flex;flex-direction:column;gap:18px;animation:colUp 58s linear infinite;will-change:transform}
+.col--down .col__track{animation-name:colDown;animation-duration:66s}
+.col:nth-child(3) .col__track{animation-duration:62s}
+@keyframes colUp{from{transform:translateY(0)}to{transform:translateY(calc(-50% - 9px))}}
+@keyframes colDown{from{transform:translateY(calc(-50% - 9px))}to{transform:translateY(0)}}
+.col__track>*{flex:none;border-radius:20px}
+.col__track img{width:100%;aspect-ratio:3/4;object-fit:cover}
+.col__track img.sq{aspect-ratio:1/1}
+.col__track img.pill{aspect-ratio:3/4;border-radius:999px}
+.tl{aspect-ratio:1/1;padding:clamp(14px,1.4vw,22px);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
+.tl small{font-size:clamp(11px,.85vw,13px);opacity:.75}
+.tl b{font-weight:500;font-size:clamp(22px,2.1vw,36px);letter-spacing:-.04em;line-height:1}
+.tl em{font-style:normal;font-size:clamp(11px,.85vw,13.5px);opacity:.8;display:block;margin-top:6px;line-height:1.3}
+.tl--w{background:#fff;color:var(--ink)}
+.tl--w small{color:var(--navy);opacity:1}
+.tl--n{background:var(--navy);color:#fff}
+.tl--s{background:#B9CBE6;color:var(--navy-dark)}
+.tl--o{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28)}
+.tl--w::after,.tl--n::after{content:"";position:absolute;right:-30%;bottom:-30%;width:70%;aspect-ratio:1;border-radius:50%;border:1.5px solid currentColor;opacity:.12}
+.tl--r{aspect-ratio:3/2}
+.hero__float{color:var(--ink);position:absolute;z-index:3;left:20px;bottom:20px;right:20px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;padding:12px;border-radius:24px;background:#fff;box-shadow:0 20px 50px rgba(5,12,24,.3);animation:up 1s .6s var(--ease) both}
+.hf__main{display:flex;align-items:center;gap:14px;padding-left:4px;min-width:0}
+.hf__ic{flex:none;width:52px;height:52px;border-radius:16px;background:var(--navy);color:#fff!important;display:grid;place-items:center}
+.hf__ic svg{width:26px;height:26px}
+.hf__certs{display:grid;grid-template-columns:repeat(3,auto);gap:6px}
+.hf__certs div{padding:10px 16px;border-radius:16px;background:var(--bg);display:grid;gap:1px}
+.hf__certs b{font-size:15px!important;white-space:nowrap}
+.hf__certs span{font-size:12.5px!important}
+@media(max-width:1300px){.hero__float{grid-template-columns:minmax(0,1fr)}.hf__certs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:560px){.hf__main span:not(.hf__ic){display:none}.hf__certs{grid-template-columns:repeat(3,minmax(0,1fr))}.hf__certs div{padding:8px;text-align:center}.hf__certs b{font-size:12px!important;white-space:normal!important}.hf__certs span{display:none}}
+.hero__float b{display:block;font-weight:500;font-size:16px}
+.hero__float span{color:var(--muted);font-size:14px}
+.certs-mini{display:flex;gap:6px;flex-wrap:wrap}
+.certs-mini i{font-style:normal;font-size:13px;padding:7px 12px;border-radius:999px;background:var(--navy-soft);color:var(--navy);font-weight:500;white-space:nowrap}
+@media(max-width:1000px){.hero{grid-template-columns:minmax(0,1fr);height:auto}.hero__r{height:520px}}
+@media(max-width:560px){.hero__r{height:440px;min-height:0}.hs:nth-child(even){padding-left:16px}}
+
+/* marquee with image chips */
+.mq{overflow:hidden;padding-block:clamp(40px,5vw,72px) 0}
+.mq__track{display:flex;align-items:center;width:max-content;animation:mq 70s linear infinite}
+.mq__track>*{flex:none}
+.mq__w{font-size:clamp(40px,5.4vw,92px);font-weight:500;letter-spacing:-.04em;line-height:1;color:var(--ink);padding-inline:clamp(14px,1.4vw,24px)}
+.mq__w:nth-child(4n+3){color:#9AA6B6}
+.mq__img{width:clamp(96px,8vw,150px);height:clamp(56px,4.8vw,88px);border-radius:999px;object-fit:cover}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ============ 2. ABOUT ============ */
+.about{display:grid;gap:clamp(40px,5vw,72px)}
+.about__top{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,9fr);gap:var(--gap);align-items:start}
+.statement{font-size:clamp(26px,2.7vw,46px);line-height:1.22;letter-spacing:-.025em;font-weight:500;max-width:30ch}
+.statement .w{color:#A4AEBC;transition:color .4s}
+.statement .w.on{color:var(--ink)}
+.about__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap);grid-auto-rows:clamp(300px,24vw,420px)}
+.about__grid .ph{border-radius:var(--r)}
+.ab{border-radius:var(--r);padding:var(--pad);display:flex;flex-direction:column;justify-content:space-between;gap:24px;min-width:0}
+.ab__v{font-size:clamp(40px,3.8vw,64px);font-weight:500;letter-spacing:-.045em;line-height:1;white-space:nowrap}
+.ab__l{font-size:15.5px}
+.ab--navy{background:var(--navy);color:#fff}
+.ab--navy .ab__l{color:rgba(255,255,255,.75)}
+.ab--white{background:var(--card)}
+.ab--white .ab__l{color:var(--muted)}
+.mini{display:grid;gap:0}
+.mini div{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:15.5px}
+.mini div span{color:var(--muted)}
+.mini div b{font-weight:500}
+.ab__bars{display:flex;align-items:flex-end;gap:5px;height:70px}
+.ab__bars i{flex:1;border-radius:4px;background:rgba(255,255,255,.22);transform-origin:bottom;transition:transform 1s var(--ease)}
+.ab__bars i.hi{background:#fff}
+.ab__bars.pre-b i{transform:scaleY(.1)}
+@media(max-width:1000px){.about__top{grid-template-columns:minmax(0,1fr)}.about__grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.about__grid{grid-template-columns:minmax(0,1fr);grid-auto-rows:auto}.about__grid .ph{height:260px}}
+
+/* ============ 3. CYCLE (accordion) ============ */
+.navy{background:var(--navy-dark);color:var(--on-navy)}
+.band{border-radius:var(--r-lg);margin-inline:var(--gl) var(--gr)}
+.band .inner{padding-inline:clamp(20px,3vw,56px)}
+.cyc-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:clamp(36px,4vw,56px)}
+.cyc-ctrl{display:flex;gap:10px;align-items:center}
+.cyc-ctrl span{color:var(--on-navy-muted);font-size:15px;font-variant-numeric:tabular-nums;min-width:64px;text-align:center}
+.arrow{width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center;transition:background .3s,color .3s}
+.arrow:hover{background:#fff;color:var(--navy-dark)}
+.arrow svg{width:18px;height:18px}
+.acc{display:flex;gap:10px;height:clamp(480px,64vh,660px)}
+.acc__it{position:relative;flex:1 1 0;min-width:0;border-radius:var(--r);overflow:hidden;cursor:pointer;background:#24395A;color:#fff;transition:flex .9s var(--ease);isolation:isolate}
+.acc__it.on{flex:7 1 0;cursor:default}
+.acc__it img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1.6s var(--ease);transform:scale(1.08)}
+.acc__it::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(19,32,51,.5);transition:opacity .6s}
+.acc__it.on::before{opacity:0}
+.acc__it:not(.on):hover::before{opacity:.6}
+.acc__it.on img{transform:none}
+.acc__it::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(19,32,51,.85),rgba(19,32,51,0) 55%);opacity:0;transition:opacity .6s}
+.acc__it.on::after{opacity:1}
+.acc__no{position:absolute;top:20px;left:50%;transform:translateX(-50%);font-size:14px;font-variant-numeric:tabular-nums;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.14);transition:left .6s var(--ease),transform .6s var(--ease)}
+.acc__it.on .acc__no{left:24px;transform:none}
+.acc__v{position:absolute;bottom:24px;left:50%;writing-mode:vertical-rl;transform:translateX(-50%) rotate(180deg);white-space:nowrap;font-size:16px;font-weight:500;transition:opacity .3s}
+.acc__it.on .acc__v{opacity:0}
+.acc__body{position:absolute;left:clamp(22px,2.4vw,36px);right:clamp(22px,2.4vw,36px);bottom:clamp(22px,2.4vw,36px);max-width:560px;display:grid;gap:10px;opacity:0;transform:translateY(18px);transition:opacity .4s,transform .5s var(--ease);pointer-events:none}
+.acc__it.on .acc__body{opacity:1;transform:none;transition-delay:.35s}
+.acc__body h3{font-size:clamp(28px,2.6vw,42px);letter-spacing:-.03em;line-height:1.08}
+.acc__body p{color:rgba(255,255,255,.82);font-size:clamp(16px,1.2vw,18px)}
+.acc__bar{position:absolute;left:0;bottom:0;height:3px;width:0;background:#fff;opacity:0}
+.acc__it.on .acc__bar{opacity:1;animation:fill 5s linear forwards}
+.acc.paused .acc__it.on .acc__bar{animation-play-state:paused}
+@keyframes fill{to{width:100%}}
+@media(max-width:900px){
+  .acc{flex-direction:column;height:auto;gap:8px}
+  .acc__it{flex:none;height:72px;transition:height .7s var(--ease)}
+  .acc__it.on{flex:none;height:400px}
+  .acc__no{left:18px;transform:none;top:18px}
+  .acc__it.on .acc__no{left:18px}
+  .acc__v{writing-mode:horizontal-tb;transform:none;left:70px;top:22px;bottom:auto}
+  .acc__bar{display:none}
+  .cyc-ctrl{display:none}
+}
+/* ============ 4. PRODUCTS ============ */
+.pcard{padding:0;display:flex;flex-direction:column;overflow:hidden}
+.pcard .ph{border-radius:0;aspect-ratio:4/3}
+.pcard:hover .ph img{transform:scale(1.04)}
+.pcard__b{padding:var(--pad);display:flex;flex-direction:column;gap:14px;flex:1}
+.pcard h3{font-size:clamp(22px,1.8vw,26px);letter-spacing:-.025em}
+.pcard p{color:var(--muted);font-size:15.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px}
+.chips span{font-size:14px;padding:7px 13px;border-radius:999px;background:var(--bg)}
+.seg{display:flex;flex-direction:column;gap:10px}
+.seg b{font-size:clamp(20px,1.6vw,24px);font-weight:500;letter-spacing:-.02em}
+.seg span{color:var(--muted);font-size:15px}
+.seg--navy{background:var(--navy-soft)}
+
+/* ============ 5. ADVANTAGES ============ */
+.adv{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--gap);align-items:start}
+.adv__side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 112px);display:grid;gap:28px}
+.adv__side .ph{aspect-ratio:4/3}
+.adv__list{list-style:none;margin:0;padding:0;display:grid;gap:var(--gap)}
+.adv__item{display:grid;grid-template-columns:56px minmax(0,1fr);gap:20px;align-items:start}
+.adv__num{width:56px;height:56px;border-radius:50%;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;font-weight:500;font-variant-numeric:tabular-nums}
+.adv__item h3{font-size:clamp(21px,1.7vw,25px);letter-spacing:-.025em;margin:12px 0 8px;line-height:1.2}
+.adv__item p{color:var(--muted)}
+@media(max-width:900px){.adv{grid-template-columns:minmax(0,1fr)}.adv__side{position:relative;top:auto}}
+
+/* ============ 6. QUALITY ============ */
+.q-top{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+.q-top .ph{min-height:440px;background:#24395A}
+.qcard{background:rgba(255,255,255,.06);border-radius:var(--r);padding:var(--pad);display:flex;flex-direction:column;gap:20px;min-width:0}
+.qcard h3{font-size:clamp(22px,1.8vw,26px);letter-spacing:-.025em}
+.checks{list-style:none;margin:0;padding:0;display:grid}
+.checks li{display:flex;gap:14px;align-items:center;padding:15px 0;border-top:1px solid rgba(167,180,199,.18)}
+.checks li:first-child{border-top:0}
+.ck{flex:none;width:28px;height:28px;border-radius:50%;background:rgba(167,180,199,.18);display:grid;place-items:center;transition:background .5s}
+.ck svg{width:14px;height:14px;opacity:.35;transition:opacity .5s}
+.checks li.ok .ck{background:#8FD3A8}
+.checks li.ok .ck svg{opacity:1}
+.otk .qcard{gap:28px;justify-content:space-between;min-height:180px}
+.otk__n{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;font-variant-numeric:tabular-nums;font-size:15px}
+.otk b{display:block;font-weight:500;font-size:19px;letter-spacing:-.02em;margin-bottom:4px}
+.otk span{color:var(--on-navy-muted);font-size:15px}
+.cert{background:var(--card);color:var(--ink);display:flex;align-items:center;gap:18px}
+.cert__ic{flex:none;width:56px;height:56px;border-radius:50%;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center}
+.cert__ic svg{width:26px;height:26px}
+.cert b{display:block;font-weight:500;font-size:clamp(19px,1.5vw,22px);letter-spacing:-.02em}
+.cert span{color:var(--muted);font-size:15px}
+@media(max-width:900px){.q-top{grid-template-columns:minmax(0,1fr)}.q-top .ph{min-height:300px}}
+@media(max-width:1000px){.certs{grid-template-columns:minmax(0,1fr)}}
+
+/* ============ 7. PARTNERS ============ */
+.partners{overflow:hidden}
+.prow{display:flex;gap:var(--gap);width:max-content;will-change:transform;padding-block:6px}
+.prow+.prow{margin-top:calc(var(--gap) - 12px)}
+.plate{position:relative;flex:none;width:clamp(230px,19vw,330px);height:clamp(110px,8.6vw,140px);border-radius:var(--r);background:var(--card);display:grid;place-items:center;text-align:center;padding:0 20px;font-size:clamp(19px,1.5vw,23px);font-weight:500;letter-spacing:-.01em;color:#3B4759;overflow:hidden;isolation:isolate;transition:border-radius .5s var(--ease)}
+.plate::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(135deg,#3D649C,var(--navy-dark));clip-path:circle(0% at var(--mx,50%) var(--my,50%));transition:clip-path .6s var(--ease)}
+.plate:hover{border-radius:60px}
+.plate:hover::before{clip-path:circle(150% at var(--mx,50%) var(--my,50%))}
+.tx{display:block;height:1.3em;line-height:1.3;overflow:hidden}
+.tx span{display:block;transition:transform .55s var(--ease)}
+.tx span+span{color:#fff}
+.plate:hover .tx span{transform:translateY(-100%)}
+.plate small{position:absolute;top:14px;left:18px;font-size:12px;font-weight:400;color:#9AA5B4;transition:color .4s}
+.plate:hover small{color:rgba(255,255,255,.6)}
+.plate i{position:absolute;right:14px;bottom:14px;width:34px;height:34px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;transform:scale(0) rotate(-90deg);transition:transform .5s .1s var(--ease)}
+.plate i svg{width:14px;height:14px}
+.plate:hover i{transform:none}
+.geo{margin-top:clamp(28px,3vw,44px)}
+.geo .card{display:flex;justify-content:space-between;align-items:center;gap:16px;background:transparent;box-shadow:inset 0 0 0 1px var(--line);padding-block:22px}
+.geo b{font-weight:500;font-size:20px;letter-spacing:-.02em}
+.geo span{color:var(--muted);font-size:15px;text-align:right}
+
+/* ============ 7b. GEOGRAPHY ============ */
+.geo3{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:var(--gap);align-items:stretch}
+.gcard{background:var(--card);border-radius:var(--r-lg);padding:var(--pad);display:flex;flex-direction:column;gap:22px}
+.gcard__k{font-size:14px;font-weight:500;color:var(--navy)}
+.gl{list-style:none;margin:0;padding:0;display:grid;position:relative}
+.gl::before,.gl li::after{content:"";position:absolute;left:0;right:0;height:1px;background:var(--line);transition:opacity .35s}
+.gl::before{top:0}
+.gl li::after{bottom:0}
+.gl li:hover::after,.gl li:focus-visible::after,.gl li:has(+ li:hover)::after,.gl li:has(+ li:focus-visible)::after,.gl:has(li:first-child:hover)::before,.gl:has(li:first-child:focus-visible)::before{opacity:0}
+.gl li{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:20px 4px;cursor:default;border-radius:14px;transition:background .35s,padding .35s}
+.gl li:hover,.gl li:focus-visible{background:var(--bg);padding-inline:14px;outline:none;box-shadow:none}
+.gl__n{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.gl b{display:block;font-weight:500;font-size:20px;letter-spacing:-.02em;line-height:1.2}
+.gl li div span{display:block;color:var(--muted);font-size:14.5px;margin-top:3px}
+.gl em{font-style:normal;font-size:14px;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.gcard__foot{margin-top:auto;display:flex;gap:14px;align-items:center;padding:16px;border-radius:var(--r-sm);background:var(--bg)}
+.gcard__ic{flex:none;width:46px;height:46px;border-radius:14px;background:var(--navy);color:#fff;display:grid;place-items:center}
+.gcard__ic svg{width:24px;height:24px}
+.gcard__foot p{font-size:14px;color:var(--muted);line-height:1.45}
+.gmap{position:relative;border-radius:var(--r-lg);background:radial-gradient(ellipse 60% 70% at 78% 78%,#F4F7FB 0%,rgba(244,247,251,0) 60%),linear-gradient(160deg,#E7EDF5 0%,#D9E3EF 100%);overflow:hidden;min-height:540px}
+.grat line{stroke:#fff;stroke-width:1.2;stroke-dasharray:2 7;opacity:.9}
+.gmap{container-type:inline-size}
+.gmap__in{position:absolute;left:0;right:0;bottom:calc(126px - 16.85cqw);aspect-ratio:1800/1061}
+.gmap__in>img{position:absolute;inset:0;width:100%;height:100%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 92%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 92%,transparent 100%)}
+.gmap__in>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.r{transition:opacity .4s}
+.r__line{fill:none;stroke:#315383;stroke-width:2.4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.8s var(--ease) var(--d)}
+.r__dot{fill:#315383;opacity:0;transition:opacity .5s calc(var(--d) + 1.6s)}
+.r__end{fill:#fff;stroke:#315383;stroke-width:3.5;transform-box:fill-box;transform-origin:center;transform:scale(0);transition:transform .6s var(--ease) calc(var(--d) + 1.4s)}
+.gmap.in .r__line{stroke-dashoffset:0}
+.gmap.in .r__dot{opacity:1}
+.gmap.in .r__end{transform:scale(1)}
+.home__ring{fill:none;stroke:#315383;stroke-width:1.5;opacity:.35;transform-box:fill-box;transform-origin:center;animation:hring 3s ease-out infinite}
+@keyframes hring{from{transform:scale(.5);opacity:.5}to{transform:scale(1.6);opacity:0}}
+.g-lbl,.g-home{position:absolute;white-space:nowrap;line-height:1.25;display:flex;align-items:center;gap:12px;padding:10px 20px 10px 10px;border-radius:18px;background:#fff;box-shadow:0 0 0 1px rgba(26,45,74,.06);text-align:left!important;transition:opacity .4s}
+.g-n{flex:none;width:38px;height:38px;border-radius:12px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.g-n svg{width:20px;height:20px}
+.g-lbl .g-n,.g-home .g-n{display:grid!important;font-size:13px!important;margin:0}
+.g-lbl .g-n{color:var(--navy)!important}
+.g-home .g-n{color:var(--navy)!important}
+.g-lbl b,.g-home b{margin-bottom:1px}
+.g-lbl b,.g-home b{display:block;font-weight:500;font-size:clamp(14px,1.15vw,17px);color:var(--ink)}
+.g-lbl span,.g-home span{display:block;font-size:clamp(12px,.9vw,13.5px);color:var(--muted)}
+.g-t{transform:translate(-50%,calc(-100% - 18px))}
+.g-tl{transform:translate(calc(-100% - 14px),calc(-100% - 6px))}
+.g-r{transform:translate(16px,-50%)}
+.g-home{transform:translate(-50%,26px);background:var(--navy)}
+.g-home .g-n{background:#fff}
+.g-home b{font-size:clamp(16px,1.3vw,19px);color:#fff!important}
+.g-home span{color:rgba(255,255,255,.75)!important}
+.g-scale{position:absolute;right:1%;bottom:3%;display:grid;gap:4px;justify-items:end;font-size:12.5px;color:var(--muted)}
+.g-scale i{display:block;height:6px;min-width:60px;border:1.5px solid #9AA8BA;border-top:0}
+.gmap__legend{position:absolute;left:var(--pad);top:var(--pad);display:flex;gap:18px;flex-wrap:wrap;font-size:13.5px;color:var(--ink);padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.85)}
+.gmap__legend span{display:inline-flex;align-items:center;gap:8px}
+.lg-line{width:22px;height:2.4px;border-radius:2px;background:#315383}
+.lg-uz{width:9px;height:9px;border-radius:50%;background:#315383}
+.gmap[data-focus] .r{opacity:.18}
+.gmap[data-focus] .g-lbl{opacity:.35}
+.gmap[data-focus="ru"] .r-ru,.gmap[data-focus="cis"] .r-cis,.gmap[data-focus="eu"] .r-eu{opacity:1}
+.gmap.paused *{animation-play-state:paused!important}
+@media(max-width:1000px){.geo3{grid-template-columns:minmax(0,1fr)}.gmap{min-height:0;aspect-ratio:16/11}}
+@media(max-width:640px){.gl li{grid-template-columns:28px minmax(0,1fr)}.gl em{grid-column:2}.gmap{aspect-ratio:4/3.4}.gmap__in{left:-16%;right:auto;width:122%;top:4%;bottom:auto}.g-lbl.r-cis{transform:translate(-88%,calc(-100% - 14px));text-align:right}.g-lbl div span,.g-home div span{display:none}.g-lbl,.g-home{padding:6px 12px 6px 6px;gap:8px;border-radius:12px}.g-n{width:26px;height:26px;border-radius:8px;font-size:11px}.g-n svg{width:15px;height:15px}.gmap__legend{left:16px;top:14px;font-size:12px;gap:12px}.g-scale{display:none}.g-home{transform:translate(-60%,16px)}}
+
+/* ============ 8. PROCESS ============ */
+.step{display:flex;flex-direction:column;justify-content:space-between;gap:44px;min-height:230px;transition:transform .4s var(--ease)}
+.step:hover{transform:translateY(-4px)}
+.step__top{display:flex;justify-content:space-between;align-items:flex-start}
+.step__ic{width:60px;height:60px;border-radius:18px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;transition:background .5s,color .5s}
+.step__ic svg{width:28px;height:28px}
+.step.on .step__ic{background:var(--navy);color:#fff}
+.step__no{font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums;padding:6px 12px;border-radius:999px;background:var(--bg)}
+.step h3{font-size:clamp(20px,1.6vw,23px);letter-spacing:-.02em;margin-bottom:8px}
+.step p{color:var(--muted);font-size:15.5px}
+.conds{margin-top:var(--gap)}
+.cond{display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+.cond__v{font-size:clamp(36px,3.2vw,48px);font-weight:500;letter-spacing:-.04em;line-height:1;white-space:nowrap}
+.cond__v small{font-size:.42em;color:var(--on-navy-muted);margin-left:6px;letter-spacing:0}
+.cond.navy .cond__l{color:var(--on-navy-muted)}
+.cond__l{color:var(--muted);font-size:15.5px}
+.need{gap:16px;justify-content:flex-start}
+.need ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.need li{font-size:14px;padding:7px 13px;border-radius:999px;background:var(--bg)}
+.need p{color:var(--muted);font-size:15px}
+.need h3{font-size:20px;letter-spacing:-.02em}
+
+/* ============ 9. INSIDE: expanding frame ============ */
+.xp{position:relative;height:230vh}
+.xp__stage{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);height:calc(100vh - 100px);height:calc(100svh - 100px);overflow:hidden}
+.xp__frame{position:absolute;left:50%;top:50%;width:var(--fw,40%);height:var(--fh,52%);transform:translate(-50%,-50%);border-radius:var(--fr,32px);overflow:hidden;background:var(--navy-dark);z-index:2;isolation:isolate;color:#fff}
+.xp__frame>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transform:scale(var(--fs,1.15))}
+.xp__frame::after{background:linear-gradient(90deg,rgba(19,32,51,calc(.25 + var(--co,0) * .55)),rgba(19,32,51,calc(var(--co,0) * .35)))!important}
+.xp__in{position:absolute;inset:0;padding:clamp(28px,4vw,64px);display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--gap);align-items:end;opacity:var(--co,0);transform:translateY(calc((1 - var(--co,0)) * 30px));pointer-events:none}
+.xp__in a{pointer-events:auto}
+.xp__txt{display:grid;gap:18px;justify-items:start;max-width:620px}
+.xp__txt .eyebrow{color:#B9CBE6}
+.xp__txt h3{font-size:clamp(32px,3.6vw,60px);line-height:1.04;letter-spacing:-.035em}
+.xp__txt p{color:rgba(255,255,255,.82);font-size:clamp(16px,1.2vw,19px);max-width:46ch}
+.xp__stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.xp__stats div{border-radius:var(--r);padding:22px;background:rgba(255,255,255,.95);color:var(--ink);display:grid;gap:6px}
+.xp__stats b{font-weight:500;font-size:clamp(26px,2.4vw,38px);letter-spacing:-.035em;line-height:1;white-space:nowrap}
+.xp__stats span{color:var(--muted);font-size:14.5px}
+.xp__frame::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(19,32,51,.8),rgba(19,32,51,.15) 60%)}
+.xp__cap{position:absolute;left:clamp(24px,3vw,48px);right:clamp(24px,3vw,48px);bottom:clamp(24px,3vw,44px);display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;opacity:var(--co,0);transform:translateY(calc((1 - var(--co,0)) * 20px))}
+.xp__cap b{display:block;font-weight:500;font-size:clamp(26px,2.6vw,42px);letter-spacing:-.03em;line-height:1.1}
+.xp__cap span{color:rgba(255,255,255,.8);max-width:44ch;display:block;margin-top:8px}
+.xp__chips{display:flex;gap:8px;flex-wrap:wrap}
+.xp__chips i{font-style:normal;font-size:14px;padding:9px 15px;border-radius:999px;background:rgba(255,255,255,.16);}
+.xp__side{position:absolute;width:22%;aspect-ratio:4/3;border-radius:var(--r);overflow:hidden;z-index:1;opacity:var(--so,1);transform:translate(var(--sx,0),var(--sy,0))}
+.xp__side img{width:100%;height:100%;object-fit:cover}
+.s1{left:var(--gl);top:4%}.s2{left:calc(var(--gl) + 4%);bottom:4%;width:18%}.s3{right:var(--gr);top:8%;width:18%}.s4{right:calc(var(--gr) + 3%);bottom:2%}
+@media(max-width:900px),(prefers-reduced-motion:reduce){
+  .xp{height:auto}
+  .xp__stage{position:relative;top:auto;height:auto;overflow:visible;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap);padding-inline:var(--gl) var(--gr)}
+  .xp__frame{position:relative;left:auto;top:auto;transform:none;width:auto;height:auto;min-height:520px;grid-column:1/-1;border-radius:var(--r);--co:1;--fs:1}
+  .xp__in{position:relative;grid-template-columns:minmax(0,1fr);min-height:520px}
+  .xp__side{position:relative;inset:auto;width:auto;transform:none;opacity:1}
+}
+
+/* CTA: visit */
+.visit2{position:relative;border-radius:var(--r-lg);overflow:hidden;color:#fff;isolation:isolate;min-height:clamp(520px,44vw,640px);display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--gap);padding:clamp(28px,4vw,64px);margin-top:clamp(56px,6vw,96px)}
+.visit2>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transform:scale(1.04);transition:transform 2s var(--ease)}
+.visit2:hover>img{transform:scale(1)}
+.visit2::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(19,32,51,.92) 0%,rgba(19,32,51,.7) 50%,rgba(19,32,51,.25) 100%)}
+.visit2__body{display:flex;flex-direction:column;justify-content:space-between;gap:36px}
+.visit2 .eyebrow{color:#B9CBE6}
+.visit2 h2{font-size:clamp(34px,4vw,62px);line-height:1.04;letter-spacing:-.035em;margin-top:18px}
+.visit2 p{color:rgba(255,255,255,.8);max-width:46ch;margin-top:18px;font-size:clamp(17px,1.25vw,19px)}
+.vlist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.vlist li{border-radius:var(--r-sm);padding:16px;background:rgba(255,255,255,.14);display:grid;gap:12px;font-size:15px;line-height:1.35}
+.vlist svg{width:24px;height:24px;color:#B9CBE6}
+.visit2__btns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.visit2__btns span{color:rgba(255,255,255,.75);font-size:15px}
+.visit2__side{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;gap:24px}
+.rot{position:relative;width:clamp(130px,11vw,170px);aspect-ratio:1;display:grid;place-items:center;text-decoration:none;color:#fff;flex:none}
+.rot svg.ring{position:absolute;inset:0;width:100%;height:100%;animation:spin 18s linear infinite;will-change:transform}
+.rot text{font-size:10.5px;letter-spacing:3.2px;fill:#fff;text-transform:uppercase}
+.rot__c{width:46%;aspect-ratio:1;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;transition:transform .4s var(--ease);will-change:transform}
+.rot:hover .rot__c{transform:scale(1.12)}
+.rot__c svg{transition:transform .4s var(--ease)}
+.rot:hover .rot__c svg{transform:rotate(90deg)}
+.rot__c svg{width:22px;height:22px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.vcard{border-radius:var(--r);padding:22px 24px;background:rgba(255,255,255,.95);color:var(--ink);width:min(340px,100%)}
+.vcard b{display:block;font-weight:500;font-size:clamp(26px,2.2vw,34px);letter-spacing:-.035em;line-height:1}
+.vcard span{color:var(--muted);font-size:15px;display:block;margin-top:6px}
+@media(max-width:1000px){.visit2{grid-template-columns:minmax(0,1fr)}.visit2__side{flex-direction:row;align-items:flex-end}.vlist{grid-template-columns:minmax(0,1fr)}}
+
+/* ============ 10. REQUEST ============ */
+.rq{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--gap);align-items:stretch}
+.rq__l{border-radius:var(--r-lg);padding:clamp(28px,3.4vw,56px);display:flex;flex-direction:column;justify-content:space-between;gap:40px;position:relative;overflow:hidden;isolation:isolate}
+.rq__l::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;right:-220px;bottom:-240px;z-index:-1;background:radial-gradient(circle,rgba(84,121,176,.55),transparent 65%)}
+.rq__l::after{content:"";position:absolute;width:340px;height:340px;border-radius:50%;right:-120px;bottom:-140px;z-index:-1;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 70px rgba(255,255,255,.03),0 0 0 140px rgba(255,255,255,.02)}
+.rq__l h2{font-size:clamp(32px,3.4vw,52px);line-height:1.05;letter-spacing:-.035em;margin-top:18px}
+.rq__l p{color:var(--on-navy-muted);margin-top:18px;max-width:40ch}
+.perks{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.perks li{display:flex;gap:14px;align-items:center;font-size:16px}
+.perks li span{flex:none;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center}
+.perks svg{width:15px;height:15px}
+.mgr{display:flex;align-items:center;gap:16px;padding:16px;border-radius:var(--r-sm);background:rgba(255,255,255,.08)}
+.mgr__ic{flex:none;width:48px;height:48px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center}
+.mgr__ic svg{width:20px;height:20px}
+.mgr b{display:block;font-weight:500;font-size:18px}
+.mgr span{color:var(--on-navy-muted);font-size:14px}
+.rq__r{border-radius:var(--r-lg);background:var(--card);padding:clamp(28px,3.4vw,56px)}
+.form{display:grid;gap:30px}
+.frow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.fl{position:relative;min-width:0}
+.fl input,.fl textarea{width:100%;border:0;border-bottom:1.5px solid var(--line);background:transparent;padding:26px 0 12px;font:inherit;font-size:18px;color:var(--ink);border-radius:0;transition:border-color .3s;resize:none}
+.fl textarea{min-height:90px}
+.fl label{position:absolute;left:0;top:26px;color:var(--muted);font-size:17px;pointer-events:none;transition:transform .3s var(--ease),font-size .3s,color .3s;transform-origin:left top}
+.fl input:focus,.fl textarea:focus{outline:none;border-color:var(--navy)}
+.fl input:focus+label,.fl input:not(:placeholder-shown)+label,.fl textarea:focus+label,.fl textarea:not(:placeholder-shown)+label{transform:translateY(-24px);font-size:13.5px;color:var(--navy)}
+.fl::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--navy);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.fl:focus-within::after{transform:scaleX(1)}
+.fgroup{display:grid;gap:14px;border:0;margin:0;padding:0;min-width:0}
+.fgroup legend{font-size:15px;color:var(--muted);padding:0;margin-bottom:14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;position:relative}
+.opts input{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
+.opts label{cursor:pointer;padding:12px 18px;border-radius:999px;background:var(--bg);font-size:15.5px;transition:background .25s,color .25s,transform .25s var(--ease);display:inline-flex;align-items:center;gap:8px}
+.opts label:hover{transform:translateY(-2px)}
+.opts label::before{content:"";width:8px;height:8px;border-radius:50%;background:#C3CBD6;transition:background .25s}
+.opts input:checked+label{background:var(--navy);color:#fff}
+.opts input:checked+label::before{background:#8FD3A8}
+.opts input:focus-visible+label{outline:2px solid var(--navy);outline-offset:2px}
+.ffoot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--muted)}
+.consent input{width:18px;height:18px;margin-top:2px;accent-color:var(--navy);flex:none}
+.btn-big{padding:10px 10px 10px 30px;font-size:17px;gap:18px}
+.btn-big .ar{width:52px;height:52px}
+.done{display:grid;gap:18px;align-content:center;min-height:420px}
+.done__ic{width:72px;height:72px;border-radius:50%;background:var(--navy);display:grid;place-items:center}
+.done__ic svg{width:30px;height:30px}
+.done b{font-weight:500;font-size:clamp(28px,2.8vw,40px);letter-spacing:-.03em}
+.done p{color:var(--muted);max-width:46ch}
+.contacts{margin-top:var(--gap)}
+.contacts .card{display:grid;gap:16px;align-content:start}
+.contacts h3{font-size:15px;font-weight:500;color:var(--navy)}
+.cline{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.cline .v{text-decoration:none;font-size:clamp(19px,1.6vw,24px);font-weight:500;letter-spacing:-.02em;min-width:0;overflow-wrap:anywhere;user-select:all}
+.copy{flex:none;border:0;cursor:pointer;border-radius:999px;padding:9px 15px;background:var(--bg);font-size:14px;transition:background .3s}
+.copy:hover{background:var(--navy-soft)}
+.msg{display:flex;gap:8px;flex-wrap:wrap}
+.msg a{text-decoration:none;font-size:15px;padding:11px 18px;border-radius:999px;background:var(--bg);transition:background .3s}
+.msg a:hover{background:var(--navy-soft)}
+.addr{display:grid;gap:2px}
+.addr+.addr{padding-top:12px;border-top:1px solid var(--line)}
+.addr span:first-child{color:var(--muted);font-size:14px}
+@media(max-width:1100px){.rq{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){.frow{grid-template-columns:minmax(0,1fr);gap:18px}.ffoot{grid-template-columns:minmax(0,1fr)}}
+
+
+@media(max-width:640px){
+  .g-home{transform:translate(-88%,14px)!important}
+  .gmap__legend{display:none}
+  .gmap__in{top:10%!important}
+  .visit2__side{flex-direction:column;align-items:flex-start}
+  .vcard{width:100%}
+  .cline{flex-wrap:wrap}
+  .cline .v{font-size:18px}
+}
+/* ============ FOOTER ============ */
+.foot{margin-top:clamp(72px,8vw,120px);border-radius:var(--r-lg) var(--r-lg) 0 0;padding-block:clamp(48px,6vw,88px) calc(24px + env(safe-area-inset-bottom,0px));overflow:hidden;position:relative;isolation:isolate}
+.foot::before{content:"";position:absolute;width:780px;height:780px;right:-260px;top:-360px;border-radius:50%;z-index:-1;background:radial-gradient(circle,rgba(84,121,176,.35),transparent 65%)}
+.ft-cta{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:20px 36px;padding:clamp(22px,2.6vw,36px);border-radius:var(--r-lg);background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(167,180,199,.14)}
+.ft-cta__l{display:flex;align-items:center;gap:20px;min-width:0}
+.ft-cta__ic{flex:none;width:64px;height:64px;border-radius:20px;background:#fff;color:var(--navy);display:grid;place-items:center}
+.ft-cta__ic svg{width:28px;height:28px}
+.ft-cta h2{font-size:clamp(26px,2.4vw,38px);line-height:1.1;letter-spacing:-.03em}
+.ft-cta p{color:var(--on-navy-muted);margin-top:6px;font-size:15.5px}
+.ft-cta__r{display:contents}
+.ft-phone{display:grid;text-decoration:none;line-height:1.25;padding-left:36px;border-left:1px solid rgba(167,180,199,.2)}
+.ft-phone b{font-weight:500;font-size:clamp(19px,1.5vw,24px);letter-spacing:-.02em}
+.ft-phone span{color:var(--on-navy-muted);font-size:14px}
+.ft-brand img{height:54px;width:auto;margin-bottom:18px}
+.ft-brand p{color:var(--on-navy-muted);font-size:15px;max-width:26ch}
+@media(max-width:1000px){.ft-cta{grid-template-columns:minmax(0,1fr)}.ft-phone{padding-left:0;border-left:0}.ft-cta .btn{justify-self:start}}
+.foot .btn-ar .ar{background:var(--navy);color:#fff}
+.ft-grid{display:grid;grid-template-columns:minmax(0,1.1fr) repeat(3,minmax(0,1fr)) minmax(0,1.3fr);gap:var(--gap) 32px;padding-block:clamp(40px,5vw,64px)}
+.ft-col{min-width:0}
+.ft-col h4{margin:0 0 18px;font-size:14px;font-weight:500;color:var(--on-navy-muted)}
+.ft-col ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.ft-col a{text-decoration:none;font-size:16.5px;transition:color .3s;overflow-wrap:anywhere}
+.ft-col a:hover{color:#B9CBE6}
+.ft-col li span{display:block;color:var(--on-navy-muted);font-size:13.5px;margin-bottom:2px}
+.ft-col li p{font-size:15.5px;line-height:1.45}
+.ft-shop{position:relative;border-radius:var(--r);overflow:hidden;min-height:230px;display:flex;flex-direction:column;justify-content:space-between;padding:24px;text-decoration:none;color:#fff;isolation:isolate}
+.ft-shop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1.2s var(--ease)}
+.ft-shop::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(19,32,51,.92) 0%,rgba(19,32,51,.7) 45%,rgba(19,32,51,.35) 100%)}
+.ft-shop:hover img{transform:scale(1.05)}
+.ft-shop__top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.ft-shop__tag{font-size:13px;padding:7px 12px;border-radius:999px;background:#fff;color:var(--navy);font-weight:500}
+.ft-shop__ar{width:46px;height:46px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;transition:transform .4s var(--ease)}
+.ft-shop__ar svg{width:16px;height:16px}
+.ft-shop:hover .ft-shop__ar{transform:rotate(-45deg)}
+.ft-shop b{display:block;font-weight:500;font-size:clamp(20px,1.6vw,24px);letter-spacing:-.03em;line-height:1.1}
+.ft-shop small{display:block;color:rgba(255,255,255,.8);font-size:14.5px;margin-top:6px}
+.ft-mark{display:block;width:100%;height:auto;opacity:.1;margin-top:clamp(8px,2vw,24px)}
+.ft-mark.rv.pre{transform:translateY(60px)}
+.ft-bot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:22px;margin-top:0;border-top:1px solid rgba(167,180,199,.18);color:var(--on-navy-muted);font-size:14.5px}
+.ft-certs{display:flex;gap:6px;flex-wrap:wrap}
+.ft-certs i{font-style:normal;font-size:13px;padding:6px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(167,180,199,.3);color:#D6DEEA}
+.totop{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:#fff}
+.totop i{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;transition:background .3s,transform .4s var(--ease)}
+.totop i svg{width:16px;height:16px}
+.totop:hover i{background:#fff;color:var(--navy);transform:translateY(-3px)}
+@media(max-width:1300px){.ft-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1000px){.ft-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.ft-grid{grid-template-columns:minmax(0,1fr)}}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-size:15px;z-index:70;transition:opacity .3s,transform .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}html{scroll-behavior:auto}.pre{opacity:1;transform:none}}
+</style>
+
+<div class="pl" id="pl" aria-hidden="true"><div class="pl__in"><img decoding="async" src="img/logo-navy.png" alt="" width="190" height="73"><div class="pl__bar"><i id="plBar"></i></div><span id="plNum">0%</span></div></div>
+<script>(function(){var pl=document.getElementById('pl'),bar=document.getElementById('plBar'),num=document.getElementById('plNum'),p=0,done=false,t0=Date.now(),rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function set(v){bar.style.transform='scaleX('+(v/100)+')';num.textContent=Math.round(v)+'%'}
+function step(){if(done)return;p+=(92-p)*.05;set(p);requestAnimationFrame(step)}
+function finish(){if(done)return;done=true;setTimeout(function(){set(100);setTimeout(function(){pl.classList.add('done');document.documentElement.classList.add('ready')},rm?0:280)},rm?0:Math.max(0,900-(Date.now()-t0)))}
+addEventListener('load',finish);setTimeout(finish,3500);requestAnimationFrame(step)})()</script>
+<!-- ============ HEADER ============ -->
+<div class="hdr-wrap wrap" id="hdrWrap">
+  <header class="hdr inner">
+    <a class="logo" href="#top" aria-label="Daud Textile, наверх"><img decoding="async" src="img/logo-navy.png" alt="Daud Textile" width="129" height="50"></a>
+    <nav class="nav" id="nav" aria-label="Разделы страницы">
+      <span class="nav__ind" id="navInd" aria-hidden="true"></span>
+      <a href="#about">О фабрике</a><a href="#cycle">Полный цикл</a><a href="#products">Продукция</a><a href="#quality">Качество</a><a href="#process">Как работаем</a><a href="#contacts">Контакты</a>
+    </nav>
+    <div class="hdr__right">
+      <a class="shop" href="https://daudtextile.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg><span>Интернет-магазин</span></a>
+      <div class="hdr__phone"><a href="tel:+998909655557" style="text-decoration:none;font-weight:500;font-size:15.5px;white-space:nowrap">+998 90 965 55 57</a><span>Отдел продаж</span></div>
+      <a class="btn btn--navy btn-ar" href="#request">Оставить заявку <span class="ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h11M9 4l4 4-4 4"/></svg></span></a>
+    </div>
+    <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false">Меню <i><span></span></i></button>
+  </header>
+</div>
+<div class="menu" id="menu" aria-hidden="true">
+  <div class="menu__in">
+    <nav class="menu__nav" aria-label="Меню">
+      <a href="#about"><span>01</span>О фабрике</a><a href="#cycle"><span>02</span>Полный цикл</a><a href="#products"><span>03</span>Продукция</a><a href="#quality"><span>04</span>Качество</a><a href="#process"><span>05</span>Как работаем</a><a href="#contacts"><span>06</span>Контакты</a>
+    </nav>
+    <div class="menu__side">
+      <div class="ph"><img decoding="async" src="img/sewing-line.webp" alt="" loading="lazy"></div>
+      <div class="menu__c"><span>Отдел продаж</span><a href="tel:+998909655557" style="color:#fff;font-weight:500;font-size:22px;text-decoration:none">+998 90 965 55 57</a><span>daudtextileuz@gmail.com</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--white" href="#request">Оставить заявку</a><a class="btn btn--ghost" href="https://daudtextile.com" target="_blank" rel="noopener">Интернет-магазин ↗</a></div>
+    </div>
+  </div>
+</div>
+
+<main id="top">
+<!-- ============ 1. HERO ============ -->
+<section class="wrap" style="padding-top:4px">
+  <div class="inner hero">
+    <div class="hero__l">
+      <div class="hero__top anim-up">
+        <span class="hero__badge"><i></i>Фабрика в Ташкентской области с 2012 года</span>
+        <h1>Производство одежды <span class="hl">полного цикла</span></h1>
+        <p>Собственная ткань, пошив и упаковка на одной фабрике. Детская, ясельная и взрослая одежда под ваш бренд.</p>
+        <div class="hero__btns">
+          <a class="btn btn--navy btn-ar" href="#request">Рассчитать заказ <span class="ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h11M9 4l4 4-4 4"/></svg></span></a>
+          <a class="btn btn--soft" href="#cycle">Как мы работаем</a>
+        </div>
+      </div>
+      <div class="hero__stats anim-up">
+        <div class="hs"><b data-count="1400">1 400</b><span>сотрудников</span></div>
+        <div class="hs"><b><span data-count="12000">12 000</span><small>м²</small></b><span>производственных площадей</span></div>
+        <div class="hs"><b data-count="20">20</b><span>швейных линий</span></div>
+        <div class="hs"><b data-count="25000">25 000</b><span>изделий в сутки</span></div>
+      </div>
+    </div>
+    <div class="hero__r" aria-hidden="true">
+      <div class="wall">
+        <div class="col"><div class="col__track"><img decoding="async" src="img/t-sewing-line.webp" alt=""><div class="tl tl--w"><small>Своё производство</small><div><b>Пряжа</b><em>и трикотажное полотно</em></div></div><img decoding="async" src="img/t-cones.webp" alt="" class="sq"><div class="tl tl--n tl--r"><small>С 2012 года</small><div><b>14 лет</b><em>в производстве одежды</em></div></div><img decoding="async" src="img/t-sampling.webp" alt="" class="pill"><img decoding="async" src="img/t-sewing-line.webp" alt=""><div class="tl tl--w"><small>Своё производство</small><div><b>Пряжа</b><em>и трикотажное полотно</em></div></div><img decoding="async" src="img/t-cones.webp" alt="" class="sq"><div class="tl tl--n tl--r"><small>С 2012 года</small><div><b>14 лет</b><em>в производстве одежды</em></div></div><img decoding="async" src="img/t-sampling.webp" alt="" class="pill"></div></div>
+        <div class="col col--down"><div class="col__track"><img decoding="async" src="img/t-kids-outer.webp" alt=""><div class="tl tl--s"><small>Сертификат</small><div><b>OEKO-TEX®</b><em>Standard 100</em></div></div><img decoding="async" src="img/t-embroidery.webp" alt="" class="sq"><div class="tl tl--o"><small>Пошив</small><div><b>20 линий</b><em>600+ единиц оборудования</em></div></div><img decoding="async" src="img/t-knitwear.webp" alt=""><img decoding="async" src="img/t-kids-outer.webp" alt=""><div class="tl tl--s"><small>Сертификат</small><div><b>OEKO-TEX®</b><em>Standard 100</em></div></div><img decoding="async" src="img/t-embroidery.webp" alt="" class="sq"><div class="tl tl--o"><small>Пошив</small><div><b>20 линий</b><em>600+ единиц оборудования</em></div></div><img decoding="async" src="img/t-knitwear.webp" alt=""></div></div>
+        <div class="col"><div class="col__track"><img decoding="async" src="img/t-yarn-machine.webp" alt="" class="sq"><div class="tl tl--n"><small>Площадь</small><div><b>12 000 м²</b><em>производственных площадей</em></div></div><img decoding="async" src="img/t-threading.webp" alt="" class="pill"><div class="tl tl--w tl--r"><small>Минимальный тираж</small><div><b>1 000</b><em>единиц на модель</em></div></div><img decoding="async" src="img/t-denim.webp" alt="" class="sq"><img decoding="async" src="img/t-yarn-machine.webp" alt="" class="sq"><div class="tl tl--n"><small>Площадь</small><div><b>12 000 м²</b><em>производственных площадей</em></div></div><img decoding="async" src="img/t-threading.webp" alt="" class="pill"><div class="tl tl--w tl--r"><small>Минимальный тираж</small><div><b>1 000</b><em>единиц на модель</em></div></div><img decoding="async" src="img/t-denim.webp" alt="" class="sq"></div></div>
+        <div class="col col--down"><div class="col__track"><img decoding="async" src="img/t-buttons.webp" alt="" class="sq"><div class="tl tl--w"><small>Мощность</small><div><b>25 000</b><em>изделий в сутки</em></div></div><img decoding="async" src="img/t-sewing-row.webp" alt=""><div class="tl tl--s"><small>Полный цикл</small><div><b>10 этапов</b><em>собственного производства</em></div></div><img decoding="async" src="img/t-fabric-dye.webp" alt="" class="sq"><img decoding="async" src="img/t-buttons.webp" alt="" class="sq"><div class="tl tl--w"><small>Мощность</small><div><b>25 000</b><em>изделий в сутки</em></div></div><img decoding="async" src="img/t-sewing-row.webp" alt=""><div class="tl tl--s"><small>Полный цикл</small><div><b>10 этапов</b><em>собственного производства</em></div></div><img decoding="async" src="img/t-fabric-dye.webp" alt="" class="sq"></div></div>
+      </div>
+      <span class="vig"></span>
+      <div class="hero__float"><div class="hf__main"><span class="hf__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l8 3v6c0 4.8-3.4 8.6-8 10.5-4.6-1.9-8-5.7-8-10.5v-6z"/><path d="M8.5 12l2.5 2.5 4.5-4.5"/></svg></span><div><b>Сертифицированное производство</b><span>Стандарты качества и безопасности</span></div></div><div class="hf__certs"><div><b>ISO 9001</b><span>Качество</span></div><div><b>ISO 14001</b><span>Экология</span></div><div><b>OEKO-TEX® 100</b><span>Безопасный текстиль</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="mq" aria-hidden="true"><div class="mq__track">
+  <span class="mq__w">Пряжа</span><img class="mq__img" src="img/t-cones.webp" alt=""><span class="mq__w">Полотно</span><img class="mq__img" src="img/t-yarn-machine.webp" alt=""><span class="mq__w">Окрашивание</span><img class="mq__img" src="img/t-fabric-dye.webp" alt=""><span class="mq__w">Раскрой</span><img class="mq__img" src="img/t-factory-wide.webp" alt=""><span class="mq__w">Вышивка</span><img class="mq__img" src="img/t-embroidery.webp" alt=""><span class="mq__w">Пошив</span><img class="mq__img" src="img/t-sewing-line.webp" alt=""><span class="mq__w">Упаковка</span><img class="mq__img" src="img/t-tshirts.webp" alt="">
+  <span class="mq__w">Пряжа</span><img class="mq__img" src="img/t-cones.webp" alt=""><span class="mq__w">Полотно</span><img class="mq__img" src="img/t-yarn-machine.webp" alt=""><span class="mq__w">Окрашивание</span><img class="mq__img" src="img/t-fabric-dye.webp" alt=""><span class="mq__w">Раскрой</span><img class="mq__img" src="img/t-factory-wide.webp" alt=""><span class="mq__w">Вышивка</span><img class="mq__img" src="img/t-embroidery.webp" alt=""><span class="mq__w">Пошив</span><img class="mq__img" src="img/t-sewing-line.webp" alt=""><span class="mq__w">Упаковка</span><img class="mq__img" src="img/t-tshirts.webp" alt="">
+</div></div>
+
+<!-- ============ 2. ABOUT ============ -->
+<section class="sec wrap" id="about">
+  <div class="inner about">
+    <div class="about__top">
+      <span class="eyebrow rv">О фабрике</span>
+      <p class="statement" id="statement">С 2012 года шьём одежду под своим брендом и для компаний из России, СНГ и Европы. Мы сами производим ткань и шьём, поэтому держим качество и сроки под контролем.</p>
+    </div>
+    <div class="about__grid">
+      <div class="ph rv"><img decoding="async" src="img/sewing-line.webp" alt="Швейная линия" loading="lazy"></div>
+      <div class="ab ab--navy rv"><span class="ab__l">Мощность в месяц</span><div class="ab__bars" id="abBars"><i style="height:40%"></i><i style="height:48%"></i><i style="height:55%"></i><i style="height:62%"></i><i style="height:70%"></i><i style="height:78%"></i><i class="hi" style="height:88%"></i><i class="hi" style="height:100%"></i></div><div><div class="ab__v">650 000</div><span class="ab__l">изделий при полной загрузке</span></div></div>
+      <div class="ab ab--white rv"><span class="ab__l">Производство</span><div><div class="ab__v">600+</div><span class="ab__l">единиц оборудования</span></div><div class="mini"><div><span>Коллекций в год</span><b>4–6</b></div><div><span>Рынки</span><b>Россия, СНГ, Европа</b></div></div></div>
+      <div class="ph rv"><img decoding="async" src="img/buttons.webp" alt="Пришивание пуговиц" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. FULL CYCLE ============ -->
+<section class="navy band on-navy sec" id="cycle">
+  <div class="inner">
+    <div class="cyc-head">
+      <div class="head__t rv"><span class="eyebrow">Полный цикл</span><h2 class="h2">10 этапов производства</h2><p class="lead">Один подрядчик вместо нескольких. Вы передаёте техзадание и получаете готовую партию.</p></div>
+      <div class="cyc-ctrl rv"><button class="arrow" id="aPrev" aria-label="Предыдущий этап"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 9H3M7 5L3 9l4 4"/></svg></button><span id="aCount">01 / 10</span><button class="arrow" id="aNext" aria-label="Следующий этап"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9h12M11 5l4 4-4 4"/></svg></button></div>
+    </div>
+    <div class="acc rv" id="acc">
+      <article class="acc__it on" tabindex="0" role="button" aria-expanded="true"><img decoding="async" src="img/yarn-machine.webp" alt="" loading="lazy"><span class="acc__no">01</span><span class="acc__v">Производство ткани</span><div class="acc__body"><h3>Производство ткани</h3><p>Производим ткань и вяжем трикотажное полотно на собственном оборудовании.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/fabric-dye.webp" alt="" loading="lazy" style="object-position:50% 70%"><span class="acc__no">02</span><span class="acc__v">Окрашивание и отделка</span><div class="acc__body"><h3>Окрашивание и отделка</h3><p>Окрашиваем и отделываем полотно под требования модели.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/sampling.webp" alt="" loading="lazy"><span class="acc__no">03</span><span class="acc__v">Разработка изделия</span><div class="acc__body"><h3>Разработка изделия</h3><p>Конструирование, лекала и образцы. Готовим модель к серийному запуску.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/factory-wide.webp" alt="" loading="lazy" style="object-position:30% 50%"><span class="acc__no">04</span><span class="acc__v">Раскрой ткани</span><div class="acc__body"><h3>Раскрой ткани</h3><p>Раскраиваем полотно по утверждённым лекалам для партий от 1 000 единиц на модель.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/embroidery.webp" alt="" loading="lazy"><span class="acc__no">05</span><span class="acc__v">Печать и вышивка</span><div class="acc__body"><h3>Печать и вышивка</h3><p>Наносим принты и вышивку на детали кроя до пошива.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/sewing-line.webp" alt="" loading="lazy"><span class="acc__no">06</span><span class="acc__v">Швейное производство</span><div class="acc__body"><h3>Швейное производство</h3><p>20 швейных линий и более 600 единиц оборудования.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/seam.webp" alt="" loading="lazy"><span class="acc__no">07</span><span class="acc__v">ВТО и отделка</span><div class="acc__body"><h3>ВТО и финишная отделка</h3><p>Влажно-тепловая обработка придаёт изделию форму и товарный вид.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/tshirts.webp" alt="" loading="lazy"><span class="acc__no">08</span><span class="acc__v">Маркировка и упаковка</span><div class="acc__body"><h3>Маркировка и упаковка</h3><p>Маркируем и упаковываем по требованиям заказчика.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/fabric-store.webp" alt="" loading="lazy"><span class="acc__no">09</span><span class="acc__v">Складирование</span><div class="acc__body"><h3>Складирование</h3><p>Храним готовую продукцию на складе фабрики до отгрузки.</p></div><span class="acc__bar"></span></article>
+      <article class="acc__it" tabindex="0" role="button" aria-expanded="false"><img decoding="async" src="img/logistics.webp" alt="" loading="lazy" style="object-position:35% 50%"><span class="acc__no">10</span><span class="acc__v">Логистика</span><div class="acc__body"><h3>Логистика и продажа</h3><p>Отгружаем партии в Россию, страны СНГ и Европу.</p></div><span class="acc__bar"></span></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. PRODUCTS ============ -->
+<section class="sec wrap" id="products">
+  <div class="inner">
+    <div class="head">
+      <div class="head__t rv"><span class="eyebrow">Продукция</span><h2 class="h2">Что мы производим</h2></div>
+      <p class="lead rv">Шьём одежду под собственным брендом и по заказам партнёров: private label и контрактное производство по техзаданию клиента.</p>
+    </div>
+    <div class="grid g3">
+      <article class="card pcard rv"><div class="ph"><img decoding="async" src="img/knitwear.webp" alt="Трикотажные изделия" loading="lazy"></div><div class="pcard__b"><h3>Трикотажные изделия</h3><p>Из собственного полотна: вяжем, красим и шьём на одной площадке.</p><div class="chips"><span>Футболки</span><span>Худи</span><span>Костюмы</span><span>Боди</span></div></div></article>
+      <article class="card pcard rv"><div class="ph"><img decoding="async" src="img/denim.webp" alt="Тканые изделия" loading="lazy"></div><div class="pcard__b"><h3>Тканые изделия</h3><p>Из собственной ткани или материалов заказчика.</p><div class="chips"><span>Брюки</span><span>Рубашки</span><span>Платья</span><span>Деним</span></div></div></article>
+      <article class="card pcard rv"><div class="ph"><img decoding="async" src="img/kids-outer.webp" alt="Верхняя одежда" loading="lazy" style="object-position:50% 25%"></div><div class="pcard__b"><h3>Верхняя одежда</h3><p>Куртки и жилеты для детей и взрослых.</p><div class="chips"><span>Куртки</span><span>Жилеты</span><span>Демисезонные</span></div></div></article>
+    </div>
+    <div class="grid g4" style="margin-top:var(--gap)">
+      <div class="card seg rv"><b>Детская</b><span>Одежда для детей и подростков</span></div>
+      <div class="card seg rv"><b>Ясельная</b><span>Для новорождённых и малышей</span></div>
+      <div class="card seg rv"><b>Взрослая</b><span>Базовые и сезонные коллекции</span></div>
+      <div class="card seg seg--navy rv"><b>Гибкость по материалам</b><span>Шьём из собственного полотна или из ткани заказчика</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. ADVANTAGES ============ -->
+<section class="sec wrap" style="padding-top:0" id="why">
+  <div class="inner adv">
+    <div class="adv__side">
+      <div class="head__t rv"><span class="eyebrow">Почему Daud Textile</span><h2 class="h2">Пять причин заказать производство у нас</h2></div>
+      <div class="ph rv"><img decoding="async" src="img/threading.webp" alt="Швея заправляет нить в швейную машину" loading="lazy"></div>
+    </div>
+    <ol class="adv__list">
+      <li class="card adv__item rv"><span class="adv__num">01</span><div><h3>Полный цикл на одной фабрике</h3><p>Не нужно искать отдельно поставщика полотна, красильню, цех печати и швейное производство. Один подрядчик отвечает за сроки и качество на всех этапах.</p></div></li>
+      <li class="card adv__item rv"><span class="adv__num">02</span><div><h3>Собственное ткацкое и трикотажное производство</h3><p>Контролируем состав и качество полотна с самого начала и не зависим от сторонних поставщиков.</p></div></li>
+      <li class="card adv__item rv"><span class="adv__num">03</span><div><h3>Одежда для взрослых, детей и младенцев</h3><p>Включая верхнюю одежду. Заказы по разным категориям можно разместить на одной фабрике.</p></div></li>
+      <li class="card adv__item rv"><span class="adv__num">04</span><div><h3>Собственный бренд и контрактное производство</h3><p>Мы сами продаём одежду под своим брендом, поэтому хорошо знаем требования розницы и маркетплейсов к качеству, маркировке и упаковке.</p></div></li>
+      <li class="card adv__item rv"><span class="adv__num">05</span><div><h3>Мощности для крупных оптовых заказов</h3><p>До 25 000 изделий в сутки и до 650 000 в месяц. Средний срок выполнения заказа — 35–40 дней.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 6. QUALITY ============ -->
+<section class="navy band on-navy sec" id="quality">
+  <div class="inner">
+    <div class="head">
+      <div class="head__t rv"><span class="eyebrow">Качество и безопасность</span><h2 class="h2">Контроль на каждом этапе производства</h2></div>
+      <p class="lead rv">Собственный отдел контроля качества проверяет сырьё, операции на линиях и готовые изделия перед отгрузкой.</p>
+    </div>
+    <div class="grid q-top">
+      <div class="ph rv"><img decoding="async" src="img/sewing-row.webp" alt="Швейные машины на производственной линии" loading="lazy"></div>
+      <div class="qcard rv">
+        <h3>Безопасность детской одежды</h3>
+        <ul class="checks" id="checks">
+          <li><span class="ck"><svg viewBox="0 0 14 14" fill="none" stroke="#1A2D4A" stroke-width="2"><path d="M3 7.2l2.6 2.6L11 4.4"/></svg></span>Состав и качество материалов</li>
+          <li><span class="ck"><svg viewBox="0 0 14 14" fill="none" stroke="#1A2D4A" stroke-width="2"><path d="M3 7.2l2.6 2.6L11 4.4"/></svg></span>Прочность швов</li>
+          <li><span class="ck"><svg viewBox="0 0 14 14" fill="none" stroke="#1A2D4A" stroke-width="2"><path d="M3 7.2l2.6 2.6L11 4.4"/></svg></span>Надёжность крепления пуговиц и фурнитуры</li>
+          <li><span class="ck"><svg viewBox="0 0 14 14" fill="none" stroke="#1A2D4A" stroke-width="2"><path d="M3 7.2l2.6 2.6L11 4.4"/></svg></span>Отсутствие острых элементов и дефектов</li>
+          <li><span class="ck"><svg viewBox="0 0 14 14" fill="none" stroke="#1A2D4A" stroke-width="2"><path d="M3 7.2l2.6 2.6L11 4.4"/></svg></span>Лабораторные испытания на вредные вещества по запросу</li>
+        </ul>
+      </div>
+    </div>
+    <div class="grid g4 otk" style="margin-top:var(--gap)">
+      <div class="qcard rv"><span class="otk__n">1</span><div><b>Сырьё и ткань</b><span>Входной контроль пряжи и полотна</span></div></div>
+      <div class="qcard rv"><span class="otk__n">2</span><div><b>Пошив</b><span>Проверка операций на линиях</span></div></div>
+      <div class="qcard rv"><span class="otk__n">3</span><div><b>Готовые изделия</b><span>Размеры, посадка, внешний вид</span></div></div>
+      <div class="qcard rv"><span class="otk__n">4</span><div><b>Перед отгрузкой</b><span>Комплектность, маркировка, упаковка</span></div></div>
+    </div>
+    <div class="grid g3 certs" style="margin-top:var(--gap)">
+      <div class="card cert rv"><span class="cert__ic"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="13" cy="11" r="7"/><path d="M9 17l-2 7 6-3 6 3-2-7"/></svg></span><div><b>ISO 9001</b><span>Система менеджмента качества</span></div></div>
+      <div class="card cert rv"><span class="cert__ic"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 20C6 11 12 5 21 5c0 9-6 15-15 15z"/><path d="M6 20l8-8"/></svg></span><div><b>ISO 14001</b><span>Экологический менеджмент</span></div></div>
+      <div class="card cert rv"><span class="cert__ic"><svg viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 3l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V6z"/><path d="M9.5 13l2.5 2.5 4.5-4.5"/></svg></span><div><b>OEKO-TEX® Standard 100</b><span>Текстиль проверен на вредные вещества</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. PARTNERS ============ -->
+<section class="sec partners" id="partners">
+  <div class="wrap"><div class="inner head">
+    <div class="head__t rv"><span class="eyebrow">Партнёры</span><h2 class="h2">Нам доверяют ритейлеры и бренды</h2></div>
+    <p class="lead rv">Производим одежду для федеральных сетей, брендов и продавцов маркетплейсов.</p>
+  </div></div>
+  <div class="prow" data-dir="-1">
+    <div class="plate"><span class="tx"><span>Gloria Jeans</span><span>Gloria Jeans</span></span></div>
+    <div class="plate"><span class="tx"><span>Wildberries</span><span>Wildberries</span></span></div>
+    <div class="plate"><span class="tx"><span>Ozon</span><span>Ozon</span></span></div>
+    <div class="plate"><span class="tx"><span>X5 Доставка</span><span>X5 Доставка</span></span></div>
+    <div class="plate"><span class="tx"><span>Модис</span><span>Модис</span></span></div>
+    <div class="plate"><span class="tx"><span>Батик</span><span>Батик</span></span></div>
+  </div>
+  <div class="prow" data-dir="1">
+    <div class="plate"><span class="tx"><span>Сбермаркет</span><span>Сбермаркет</span></span></div>
+    <div class="plate"><span class="tx"><span>Palloncino</span><span>Palloncino</span></span></div>
+    <div class="plate"><span class="tx"><span>Furia</span><span>Furia</span></span></div>
+    <div class="plate"><span class="tx"><span>Ремингтон</span><span>Ремингтон</span></span></div>
+    <div class="plate"><span class="tx"><span>Охана маркет</span><span>Охана маркет</span></span></div>
+    <div class="plate"><span class="tx"><span>RSG</span><span>RSG</span></span></div>
+  </div>
+</section>
+
+<!-- ============ 7b. GEOGRAPHY ============ -->
+<section class="sec wrap" id="geo" style="padding-top:0">
+  <div class="inner">
+    <div class="head">
+      <div class="head__t rv"><span class="eyebrow">География поставок</span><h2 class="h2">Из Ташкента в Россию,<br>СНГ и Европу</h2></div>
+      <p class="lead rv">Отгружаем готовые партии партнёрам на внутреннем и международных рынках. Складирование и логистика входят в полный цикл производства.</p>
+    </div>
+    <div class="geo3">
+      <div class="gcard rv">
+        <span class="gcard__k">Направления поставок</span>
+        <ol class="gl" id="gl"><li class="rv" data-r="ru" tabindex="0"><span class="gl__n">01</span><div><b>Россия</b><span>Федеральные сети и маркетплейсы</span></div><em>≈ 2 800 км</em></li><li class="rv" data-r="cis" tabindex="0"><span class="gl__n">02</span><div><b>Страны СНГ</b><span>Оптовые покупатели и бренды</span></div><em>ближнее зарубежье</em></li><li class="rv" data-r="eu" tabindex="0"><span class="gl__n">03</span><div><b>Европа</b><span>И другие международные рынки</span></div><em>≈ 4 300 км</em></li></ol>
+        <div class="gcard__foot"><span class="gcard__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7h13v12h-13zM15.5 11h5l4 4v4h-9"/><circle cx="7" cy="21" r="2.2"/><circle cx="20" cy="21" r="2.2"/></svg></span><p>Отгружаем партии от 1 000 единиц на модель. Расстояния указаны по прямой от фабрики.</p></div>
+      </div>
+      <div class="gmap rv" id="gmap">
+        <div class="gmap__in">
+          <img src="img/dotmap-light.png" alt="" width="1800" height="1061" loading="lazy" decoding="async">
+          <svg viewBox="0 0 1800 1061" aria-hidden="true"><g class="grat"><line x1="208" y1="0" x2="208" y2="943"/><line x1="398" y1="0" x2="398" y2="943"/><line x1="587" y1="0" x2="587" y2="943"/><line x1="777" y1="0" x2="777" y2="943"/><line x1="966" y1="0" x2="966" y2="943"/><line x1="1156" y1="0" x2="1156" y2="943"/><line x1="1345" y1="0" x2="1345" y2="943"/><line x1="1535" y1="0" x2="1535" y2="943"/><line x1="1724" y1="0" x2="1724" y2="943"/><line x1="0" y1="796" x2="1800" y2="796"/><line x1="0" y1="501" x2="1800" y2="501"/><line x1="0" y1="206" x2="1800" y2="206"/></g><g class="r r-ru" style="--d:0.25s"><path class="r__line" d="M1520,758 Q1306,425 921,332" pathLength="1"/><circle class="r__dot" r="6"><animateMotion dur="5.5s" repeatCount="indefinite" path="M1520,758 Q1306,425 921,332"/></circle><circle class="r__end" cx="921" cy="332" r="8"/></g><g class="r r-cis" style="--d:0.60s"><path class="r__line" d="M1520,758 Q1468,602 1561,466" pathLength="1"/><circle class="r__dot" r="6"><animateMotion dur="4s" repeatCount="indefinite" path="M1520,758 Q1468,602 1561,466"/></circle><circle class="r__end" cx="1561" cy="466" r="8"/></g><g class="r r-eu" style="--d:0.95s"><path class="r__line" d="M1520,758 Q1042,462 481,498" pathLength="1"/><circle class="r__dot" r="6"><animateMotion dur="7s" repeatCount="indefinite" path="M1520,758 Q1042,462 481,498"/></circle><circle class="r__end" cx="481" cy="498" r="8"/></g><g class="home" transform="translate(1520 758)"><circle class="home__ring" r="26"/><circle r="12" fill="#315383"/><circle r="4.5" fill="#fff"/></g></svg>
+          <div class="g-lbl g-tl r-ru" style="left:51.17%;top:31.29%"><span class="g-n">01</span><div><b>Россия</b><span>≈ 2 800 км</span></div></div><div class="g-lbl g-t r-cis" style="left:86.72%;top:43.92%"><span class="g-n">02</span><div><b>Страны СНГ</b><span>ближнее зарубежье</span></div></div><div class="g-lbl g-t r-eu" style="left:26.72%;top:46.94%"><span class="g-n">03</span><div><b>Европа</b><span>≈ 4 300 км</span></div></div>
+          <div class="g-home" style="left:84.44%;top:71.44%"><span class="g-n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 21V10l5 3V10l5 3V10l5 3V5h3v16z"/><path d="M7 17h2M12 17h2M17 17h1"/></svg></span><div><b>Ташкент</b><span>Фабрика Daud Textile</span></div></div>
+          
+        </div>
+        <div class="gmap__legend"><span><i class="lg-line"></i>Маршрут поставки</span><span><i class="lg-uz"></i>Узбекистан</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. PROCESS ============ -->
+<section class="sec wrap" style="padding-top:0" id="process">
+  <div class="inner">
+    <div class="head">
+      <div class="head__t rv"><span class="eyebrow">Как работаем</span><h2 class="h2">Шесть шагов к готовой партии</h2></div>
+      <p class="lead rv">Средний срок выполнения заказа — 35–40 дней в зависимости от объёма.</p>
+    </div>
+    <div class="grid g3" id="steps">
+      <div class="card step rv"><div class="step__top"><span class="step__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H8a2 2 0 00-2 2v18a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M16 3v6h6M10 15h8M10 19h5"/></svg></span><span class="step__no">Шаг 01</span></div><div><h3>Заявка и техзадание</h3><p>Изучаем ТЗ, эскизы или образец изделия.</p></div></div>
+      <div class="card step rv"><div class="step__top"><span class="step__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="16" height="22" rx="2.5"/><path d="M10 7.5h8M10 13h.01M14 13h.01M18 13h.01M10 17h.01M14 17h.01M18 17v4M10 21h.01M14 21h.01"/></svg></span><span class="step__no">Шаг 02</span></div><div><h3>Расчёт и согласование</h3><p>Считаем стоимость и сроки, согласуем объём заказа.</p></div></div>
+      <div class="card step rv"><div class="step__top"><span class="step__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8a2.5 2.5 0 112.5-2.5"/><path d="M14 8v2L3.5 18.5A1.5 1.5 0 004.4 21h19.2a1.5 1.5 0 00.9-2.5L14 10"/></svg></span><span class="step__no">Шаг 03</span></div><div><h3>Образец и материалы</h3><p>Утверждаем образец, ткани и фурнитуру.</p></div></div>
+      <div class="card step rv"><div class="step__top"><span class="step__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="20.5" r="3"/><circle cx="7.5" cy="7.5" r="3"/><path d="M10 9l14 11M10 19L24 8"/></svg></span><span class="step__no">Шаг 04</span></div><div><h3>Запуск производства</h3><p>Раскрой, печать или вышивка, пошив.</p></div></div>
+      <div class="card step rv"><div class="step__top"><span class="step__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3l9 3.5v6.5c0 5.5-3.8 9.8-9 12-5.2-2.2-9-6.5-9-12V6.5z"/><path d="M10 14l3 3 5.5-5.5"/></svg></span><span class="step__no">Шаг 05</span></div><div><h3>Контроль качества</h3><p>ОТК проверяет каждую партию готовых изделий.</p></div></div>
+      <div class="card step rv"><div class="step__top"><span class="step__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7h13v12h-13zM15.5 11h5l4 4v4h-9"/><circle cx="7" cy="21" r="2.2"/><circle cx="20" cy="21" r="2.2"/></svg></span><span class="step__no">Шаг 06</span></div><div><h3>Упаковка и отгрузка</h3><p>Маркируем, упаковываем и отгружаем партию.</p></div></div>
+    </div>
+    <div class="grid g3 conds">
+      <div class="card cond navy rv"><span class="cond__l">Минимальный тираж</span><div class="cond__v">1 000<small>ед. на модель</small></div></div>
+      <div class="card cond navy rv"><span class="cond__l">Средний срок</span><div class="cond__v">35–40<small>дней</small></div></div>
+      <div class="card cond need rv"><h3>Что нужно для старта</h3><ul><li>Техзадание</li><li>Дизайн или образец</li><li>Материалы и фурнитура</li><li>Размерная сетка</li><li>Объём заказа</li><li>Маркировка и упаковка</li></ul><p>Нет готового ТЗ? Поможем разработать модель и подобрать материалы.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. INSIDE ============ -->
+<section id="inside">
+  <div class="wrap"><div class="inner head">
+    <div class="head__t rv"><span class="eyebrow">Производство изнутри</span><h2 class="h2">Посмотрите, как устроена фабрика</h2></div>
+    <p class="lead rv">Цеха, склад и оборудование на одной площадке в Ташкентской области.</p>
+  </div></div>
+  <div class="xp" id="xp">
+    <div class="xp__stage" id="xpStage">
+      <div class="xp__side s1"><img decoding="async" src="img/cones.webp" alt="Бобины пряжи" loading="lazy"></div>
+      <div class="xp__side s2"><img decoding="async" src="img/embroidery.webp" alt="Вышивальный участок" loading="lazy"></div>
+      <div class="xp__side s3"><img decoding="async" src="img/fabric-dye.webp" alt="Окрашенные ткани" loading="lazy"></div>
+      <div class="xp__side s4"><img decoding="async" src="img/sampling.webp" alt="Разработка образца" loading="lazy"></div>
+      <div class="xp__frame" id="xpFrame">
+        <img decoding="async" src="img/sewing-line.webp" alt="Швейный цех Daud Textile" loading="lazy">
+        <div class="xp__in">
+          <div class="xp__txt"><span class="eyebrow">Фабрика изнутри</span><h3>Всё производство под одной крышей</h3><p>Пряжа, полотно, окрашивание, раскрой, печать, пошив и упаковка проходят на одной площадке в Ташкентской области.</p><a class="btn btn--white" href="#request">Записаться на экскурсию</a></div>
+          <div class="xp__stats"><div><b>12 000 м²</b><span>производственных площадей</span></div><div><b>20</b><span>швейных линий</span></div><div><b>600+</b><span>единиц оборудования</span></div><div><b>1 400</b><span>сотрудников</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap"><div class="inner">
+    <div class="visit2 rv">
+      <img decoding="async" src="img/factory-wide.webp" alt="" loading="lazy">
+      <div class="visit2__body">
+        <div><span class="eyebrow">Визит на фабрику</span><h2>Приезжайте посмотреть производство лично</h2><p>Принимаем действующих и будущих партнёров на экскурсии и аудиты. Дату, цель визита и требования согласуем заранее.</p></div>
+        <ul class="vlist">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>Экскурсия по цехам</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/></svg>Аудит производства</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3L4 5.5l1.5 4L7.5 9V21h9V9l2 .5 1.5-4L15 3c-.5 1.5-1.7 2.5-3 2.5S9.5 4.5 9 3z"/></svg>Знакомство с образцами и материалами</li>
+        </ul>
+        <div class="visit2__btns"><a class="btn btn--white" href="#request">Запланировать визит</a><span>Ташкентская область, Букинский район</span></div>
+      </div>
+      <div class="visit2__side">
+        <a class="rot" href="#request" aria-label="Оставить заявку на визит">
+          <svg class="ring" viewBox="0 0 160 160" aria-hidden="true"><defs><path id="circ" d="M80,80 m-62,0 a62,62 0 1,1 124,0 a62,62 0 1,1 -124,0"/></defs><text><textPath href="#circ">Экскурсии · Аудиты · Daud Textile ·</textPath></text></svg>
+          <span class="rot__c"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h11M9 4l4 4-4 4"/></svg></span>
+        </a>
+        <div class="vcard"><b>12 000 м²</b><span>производственных площадей открыты для визитов партнёров</span></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ 10. REQUEST ============ -->
+<section class="sec wrap" id="request">
+  <div class="inner">
+    <div class="rq">
+      <div class="rq__l navy on-navy rv">
+        <div><span class="eyebrow">Заявка</span><h2>Рассчитаем стоимость и сроки вашего заказа</h2><p>Оставьте контакты и кратко опишите заказ. Менеджер свяжется с вами в течение рабочего дня.</p></div>
+        <ul class="perks">
+          <li><span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.3l3 3L13 4.5"/></svg></span>Расчёт стоимости и сроков</li>
+          <li><span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.3l3 3L13 4.5"/></svg></span>Помощь с моделью и образцом</li>
+          <li><span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.3l3 3L13 4.5"/></svg></span>Подбор материалов под бюджет</li>
+        </ul>
+        <div class="mgr"><span class="mgr__ic"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 3h3l1.5 4-2 1.2a9 9 0 004.3 4.3L12 10.5l4 1.5v3a2 2 0 01-2 2A13 13 0 012 5a2 2 0 012-2z"/></svg></span><div><a href="tel:+998909655557" style="display:block;text-decoration:none;font-weight:500;font-size:18px">+998 90 965 55 57</a><span>Отдел продаж, Telegram и WhatsApp</span></div></div>
+      </div>
+      <div class="rq__r rv" id="formBox">
+        <form class="form" id="reqForm" novalidate>
+          <div class="frow">
+            <div class="fl"><input id="f-name" type="text" placeholder=" " required autocomplete="name"><label for="f-name">Имя*</label></div>
+            <div class="fl"><input id="f-phone" type="tel" placeholder=" " required autocomplete="tel"><label for="f-phone">Телефон*</label></div>
+            <div class="fl"><input id="f-company" type="text" placeholder=" " autocomplete="organization"><label for="f-company">Компания или бренд</label></div>
+          </div>
+          <fieldset class="fgroup"><legend>Что нужно произвести</legend>
+            <div class="opts">
+              <input type="checkbox" id="c1"><label for="c1">Трикотаж</label>
+              <input type="checkbox" id="c2"><label for="c2">Тканые изделия</label>
+              <input type="checkbox" id="c3"><label for="c3">Верхняя одежда</label>
+              <input type="checkbox" id="c4"><label for="c4">Детская</label>
+              <input type="checkbox" id="c5"><label for="c5">Ясельная</label>
+              <input type="checkbox" id="c6"><label for="c6">Взрослая</label>
+            </div>
+          </fieldset>
+          <fieldset class="fgroup"><legend>Объём заказа</legend>
+            <div class="opts">
+              <input type="radio" name="vol" id="v1"><label for="v1">1 000 – 5 000</label>
+              <input type="radio" name="vol" id="v2"><label for="v2">5 000 – 20 000</label>
+              <input type="radio" name="vol" id="v3"><label for="v3">20 000 – 100 000</label>
+              <input type="radio" name="vol" id="v4"><label for="v4">Более 100 000</label>
+            </div>
+          </fieldset>
+          <div class="fl"><textarea id="f-desc" placeholder=" " rows="2"></textarea><label for="f-desc">Комментарий к заказу</label></div>
+          <div class="ffoot">
+            <label class="consent" for="f-ok"><input type="checkbox" id="f-ok" required checked><span>Я согласен на обработку персональных данных</span></label>
+            <button class="btn btn--navy btn-ar btn-big" type="submit">Отправить заявку <span class="ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h11M9 4l4 4-4 4"/></svg></span></button>
+          </div>
+        </form>
+        <div class="done" id="done" hidden>
+          <span class="done__ic"><svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="2.4"><path d="M7 15.5l5.5 5.5L23 10"/></svg></span>
+          <b>Заявка отправлена</b>
+          <p>Спасибо! Менеджер свяжется с вами, уточнит детали и пришлёт расчёт. Это демо-версия формы: на макете данные никуда не отправляются.</p>
+          <button class="btn btn--navy" type="button" id="again" style="justify-self:start">Новая заявка</button>
+        </div>
+      </div>
+    </div>
+    <div class="grid g3 contacts" id="contacts">
+      <div class="card rv"><h3>Телефон</h3><div class="cline"><a class="v" href="tel:+998909655557">+998 90 965 55 57</a><button class="copy" data-copy="+998909655557">Копировать</button></div><div class="msg"><a href="https://t.me/+998909655557" target="_blank" rel="noopener">Telegram</a><a href="https://wa.me/998909655557" target="_blank" rel="noopener">WhatsApp</a></div></div>
+      <div class="card rv"><h3>Email</h3><div class="cline"><a class="v" href="mailto:daudtextileuz@gmail.com">daudtextileuz@gmail.com</a><button class="copy" data-copy="daudtextileuz@gmail.com">Копировать</button></div></div>
+      <div class="card rv"><h3>Адреса</h3><div class="addr"><span>Офис</span><span>г. Ташкент, Янгихаётский район, МФЙ Файзли, ул. Райхон, 107</span></div><div class="addr"><span>Фабрика</span><span>Ташкентская область, Букинский район, МФЙ Эзгулик, ул. Шодлик, 71</span></div></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot navy on-navy wrap">
+  <div class="inner">
+    <div class="ft-cta rv">
+      <div class="ft-cta__l"><span class="ft-cta__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 01-12.4 7.6L3 21l1.4-5.4A8.5 8.5 0 1121 12z"/><path d="M8.5 10.5h7M8.5 14h4.5"/></svg></span><div><h2>Обсудим ваш заказ?</h2><p>Рассчитаем стоимость и сроки, поможем с моделью и материалами.</p></div></div>
+      <div class="ft-cta__r">
+        <a class="ft-phone" href="tel:+998909655557"><b>+998 90 965 55 57</b><span>Отдел продаж, Telegram и WhatsApp</span></a>
+        <a class="btn btn--white btn-ar" href="#request">Оставить заявку <span class="ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h11M9 4l4 4-4 4"/></svg></span></a>
+      </div>
+    </div>
+    <div class="ft-grid">
+      <div class="ft-col ft-brand rv"><img src="img/logo-white.png" alt="Daud Textile" width="140" height="54" loading="lazy" decoding="async"><p>Производство одежды полного цикла в Узбекистане с 2012 года.</p></div>
+      <div class="ft-col rv"><h4>Разделы</h4><ul><li><a href="#about">О фабрике</a></li><li><a href="#cycle">Полный цикл</a></li><li><a href="#products">Продукция</a></li><li><a href="#quality">Качество</a></li><li><a href="#process">Как работаем</a></li></ul></div>
+      <div class="ft-col rv"><h4>Связаться</h4><ul><li><span>Телефон</span><a href="tel:+998909655557">+998 90 965 55 57</a></li><li><span>Email</span><a href="mailto:daudtextileuz@gmail.com">daudtextileuz@gmail.com</a></li><li><span>Мессенджеры</span><a href="https://t.me/+998909655557" target="_blank" rel="noopener">Telegram</a> · <a href="https://wa.me/998909655557" target="_blank" rel="noopener">WhatsApp</a></li></ul></div>
+      <div class="ft-col rv"><h4>Адреса</h4><ul><li><span>Офис</span><p>г. Ташкент, Янгихаётский район, ул. Райхон, 107</p></li><li><span>Фабрика</span><p>Ташкентская область, Букинский район, ул. Шодлик, 71</p></li></ul></div>
+      <a class="ft-shop rv" href="https://daudtextile.com" target="_blank" rel="noopener"><img decoding="async" src="img/knitwear.webp" alt="" loading="lazy"><div class="ft-shop__top"><span class="ft-shop__tag">daudtextile.com</span><span class="ft-shop__ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8h11M9 4l4 4-4 4"/></svg></span></div><div><b>Интернет-магазин</b><small>Детская и взрослая одежда нашего бренда</small></div></a>
+    </div>
+    <div class="ft-bot"><span>© 2012–2026 Daud Textile. Производство одежды полного цикла</span><div class="ft-certs"><i>ISO 9001</i><i>ISO 14001</i><i>OEKO-TEX® 100</i></div><a class="totop" href="#top">Наверх <i><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 13V3M4 7l4-4 4 4"/></svg></i></a></div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  const RM=matchMedia('(prefers-reduced-motion: reduce)').matches, IO='IntersectionObserver' in window;
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+  /* menu */
+  const burger=$('#burger'),menu=$('#menu');
+  const setMenu=o=>{menu.classList.toggle('open',o);document.body.classList.toggle('menu-open',o);burger.setAttribute('aria-expanded',o);menu.setAttribute('aria-hidden',!o);burger.setAttribute('aria-label',o?'Закрыть меню':'Открыть меню');burger.firstChild.textContent=o?'Закрыть ':'Меню '};
+  burger.addEventListener('click',()=>setMenu(!menu.classList.contains('open')));
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setMenu(false)));
+
+  /* reveal: soft fade-up for blocks below the first screen; class is dropped afterwards so hovers keep their own transitions */
+  $$('.prow,.statement,.vlist li,.perks li,.visit2__side,.frow,.fgroup,.ffoot,.mgr,.cyc-ctrl').forEach(el=>el.classList.add('rv'));
+  const rvs=$$('.rv');
+  if(!RM&&IO){
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;io.unobserve(el);el.classList.remove('pre');setTimeout(()=>{el.classList.remove('rv');el.style.transitionDelay=''},1300)}),{rootMargin:'0px 0px -8% 0px'});
+    rvs.forEach(el=>{if(el.getBoundingClientRect().top>innerHeight*.95){el.classList.add('pre');const sib=[...el.parentElement.children].filter(c=>c.classList.contains('rv'));el.style.transitionDelay=(Math.min(Math.max(sib.indexOf(el),0),5)*80)+'ms';io.observe(el)}else el.classList.remove('rv')});
+  }else rvs.forEach(el=>el.classList.remove('rv'));
+
+  /* counters */
+  const fmt=n=>Math.round(n).toLocaleString('ru-RU').replace(/ /g,' ');
+  const count=el=>{const to=+el.dataset.count,t0=performance.now(),d=1600;const tick=t=>{const p=Math.min(1,(t-t0)/d);el.textContent=fmt(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)};
+  if(!RM&&IO){$$('[data-count]').forEach(el=>{const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();count(el)}},{threshold:.6});o.observe(el)})}
+
+  /* one-shot sequences */
+  const once=(el,fn,th=.3)=>{if(!el)return;if(RM||!IO){fn();return}const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();fn()}},{threshold:th});o.observe(el)};
+  once($('#steps'),()=>$$('#steps .step').forEach((s,i)=>setTimeout(()=>s.classList.add('on'),RM?0:i*350)));
+  once($('#checks'),()=>$$('#checks li').forEach((li,i)=>setTimeout(()=>li.classList.add('ok'),RM?0:200+i*350)));
+
+  /* nav hover indicator */
+  const nav=$('#nav'),ind=$('#navInd');
+  if(nav){const links=[...nav.querySelectorAll('a')];
+    links.forEach(a=>a.addEventListener('mouseenter',()=>{ind.style.width=a.offsetWidth+'px';ind.style.transform='translateX('+a.offsetLeft+'px)';ind.style.opacity=1;links.forEach(x=>x.classList.toggle('hov',x===a))}));
+    nav.addEventListener('mouseleave',()=>{ind.style.opacity=0;links.forEach(x=>x.classList.remove('hov'))});}
+
+  /* statement: words light up as you scroll */
+  const stEl=$('#statement');
+  stEl.innerHTML=stEl.textContent.trim().split(/\s+/).map(w=>'<span class="w">'+w+'</span>').join(' ');
+  const ws=[...stEl.querySelectorAll('.w')];
+  if(RM)ws.forEach(w=>w.classList.add('on'));
+
+  /* about bars */
+  const bars=$('#abBars');
+  if(!RM&&IO&&bars.getBoundingClientRect().top>innerHeight){bars.classList.add('pre-b');once(bars,()=>bars.classList.remove('pre-b'),.5)}
+
+  /* cycle accordion */
+  const acc=$('#acc'),its=[...acc.querySelectorAll('.acc__it')],aCount=$('#aCount');let ai=0;
+  const setA=i=>{ai=(i+its.length)%its.length;its.forEach((it,k)=>{it.classList.toggle('on',k===ai);it.setAttribute('aria-expanded',k===ai)});aCount.textContent=String(ai+1).padStart(2,'0')+' / 10'};
+  its.forEach((it,i)=>{
+    it.addEventListener('click',()=>{if(i!==ai)setA(i)});
+    it.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setA(i)}});
+    it.querySelector('.acc__bar').addEventListener('animationend',()=>{if(!RM&&i===ai)setA(i+1)});
+  });
+  $('#aPrev').addEventListener('click',()=>setA(ai-1));
+  $('#aNext').addEventListener('click',()=>setA(ai+1));
+  if(RM)acc.classList.add('paused');
+  else{acc.classList.add('paused');once(acc,()=>acc.classList.remove('paused'),.4);
+    acc.addEventListener('mouseenter',()=>acc.classList.add('paused'));acc.addEventListener('mouseleave',()=>acc.classList.remove('paused'));}
+
+  const hw=$('#hdrWrap');let tk=false;
+  const onScroll=()=>{tk=false;const vh=innerHeight;hw.classList.toggle('shadow',scrollY>10);
+    if(!RM){const r=stEl.getBoundingClientRect();const p=Math.max(0,Math.min(1,(vh*.85-r.top)/(r.height+vh*.3)));const n=Math.round(p*ws.length);ws.forEach((w,k)=>w.classList.toggle('on',k<n))}};
+  addEventListener('scroll',()=>{if(!tk){tk=true;requestAnimationFrame(onScroll)}},{passive:true});
+  addEventListener('resize',onScroll);onScroll();
+
+  /* accordion: open on hover (desktop) */
+  if(matchMedia('(hover:hover) and (min-width:901px)').matches){its.forEach((it,i)=>it.addEventListener('mouseenter',()=>{if(i!==ai)setA(i)}))}
+
+  /* partners: two rows drifting in opposite directions, slow down on hover */
+  const rows=$$('.prow');
+  rows.forEach(row=>{[...row.children].forEach(k=>{const c=k.cloneNode(true);c.setAttribute('aria-hidden','true');row.appendChild(c)});
+    row.querySelectorAll('.plate').forEach(p=>['pointerenter','pointerleave'].forEach(ev=>p.addEventListener(ev,e=>{const r=p.getBoundingClientRect();p.style.setProperty('--mx',(e.clientX-r.left)+'px');p.style.setProperty('--my',(e.clientY-r.top)+'px')})))});
+  if(!RM){
+    const S=rows.map(r=>({r,dir:+r.dataset.dir,x:0,v:1,t:1}));
+    const measure=()=>S.forEach(s=>{s.P=(s.r.scrollWidth+parseFloat(getComputedStyle(s.r).columnGap||16))/2});measure();addEventListener('resize',measure);
+    let pvis=true;if(IO)new IntersectionObserver(es=>{pvis=es[0].isIntersecting},{rootMargin:'100px'}).observe($('#partners'));
+    S.forEach(s=>{if(s.dir>0)s.x=-s.P;s.r.addEventListener('mouseenter',()=>s.t=.12);s.r.addEventListener('mouseleave',()=>s.t=1)});
+    let last=performance.now();
+    const loop=t=>{const dt=Math.min(50,t-last);last=t;if(!pvis){requestAnimationFrame(loop);return}S.forEach(s=>{s.v+=(s.t-s.v)*.06;const P=s.P;s.x+=s.dir*s.v*dt*.05;if(s.x<=-P)s.x+=P;if(s.x>0)s.x-=P;s.r.style.transform='translate3d('+s.x.toFixed(1)+'px,0,0)'});requestAnimationFrame(loop)};
+    requestAnimationFrame(loop);
+  }
+
+  /* inside: frame expands to full width while scrolling */
+  const xp=$('#xp'),xf=$('#xpFrame'),xs=$$('.xp__side'),xpMQ=matchMedia('(min-width:901px)');
+  const xpUpdate=()=>{if(RM||!xpMQ.matches)return;const r=xp.getBoundingClientRect(),vh=innerHeight;
+    const p=Math.max(0,Math.min(1,(-r.top+vh*.15)/(r.height-vh)));const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    xf.style.setProperty('--fw','calc('+(40+60*e).toFixed(2)+'% - '+e.toFixed(3)+' * (var(--gl) + var(--gr)))');
+    xf.style.setProperty('--fh',(52+48*e).toFixed(2)+'%');xf.style.setProperty('--fr',(32-8*e).toFixed(1)+'px');
+    xf.style.setProperty('--fs',(1.15-.15*e).toFixed(3));xf.style.setProperty('--co',Math.max(0,(e-.6)/.4).toFixed(3));
+    xs.forEach((s,i)=>{s.style.setProperty('--sx',((i<2?-1:1)*e*28).toFixed(2)+'vw');s.style.setProperty('--sy',((i%2?1:-1)*e*18).toFixed(2)+'vh');s.style.setProperty('--so',Math.max(0,1-e*1.4).toFixed(3))})};
+  addEventListener('scroll',()=>requestAnimationFrame(xpUpdate),{passive:true});addEventListener('resize',xpUpdate);xpUpdate();
+
+  /* geography: draw routes on reveal, link list to map, pause offscreen */
+  (()=>{const gm=$('#gmap');if(!gm)return;const sv=gm.querySelector('svg');
+    const pause=v=>{gm.classList.toggle('paused',!v);try{v?sv.unpauseAnimations():sv.pauseAnimations()}catch(_){}};
+    if(RM||!IO){gm.classList.add('in');pause(!RM)}
+    else{once(gm,()=>gm.classList.add('in'),.35);new IntersectionObserver(es=>pause(es[0].isIntersecting)).observe(gm)}
+    $$('#gl li').forEach(li=>{const on=()=>{gm.dataset.focus=li.dataset.r},off=()=>{delete gm.dataset.focus};
+      li.addEventListener('mouseenter',on);li.addEventListener('mouseleave',off);li.addEventListener('focus',on);li.addEventListener('blur',off)});
+  })();
+
+  /* form */
+  const form=$('#reqForm'),done=$('#done');
+  form.addEventListener('submit',e=>{e.preventDefault();const bad=[...form.querySelectorAll('[required]')].find(i=>!i.checkValidity());if(bad){bad.focus();bad.reportValidity&&bad.reportValidity();return}form.hidden=true;done.hidden=false});
+  $('#again').addEventListener('click',()=>{form.reset();done.hidden=true;form.hidden=false});
+
+  /* copy */
+  const toast=$('#toast');let tt;const show=m=>{toast.textContent=m;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>toast.classList.remove('show'),1800)};
+  $$('.copy').forEach(b=>b.addEventListener('click',()=>{const v=b.dataset.copy;const fb=()=>{const el=b.previousElementSibling,r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);show('Выделено, нажмите Ctrl+C')};try{navigator.clipboard.writeText(v).then(()=>show('Скопировано'),fb)}catch(_){fb()}}));
+})();
+</script>
