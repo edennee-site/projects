@@ -9,6 +9,9 @@
   // Safari тяжело даются анимации, привязанные к скроллу, — там включаем упрощённый режим
   const ua = navigator.userAgent;
   const SAFARI = /Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Android|FxiOS/.test(ua);
+  // упрощённый режим: Safari и телефоны — без анимаций, привязанных к скроллу
+  const SIMPLE = SAFARI || window.matchMedia('(max-width: 860px)').matches;
+  if (SIMPLE) doc.classList.add('is-simple');
   if (SAFARI) doc.classList.add('is-safari');
   const body = document.body;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -133,7 +136,7 @@
 
   // карточки систем стопкой
   const stack = $('.stack');
-  if (stack && !SAFARI) {
+  if (stack && !SIMPLE) {
     const items = $$('.stack__item', stack).map(el => ({ el, sys: el.firstElementChild, shade: $('.sys__shade', el), top: 0, last: -1 }));
     const st = tracked(stack);
     layout.push(() => {
@@ -165,7 +168,7 @@
 
   // изогнутая лента применения
   $$('.hscroll').forEach(sec => {
-    if (SAFARI) return;
+    if (SIMPLE) return;
     const track = $('.hscroll__track', sec), count = $('.hscroll__count', sec), num = $('.hscroll__num', sec);
     const cards = $$('.app-card', track).map(el => ({ el, img: el.firstElementChild, x: 0, w: 0 }));
     const t = tracked(sec);
@@ -317,7 +320,7 @@
   const heroMouse = { x: 0, y: 0, tx: 0, ty: 0, active: false };
   let heroInit = false, heroFull = null;
   function initHero() {
-    if (heroInit || !heroStage || !window.Profile3D) return;
+    if (heroInit || !heroStage || !window.Profile3D || window.innerWidth < 860) return;
     heroInit = true;
     const view = { length: 64, yaw: -0.62, pitch: 0.42, roll: -0.08, scale: 0.72, env: 'dark', offsetX: -0.05, offsetY: 0.04 };
     const keys = ['int', 'pa', 'glass', 'ext', 'gsk'];
@@ -376,7 +379,7 @@
     const exBar = $('.explode__progress', exSec);
     let lastIdx = -2, cur = 0, tgt = 0;
     window.addEventListener('load', () => layers.forEach(l => { l.pr.resize(); l.pr.render(); l.d = l.pr.screenDelta(l.key, 1); dirty = true; }));
-    if (SAFARI) {
+    if (SIMPLE) {
       // без привязки к скроллу: профиль один раз разбирается, когда блок появляется на экране
       callouts.forEach(c => c.classList.add('is-on'));
       const io2 = new IntersectionObserver(es => es.forEach(e => {
@@ -387,7 +390,7 @@
       io2.observe(exSec);
     } else
     scenes.push(() => { if (exT.vis()) tgt = exT.prog(); });
-    if (!SAFARI) tweens.push(() => {
+    if (!SIMPLE) tweens.push(() => {
       const dd = tgt - cur;
       if (Math.abs(dd) < 0.0002) { if (cur === tgt) return false; cur = tgt; } else cur += dd * SMOOTH;
       const p = cur;

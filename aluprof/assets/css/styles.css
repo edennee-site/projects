@@ -981,19 +981,19 @@ button, input, select, textarea { font: inherit; color: inherit; letter-spacing:
 .footer__big b { color: #fff; }
 
 /* ---------- Safari: упрощённый режим без привязки анимаций к скроллу ---------- */
-.is-safari .explode { height: auto; }
-.is-safari .explode__pin { position: relative; height: 100vh; min-height: 760px; }
-.is-safari .explode__stage canvas { transition: transform 1.6s cubic-bezier(.65,0,.2,1); }
-.is-safari .callout { opacity: 1; transform: none; }
-.is-safari .explode__progress { display: none; }
-.is-safari .stack__item { position: relative; top: auto; height: 82vh; margin-bottom: 18px; }
-.is-safari .sys__shade { display: none; }
-.is-safari .hscroll { height: auto !important; padding: clamp(80px, 8vw, 140px) 0; }
-.is-safari .hscroll__pin { position: relative; height: auto; padding-top: 0; }
-.is-safari .hscroll__track { transform: none !important; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 6px; }
-.is-safari .hscroll__track::-webkit-scrollbar { display: none; }
-.is-safari .app-card { transform: none !important; scroll-snap-align: center; }
-.is-safari .hscroll__count { display: none; }
+.is-simple .explode { height: auto; }
+.is-simple .explode__pin { position: relative; height: 100vh; min-height: 760px; }
+.is-simple .explode__stage canvas { transition: transform 1.6s cubic-bezier(.65,0,.2,1); }
+.is-simple .callout { opacity: 1; transform: none; }
+.is-simple .explode__progress { display: none; }
+.is-simple .stack__item { position: relative; top: auto; height: 82vh; margin-bottom: 18px; }
+.is-simple .sys__shade { display: none; }
+.is-simple .hscroll { height: auto !important; padding: clamp(80px, 8vw, 140px) 0; }
+.is-simple .hscroll__pin { position: relative; height: auto; padding-top: 0; }
+.is-simple .hscroll__track { transform: none !important; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 6px; }
+.is-simple .hscroll__track::-webkit-scrollbar { display: none; }
+.is-simple .app-card { transform: none !important; scroll-snap-align: center; }
+.is-simple .hscroll__count { display: none; }
 
 .sys__type { margin-top: clamp(24px, 2vw, 34px); }
 /* «прицел» не заходит на текст карточки */
@@ -1001,3 +1001,34 @@ button, input, select, textarea { font: inherit; color: inherit; letter-spacing:
 .aim i:nth-child(3), .aim i:nth-child(4) { bottom: 0; }
 .app-card:hover .aim i:nth-child(3), .app-card:hover .aim i:nth-child(4) { bottom: 18%; }
 @media (max-width: 860px) { .aim { bottom: 210px; } }
+
+/* ---------- телефоны: всё статично, ничего не наезжает ---------- */
+.ds__mimg { display: none; }
+@media (max-width: 860px) {
+  .hero__art { display: none; }
+  .hero__body { justify-content: center; padding-top: 120px; }
+  .hero { min-height: auto; }
+  .hero__body { padding-bottom: 56px; }
+  .is-simple .explode__pin { height: auto; min-height: 0; padding: 90px 0 50px; display: flex; flex-direction: column; }
+  .is-simple .explode__head { position: relative; top: 0; left: 0; right: 0; padding: 0 var(--pad); width: auto; }
+  .is-simple .explode__stage { position: relative; left: auto; right: auto; top: auto; bottom: auto; height: 78vw; margin: 20px 0; }
+  .is-simple .explode__cards { position: relative; inset: auto; height: auto; width: auto; display: grid; gap: 10px; margin: 0 var(--pad); }
+  .is-simple .explode__cards--left { margin-top: 10px; }
+  .is-simple .callout { position: relative; inset: auto; opacity: 1; transform: none; }
+  .is-simple .explode__foot { display: none; }
+  .is-simple .explode .grid-bg { display: none; }
+  .is-simple .stack { padding-bottom: 0; }
+  .is-simple .stack__item { height: auto; margin-bottom: 14px; }
+  .is-simple .sys { grid-template-rows: 260px auto; }
+  .is-simple .val { grid-template-columns: 1fr; grid-template-rows: auto 260px; height: auto; }
+  .is-simple .val__body { gap: 18px; }
+  .is-simple .val__list { display: grid; }
+  .is-simple .hscroll { padding: 80px 0; }
+  .is-simple .hscroll__pin { gap: 30px; }
+  .is-simple .app-card { width: 84vw; height: 62vh; max-height: 520px; }
+  .ds__media { display: none; }
+  .ds__item { min-height: 0; opacity: 1; padding: 34px 0; }
+  .ds__mimg { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; margin-bottom: 22px; }
+  .ds__n { font-size: 56px; }
+  .prod__steps { padding-top: 20px; }
+}
