@@ -1,0 +1,1786 @@
+<meta charset="utf-8">
+<!-- iCORP x Teledukon: блок страницы icorp.uz/teledukon.
+     Вставить в HTML-блок (T123) сразу после шапки.
+     Видеоблог, FAQ, форма и футер — стандартные блоки Тильды.
+     Кнопки с href="#form" открывают попап формы iCORP.
+     Картинки: github.com/edennee-site/projects, папка teledukon/img (через jsDelivr). -->
+<div class="tdk" id="tdk-root">
+<style>
+body{margin:0}
+.tdk{--g:#0ED0A2;--gh:#0BC197;--gt:#0EB18A;--gd:#0C6F58;--gl:#E8F8F2;--tx:#252525;--tx2:#767676;--tx3:#A9A9A9;--line:#EAEAEA;--soft:#F6F7F6;--bg1:#F2F2F2;--dk:#161A1E;--dk2:#1D2227;--ms:#1E6FD9;--r:1em;--top:12.6em;
+  font-family:'Circle',Arial,sans-serif;color:var(--tx);font-size:clamp(13px,1.0417vw,20px);line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden;background:#fff}
+.tdk *,.tdk *::before,.tdk *::after{box-sizing:border-box;margin:0;padding:0}
+:where(.tdk) img{display:block;max-width:100%;height:auto}
+:where(.tdk) a{text-decoration:none;color:inherit}
+:where(.tdk) button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
+:where(.tdk) ul{list-style:none}
+:where(.tdk) svg{display:block}
+.tdk-wrap{position:relative;padding:0 6.6667vw}
+.tdk-sec{position:relative;padding:6em 0}
+.tdk-soft{background:var(--soft)}
+.tdk-dark{background:var(--dk);color:#fff}
+.tdk-grid>*{min-width:0}
+.tdk-hd{display:flex;justify-content:space-between;align-items:flex-end;gap:3em;margin-bottom:2.8em}
+.tdk-hd>*{min-width:0}
+.tdk-eye{display:flex;align-items:center;gap:.8em;font-size:.75em;letter-spacing:.09em;text-transform:uppercase;color:var(--tx2)}
+.tdk-eye b{font-weight:500;color:var(--gt);letter-spacing:.04em}
+.tdk-eye i{width:1.8em;height:1px;background:currentColor;opacity:.35}
+.tdk-dark .tdk-eye{color:rgba(255,255,255,.55)}
+.tdk-dark .tdk-eye b{color:var(--g)}
+.tdk-h2{font-family:inherit;font-size:2.35em;font-weight:600;line-height:1.12;letter-spacing:-.012em;color:var(--tx);margin-top:.5em}
+.tdk-h2 span{color:var(--gt)}
+.tdk-dark .tdk-h2{color:#fff}
+.tdk-dark .tdk-h2 span{color:var(--g)}
+.tdk-sub{font-size:.95em;font-weight:300;line-height:1.65;color:#555;max-width:25em}
+.tdk-dark .tdk-sub{color:rgba(255,255,255,.62)}
+.tdk-btn{display:inline-flex;align-items:center;justify-content:center;gap:.6em;height:3.6em;padding:0 2.2em;border-radius:999px;font-size:.78em;font-weight:600;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;transition:background .25s,color .25s,border-color .25s,box-shadow .25s}
+.tdk-btn--fill{background:var(--g);color:#fff!important}
+.tdk-btn--fill:hover{background:var(--gh);box-shadow:none}
+.tdk-btn--line{border:1px solid var(--tx);color:var(--tx)!important}
+.tdk-btn--line:hover{background:var(--tx);color:#fff!important}
+.tdk-btn--wline{border:1px solid rgba(255,255,255,.3);color:#fff!important}
+.tdk-btn--wline:hover{background:#fff;color:var(--dk)!important}
+.tdk-btn--block{width:100%}
+.tdk-more{display:inline-flex;align-items:center;gap:.45em;font-size:.88em;color:var(--gt)!important;transition:gap .25s}
+.tdk-more:hover{gap:.7em}
+.tdk-more svg{width:1em;height:1em}
+.tdk-ck{flex:none;width:1.1em;height:1.1em;border-radius:50%;margin-top:.2em;background:rgba(14,208,162,.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230EB18A' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5 10 17 19 7'/%3E%3C/svg%3E") center/.6em no-repeat}
+.tdk-no{display:inline-block;width:.8em;height:1px;background:#C9C9C9;vertical-align:middle}
+.tdk-list{display:flex;flex-direction:column;gap:.5em}
+.tdk-list li{display:flex;gap:.6em;font-size:.86em;font-weight:300;line-height:1.45;color:#444}
+.tdk-dark .tdk-list li{color:rgba(255,255,255,.82)}
+.tdk-dark .tdk-ck{background-color:rgba(14,208,162,.22)}
+.tdk-icn{width:2.6em;height:2.6em;border-radius:.8em;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--gt);box-shadow:0 0 0 1px var(--line);flex:none}
+.tdk-icn svg{width:1.25em;height:1.25em}
+.tdk-js [data-r]{opacity:0}
+.tdk-js [data-r].is-in{opacity:1;animation:tdkReveal .9s cubic-bezier(.2,.7,.2,1) var(--d,0s) backwards}
+@keyframes tdkReveal{from{opacity:0;transform:translateY(1.2em)}to{opacity:1;transform:translateY(0)}}
+.tdk-phone{position:relative;border-radius:2.5em;background:#0D0F11;padding:.42em;box-shadow:0 0 0 1px #2B2F33 inset}
+.tdk-phone__s{position:relative;border-radius:2.1em;overflow:hidden;aspect-ratio:430/938;background:#121417}
+.tdk-phone__s>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top}
+.tdk-hero{font-size:1.0667em;position:relative;background:var(--bg1);padding:var(--top) 0 8.5em;min-height:45em;overflow:hidden}
+.tdk-hero__circle{position:absolute;left:67%;top:-17.7em;width:80.4em;height:80.4em;border-radius:50%;background:rgba(226,226,226,.7);pointer-events:none}
+.tdk-hero__wm{position:absolute;left:0;bottom:0;width:39.3em;opacity:.55;pointer-events:none}
+.tdk-hero__text{position:relative;z-index:2;max-width:33em}
+.tdk-hero__logo{height:2.6em;width:auto}
+.tdk-h1{font-family:inherit;font-size:2.625em;font-weight:600;line-height:1.05;color:var(--tx);margin-top:.45em;letter-spacing:-.005em}
+.tdk-h1 span{color:var(--gt)}
+.tdk-hero__sub{margin-top:1.75em;font-size:.9em;opacity:.5}
+.tdk-hero__p{margin-top:.6em;font-size:1.05em;font-weight:300;line-height:1.45;opacity:.85;max-width:29.5em}
+.tdk-hero__btns{display:flex;flex-wrap:wrap;gap:.6em;margin-top:2.6em}
+.tdk-hero .tdk-btn{font-size:.825em;height:3.8em;padding:0 2.6em}
+.tdk-hero__frame{position:absolute;left:51.7%;top:7.25em;width:63.2%;height:34.2em;border:2px solid #fff;border-radius:3.4em;pointer-events:none}
+.tdk-hero__media{position:absolute;left:50%;bottom:0;width:44%;z-index:1}
+.tdk-hero__px{transition:transform .5s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.tdk-hero__px>img{width:100%;display:block}
+.tdk-chip{position:absolute;display:flex;align-items:center;gap:.65em;padding:.65em 1em .65em .7em;background:rgba(255,255,255,.96);border-radius:.8em;box-shadow:none;font-size:.74em;line-height:1.3;white-space:nowrap;z-index:2;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.tdk-chip b{display:block;font-weight:500}
+.tdk-chip small{display:block;color:var(--tx2);font-size:.9em}
+.tdk-chip__ic{width:2.2em;height:2.2em;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.tdk-chip__t{transition:opacity .35s,transform .35s}
+.tdk-chip.is-swap .tdk-chip__t{opacity:0;transform:translateY(.4em)}
+.tdk-chip--a{left:-8%;top:62%}
+.tdk-chip--a .tdk-chip__ic::after{content:"";position:absolute;inset:-.25em;border-radius:50%;border:1.5px solid #2AABEE;opacity:0;animation:tdkPing 2.4s ease-out infinite}
+.tdk-chip--b{right:-9%;top:18%}
+@keyframes tdkPing{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.5);opacity:0}}
+.tdk-ab{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:1em;align-items:stretch}
+.tdk-ab>*{min-width:0}
+.tdk-abc{position:relative;background:var(--soft);border-radius:1.2em;padding:1.8em;display:flex;flex-direction:column}
+.tdk-abc__top{display:flex;align-items:center;gap:.9em}
+.tdk-abc__top small{display:block;font-size:.72em;letter-spacing:.08em;text-transform:uppercase;color:var(--tx2)}
+.tdk-abc__top b{display:block;font-size:1.05em;font-weight:500;line-height:1.25}
+.tdk-abc .tdk-list{margin-top:1.4em}
+.tdk-abc__ui{margin-top:auto;padding-top:1.6em}
+.tdk-bub{background:#fff;border-radius:1em;padding:.9em;box-shadow:0 0 0 1px var(--line);font-size:.78em}
+.tdk-bub__h{display:flex;align-items:center;gap:.6em;padding-bottom:.7em;border-bottom:1px solid #F1F1F1}
+.tdk-bub__h img{width:1.9em;height:1.9em;border-radius:50%;background:var(--gl);padding:.3em}
+.tdk-bub__h b{font-weight:500;display:block;line-height:1.2}
+.tdk-bub__h small{color:var(--tx2);font-size:.88em}
+.tdk-bub__m{margin-top:.7em;padding:.6em .8em;border-radius:.9em .9em .9em .25em;background:#F3F5F4;line-height:1.4;color:#444}
+.tdk-bub__k{margin-top:.45em;text-align:center;padding:.6em;border-radius:.6em;background:var(--gl);color:var(--gd);font-weight:500}
+.tdk-sync{background:#fff;border-radius:1em;padding:.4em .9em;box-shadow:0 0 0 1px var(--line);font-size:.78em}
+.tdk-sync div{display:flex;align-items:center;gap:.7em;padding:.6em 0;border-bottom:1px solid #F3F3F3}
+.tdk-sync div:last-child{border-bottom:0}
+.tdk-sync span{flex:1;color:#555}
+.tdk-sync em{font-style:normal;font-weight:500;color:var(--gt);display:flex;align-items:center;gap:.35em}
+.tdk-sync em::before{content:"";width:.45em;height:.45em;border-radius:50%;background:var(--g)}
+.tdk-sync img{height:1.1em;width:auto}
+.tdk-art{position:relative;border-radius:1.2em;overflow:hidden;background:radial-gradient(circle at 50% 55%,#DDF4EB,#EFF7F3 55%,#F6F9F7);min-height:30em;display:flex;align-items:center;justify-content:center}
+.tdk-art>img{width:88%;mix-blend-mode:multiply;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.tdk-art:hover>img{transform:scale(1.03) translateY(-.4em)}
+.tdk-tagl{position:absolute;display:flex;align-items:center;gap:.5em;padding:.5em .85em;border-radius:999px;background:#fff;font-size:.74em;box-shadow:none}
+.tdk-tagl i{width:.45em;height:.45em;border-radius:50%;background:var(--g)}
+.tdk-tagl--1{left:6%;top:7%}
+.tdk-tagl--2{right:6%;top:30%}
+.tdk-art__bar{position:absolute;left:1em;right:1em;bottom:1em;display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:.9em;box-shadow:0 0 0 1px rgba(255,255,255,.7) inset}
+.tdk-art__bar div{padding:.85em 1em;border-left:1px solid rgba(0,0,0,.06)}
+.tdk-art__bar div:first-child{border-left:0}
+.tdk-art__bar b{display:block;font-size:1.2em;font-weight:500;line-height:1.1}
+.tdk-art__bar b span{color:var(--gt)}
+.tdk-art__bar small{display:block;font-size:.72em;color:var(--tx2);margin-top:.2em;line-height:1.3}
+.tdk-flowsec{background:var(--soft)}
+.tdk-flowsec::before{content:"";position:absolute;inset:0;background:radial-gradient(40em 22em at 50% 52%,rgba(14,208,162,.08),transparent 70%);pointer-events:none}
+.tdk-fl{position:relative;display:grid;grid-template-columns:14em minmax(8em,1fr) 10.5em 5.5em 29em;align-items:center;min-height:33em}
+.tdk-fl>*{min-width:0}
+.tdk-fl__ph{position:relative}
+.tdk-fl__ph .tdk-phone{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.tdk-fl[data-s="1"] .tdk-fl__ph .tdk-phone{transform:translateY(-.4em)}
+.tdk-fl__user{position:absolute;left:-1em;top:-1.4em;display:flex;align-items:center;gap:.5em;padding:.5em .8em .5em .5em;border-radius:.8em;background:#fff;box-shadow:none;font-size:.72em;line-height:1.25;z-index:4}
+.tdk-fl__user span{width:1.9em;height:1.9em;border-radius:50%;background:var(--gl);color:var(--gt);display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-fl__cart{position:absolute;right:-.9em;top:18%;width:2.4em;height:2.4em;border-radius:50%;background:#fff;color:var(--tx);display:flex;align-items:center;justify-content:center;box-shadow:none;z-index:4}
+.tdk-fl__cart i{position:absolute;top:-.25em;right:-.25em;min-width:1.25em;height:1.25em;padding:0 .3em;border-radius:999px;background:var(--g);color:#fff;font-style:normal;font-size:.68em;font-weight:600;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.tdk-fl__cart i.is-pop{animation:tdkPop .4s}
+@keyframes tdkPop{50%{transform:scale(1.35)}}
+.tdk-fl__toast{position:absolute;left:.9em;right:.9em;bottom:1.4em;display:flex;align-items:center;gap:.6em;padding:.65em .75em;border-radius:.8em;background:rgba(255,255,255,.97);color:var(--tx);font-size:.66em;line-height:1.25;box-shadow:none;z-index:4;opacity:0;transform:translateY(.8em);transition:opacity .4s,transform .4s}
+.tdk-fl__toast span{width:1.9em;height:1.9em;border-radius:50%;background:#2AABEE;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-fl__toast b{display:block;font-weight:600}
+.tdk-fl__toast small{color:var(--tx2)}
+.tdk-fl.t1 .tdk-fl__toast.k1,.tdk-fl.t3 .tdk-fl__toast.k3{opacity:1;transform:none}
+.tdk-fl__mid{position:relative;height:100%}
+.tdk-fl__mid>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tdk-ln{fill:none;stroke:#C7CFCB;stroke-width:1.3;stroke-dasharray:4 5;vector-effect:non-scaling-stroke;transition:stroke .4s}
+.tdk-fl[data-s="2"] .tdk-ln,.tdk-fl[data-s="3"] .tdk-ln{stroke:var(--g);animation:tdkDash 1s linear infinite}
+@keyframes tdkDash{to{stroke-dashoffset:-18}}
+.tdk-pills{position:absolute;inset:0}
+.tdk-pill{position:absolute;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:.55em;padding:.45em .9em .45em .45em;border-radius:.8em;background:#fff;box-shadow:0 0 0 1px var(--line);font-size:.78em;font-weight:500;white-space:nowrap;transition:box-shadow .4s}
+.tdk-pill span{width:2em;height:2em;border-radius:.6em;display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-pill span svg{width:1.05em;height:1.05em}
+.tdk-pill:nth-child(1){top:24%}.tdk-pill:nth-child(2){top:50%}.tdk-pill:nth-child(3){top:76%}
+.tdk-fl[data-s="2"] .tdk-pill{box-shadow:0 0 0 1px rgba(14,208,162,.55)}
+.tdk-fl__hub{position:relative;display:flex;flex-direction:column;align-items:center;gap:.8em}
+.tdk-hub{position:relative;width:8.4em;height:8.4em;border-radius:2em;background:#fff;box-shadow:0 0 0 1px var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35em;z-index:1}
+.tdk-hub img{width:3.6em}
+.tdk-hub b{font-size:.82em;font-weight:600;color:var(--gd)}
+.tdk-hub::before,.tdk-hub::after{content:"";position:absolute;inset:-.7em;border-radius:2.5em;border:1px solid rgba(14,208,162,.35);opacity:0}
+.tdk-fl[data-s="2"] .tdk-hub::before{animation:tdkRing 1.6s ease-out infinite}
+.tdk-fl[data-s="2"] .tdk-hub::after{animation:tdkRing 1.6s .8s ease-out infinite}
+@keyframes tdkRing{0%{opacity:.9;transform:scale(.92)}100%{opacity:0;transform:scale(1.22)}}
+.tdk-ordc{position:absolute;bottom:calc(100% + 1em);left:50%;transform:translate(-50%,.5em);display:flex;align-items:center;gap:.55em;padding:.55em .8em .55em .55em;border-radius:.8em;background:#fff;box-shadow:0 0 0 1px var(--line);font-size:.7em;line-height:1.25;white-space:nowrap;opacity:0;transition:opacity .4s,transform .4s}
+.tdk-ordc span{width:2.1em;height:2.1em;border-radius:.6em;background:#EEF4FF;color:var(--ms);display:flex;align-items:center;justify-content:center}
+.tdk-ordc b{display:block;font-weight:600}
+.tdk-ordc small{color:var(--tx2)}
+.tdk-fl[data-s="2"] .tdk-ordc,.tdk-fl[data-s="3"] .tdk-ordc{opacity:1;transform:translate(-50%,0)}
+.tdk-prog{width:12.5em;white-space:nowrap;padding:.55em .7em;border-radius:.8em;background:#fff;box-shadow:0 0 0 1px var(--line);font-size:.7em}
+.tdk-prog div{display:flex;justify-content:space-between;color:#555}
+.tdk-prog div b{font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums}
+.tdk-prog i{display:block;height:.35em;border-radius:1em;margin-top:.45em;background:#EDF0EE;position:relative;overflow:hidden}
+.tdk-prog i::after{content:"";position:absolute;inset:0;width:var(--p,0%);background:linear-gradient(90deg,var(--gt),var(--g));border-radius:1em;transition:width .2s linear}
+.tdk-fl__arr{position:relative;height:2px}
+.tdk-fl__arr svg{width:100%;height:1em;overflow:visible;margin-top:-.5em}
+.tdk-fl[data-s="3"] .tdk-fl__arr .tdk-ln{stroke:var(--g);animation:tdkDash 1s linear infinite}
+.tdk-fl__arr .tdk-ah{fill:#C7CFCB;transition:fill .4s}
+.tdk-fl[data-s="3"] .tdk-fl__arr .tdk-ah{fill:var(--g)}
+.tdk-msw{position:relative}
+.tdk-msw__ok{position:absolute;right:1em;top:-3.6em;display:flex;align-items:center;gap:.6em;padding:.6em .9em .6em .6em;border-radius:.8em;background:#fff;box-shadow:0 0 0 1px var(--line);font-size:.74em;font-weight:500;opacity:0;transform:translateY(.5em);transition:opacity .4s .3s,transform .4s .3s}
+.tdk-msw__ok span{width:1.9em;height:1.9em;border-radius:50%;background:var(--gt);color:#fff;display:flex;align-items:center;justify-content:center}
+.tdk-fl[data-s="3"] .tdk-msw__ok{opacity:1;transform:none}
+.tdk-win{background:#fff;border-radius:1em;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.tdk-win__bar{display:flex;align-items:center;gap:.35em;padding:.6em .9em;border-bottom:1px solid #F0F0F0}
+.tdk-win__bar i{width:.55em;height:.55em;border-radius:50%;background:#E3E3E3}
+.tdk-win__bar i:nth-child(1){background:#FF6159}.tdk-win__bar i:nth-child(2){background:#FFBD2E}.tdk-win__bar i:nth-child(3){background:#28C941}
+.tdk-win__b{display:grid;grid-template-columns:8.6em 1fr}
+.tdk-win__nav{padding:1em .7em;border-right:1px solid #F2F2F2;font-size:.74em}
+.tdk-win__nav img{height:1.55em;width:auto;margin:0 0 1.2em .4em}
+.tdk-win__nav span{display:flex;align-items:center;gap:.6em;padding:.55em .6em;border-radius:.5em;color:#666}
+.tdk-win__nav span svg{width:1.15em;height:1.15em;color:#8E9AA6}
+.tdk-win__nav span.is-on{background:#EEF4FF;color:var(--ms);font-weight:500}
+.tdk-win__nav span.is-on svg{color:var(--ms)}
+.tdk-win__m{padding:1em 1.1em;min-width:0}
+.tdk-win__h{display:flex;justify-content:space-between;align-items:center}
+.tdk-win__h b{font-size:1em;font-weight:600}
+.tdk-win__h span{display:inline-flex;align-items:center;gap:.3em;height:2em;padding:0 .8em;border-radius:.5em;background:var(--ms);color:#fff;font-size:.7em;font-weight:500}
+.tdk-rows{margin-top:.8em;font-size:.74em}
+.tdk-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:.8em;align-items:center;padding:.7em .7em;border-radius:.55em;border-bottom:1px solid #F4F4F4;color:#555}
+.tdk-row::before{content:"";width:.45em;height:.45em;border-radius:50%;background:#D9DDE1}
+.tdk-row b{font-weight:500;color:var(--tx);display:flex;align-items:center;gap:.5em;white-space:nowrap}
+.tdk-row em{font-style:normal;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tdk-row small{color:var(--tx3);white-space:nowrap}
+.tdk-row--new{display:none;background:#F2FBF7;border-bottom-color:transparent}
+.tdk-row--new::before{background:var(--g)}
+.tdk-row--new b{color:var(--gd)}
+.tdk-fl[data-s="3"] .tdk-row--new{display:grid;animation:tdkRowIn .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes tdkRowIn{from{opacity:0;transform:translateY(-.6em)}to{opacity:1;transform:none}}
+.tdk-badge{display:inline-flex;align-items:center;height:1.7em;padding:0 .6em;border-radius:999px;background:var(--g);color:#fff;font-size:.8em;font-weight:500}
+.tdk-steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:1em;margin-top:3em}
+.tdk-st3{position:relative;display:grid;grid-template-columns:6.5em 1fr;gap:1.2em;align-items:center;padding:1em 1.4em 1em 1em;border-radius:1em;background:#fff;box-shadow:0 0 0 1px var(--line);text-align:left;overflow:hidden;transition:box-shadow .4s}
+.tdk-st3__img{height:6.5em;border-radius:.75em;background:var(--soft);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tdk-st3__img img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply}
+.tdk-st3 small{font-size:.7em;letter-spacing:.08em;color:var(--tx3);transition:color .3s}
+.tdk-st3 b{display:block;font-size:.95em;font-weight:500;line-height:1.3;margin-top:.15em}
+.tdk-st3 span{display:block;font-size:.8em;font-weight:300;line-height:1.5;color:#666;margin-top:.3em}
+.tdk-st3 i{position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--g)}
+.tdk-st3.is-on{box-shadow:0 0 0 1px rgba(14,208,162,.55)}
+.tdk-st3.is-on small{color:var(--gt)}
+.tdk-st3.is-on i{animation:tdkW var(--dur,4s) linear forwards}
+@keyframes tdkW{to{width:100%}}
+.tdk-app{background:var(--dk);color:#fff;overflow:hidden}
+.tdk-appg{position:relative;z-index:1;display:grid;grid-template-columns:27em 1fr;gap:3em;align-items:center}
+.tdk-appg>*{min-width:0}
+.tdk-tabs{margin-top:2.2em;display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.1)}
+.tdk-tab{display:grid;grid-template-columns:2.2em 1fr auto;gap:.6em;align-items:start;padding:.95em 0;border-bottom:1px solid rgba(255,255,255,.1);text-align:left;color:rgba(255,255,255,.5);transition:color .3s;position:relative}
+.tdk-tab:hover{color:rgba(255,255,255,.8)}
+.tdk-tab small{font-size:.72em;letter-spacing:.06em;padding-top:.3em}
+.tdk-tab b{display:block;font-size:.98em;font-weight:500}
+.tdk-tab__d{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s}
+.tdk-tab__d>span{overflow:hidden;font-size:.82em;font-weight:300;line-height:1.55;color:rgba(255,255,255,.6)}
+.tdk-tab.is-on{color:#fff}
+.tdk-tab.is-on small{color:var(--g)}
+.tdk-tab.is-on .tdk-tab__d{grid-template-rows:1fr}
+.tdk-tab.is-on .tdk-tab__d>span{padding-top:.35em}
+.tdk-tab svg{width:.9em;height:.9em;margin-top:.35em;opacity:0;transform:translateX(-.3em);transition:.3s}
+.tdk-tab.is-on svg{opacity:1;transform:none;color:var(--g)}
+.tdk-tab::after{content:"";position:absolute;left:0;bottom:-1px;height:1px;width:0;background:var(--g)}
+.tdk-tab.is-on::after{animation:tdkW 5s linear forwards}
+.tdk-cf.is-paused .tdk-tab::after{animation-play-state:paused}
+.tdk-cf__stage{position:relative;height:36em}
+.tdk-cf__ph{position:absolute;left:50%;top:50%;width:14.5em;margin-left:-7.25em;transform:translateY(-50%);transition:transform .7s cubic-bezier(.3,.7,.2,1),opacity .7s,filter .7s;cursor:pointer}
+.tdk-cf__ph .tdk-phone{box-shadow:0 0 0 1px #33383D inset}
+.tdk-cf__ph .tdk-phone__s>img.ct{object-fit:contain;background:#16161E}
+.tdk-cf__lbl{position:absolute;left:50%;bottom:-2.6em;transform:translateX(-50%);font-size:.75em;color:rgba(255,255,255,.55);white-space:nowrap;opacity:0;transition:opacity .4s}
+.tdk-cf__ph.is-on .tdk-cf__lbl{opacity:1}
+.tdk-feat{display:grid;grid-template-columns:repeat(12,1fr);gap:1em}
+.tdk-feat>*{min-width:0}
+.tdk-card{position:relative;background:var(--soft);border-radius:var(--r);padding:1.9em;overflow:hidden;transition:background .3s,box-shadow .3s}
+.tdk-card::after{content:"";position:absolute;right:-6em;top:-6em;width:16em;height:16em;border-radius:50%;background:radial-gradient(circle,rgba(14,208,162,.12),transparent 65%);opacity:0;transition:opacity .5s;pointer-events:none}
+.tdk-card:hover{background:#fff;box-shadow:0 0 0 1px var(--line)}
+.tdk-card:hover::after{opacity:1}
+.tdk-card h3{font-size:1.12em;font-weight:500;line-height:1.3;color:var(--tx)}
+.tdk-card p{font-size:.86em;font-weight:300;line-height:1.6;color:#555;margin-top:.5em}
+.tdk-card .tdk-list{margin-top:1.2em}
+.tdk-c7{grid-column:span 7}.tdk-c5{grid-column:span 5}.tdk-c4{grid-column:span 4}
+.tdk-cat{display:grid;grid-template-columns:1fr 1fr;gap:1.5em;align-items:center}
+.tdk-cat>*{min-width:0}
+.tdk-cat img{mix-blend-mode:multiply;width:100%;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.tdk-card:hover .tdk-cat img{transform:scale(1.04) rotate(-1deg)}
+.tdk-chips{display:flex;flex-wrap:wrap;gap:.35em;margin-top:1.3em}
+.tdk-chips span{font-size:.72em;padding:.35em .75em;border-radius:999px;background:#fff;box-shadow:0 0 0 1px var(--line);color:#555}
+.tdk-ico{width:6.2em;height:6.2em;border-radius:1.1em;overflow:hidden;margin-bottom:1.3em;background:#fff;box-shadow:0 0 0 1px var(--line);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.tdk-ico img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.tdk-card:hover .tdk-ico{transform:translateY(-.25em) rotate(-3deg)}
+.tdk-own{background:var(--dk);color:#fff;padding-bottom:0;display:grid;grid-template-columns:1fr 12em;gap:1.4em}
+.tdk-own>*{min-width:0}
+.tdk-own:hover{background:#1A1F24;box-shadow:none}
+.tdk-own::after{opacity:1;right:-4em;top:auto;bottom:-8em;width:22em;height:22em;background:radial-gradient(circle,rgba(14,208,162,.28),transparent 65%)}
+.tdk-own h3{color:#fff}
+.tdk-own h3 span{color:var(--g)}
+.tdk-own p{color:rgba(255,255,255,.6)}
+.tdk-own__ph{position:relative;z-index:1;align-self:end;border-radius:1.6em 1.6em 0 0;background:#0D0F11;padding:.35em .35em 0;box-shadow:0 0 0 1px #2B2F33 inset;transform:translateY(.4em);transition:transform .5s}
+.tdk-own:hover .tdk-own__ph{transform:translateY(-.3em)}
+.tdk-own__ph img{border-radius:1.3em 1.3em 0 0;height:15em;width:100%;object-fit:cover;object-position:top}
+.tdk-who{display:grid;grid-template-columns:repeat(3,1fr);gap:1em}
+.tdk-who>*{min-width:0}
+.tdk-wc{position:relative;background:#fff;border-radius:var(--r);padding:1.7em 1.8em 1.6em;display:flex;flex-direction:column;overflow:hidden;transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s}
+.tdk-wc::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--gt));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.tdk-wc:hover{transform:translateY(-3px);box-shadow:none}
+.tdk-wc:hover::before{transform:scaleX(1)}
+.tdk-wc__top{display:flex;justify-content:space-between;align-items:flex-start}
+.tdk-wc__ic{width:3em;height:3em;border-radius:.9em;background:var(--gl);color:var(--gt);display:flex;align-items:center;justify-content:center;transition:background .35s,color .35s,transform .45s cubic-bezier(.2,.7,.2,1)}
+.tdk-wc__ic svg{width:1.35em;height:1.35em}
+.tdk-wc:hover .tdk-wc__ic{background:var(--g);color:#fff;transform:rotate(-6deg) scale(1.05)}
+.tdk-wc__n{position:relative;font-size:.72em;color:var(--tx3);letter-spacing:.06em;height:1.6em;overflow:hidden}
+.tdk-wc__n span{display:block;transition:transform .35s}
+.tdk-wc__n svg{width:1.4em;height:1.4em;color:var(--gt);transition:transform .35s}
+.tdk-wc:hover .tdk-wc__n span,.tdk-wc:hover .tdk-wc__n svg{transform:translateY(-100%)}
+.tdk-wc h3{margin-top:1.2em;font-size:1.05em;font-weight:500;color:var(--tx)}
+.tdk-wc p{margin-top:.45em;font-size:.84em;font-weight:300;line-height:1.6;color:#555}
+.tdk-wc ul{margin-top:auto;padding-top:1.2em;display:flex;flex-wrap:wrap;gap:.35em}
+.tdk-wc li{font-size:.72em;padding:.3em .7em;border-radius:999px;background:var(--soft);color:#555;transition:background .3s,color .3s}
+.tdk-wc:hover li{background:var(--gl);color:var(--gd)}
+.tdk-tree{position:relative;margin-bottom:-.2em}
+.tdk-tree__root{position:relative;z-index:1;display:flex;justify-content:center}
+.tdk-tree__root span{display:inline-flex;align-items:center;gap:.6em;height:2.7em;padding:0 1.2em 0 .5em;border-radius:999px;background:var(--dk);color:#fff;font-size:.82em}
+.tdk-tree__root span i{width:1.9em;height:1.9em;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;color:var(--dk);font-style:normal;font-weight:700}
+.tdk-tree svg{width:100%;height:2.6em;margin-top:-.1em}
+.tdk-tree path{fill:none;stroke:#CDD5D1;stroke-width:1.3;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)}
+.tdk-tree.is-in path{stroke-dashoffset:0}
+.tdk-ln3{display:grid;grid-template-columns:repeat(3,1fr);gap:1em}
+.tdk-ln3>*{min-width:0}
+.tdk-lc{position:relative;background:#fff;border-radius:1.2em;box-shadow:0 0 0 1px var(--line);display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .4s,transform .4s cubic-bezier(.2,.7,.2,1)}
+.tdk-lc:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(14,208,162,.5)}
+.tdk-lc__img{position:relative;height:12.5em;background:linear-gradient(180deg,#F5FAF8,#fff);display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid #F1F1F1}
+.tdk-lc__img img{width:92%;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.tdk-lc:hover .tdk-lc__img img{transform:scale(1.05)}
+.tdk-lc__q{position:absolute;left:1em;top:1em;font-size:.7em;letter-spacing:.07em;text-transform:uppercase;color:var(--tx2);background:#fff;padding:.35em .7em;border-radius:999px;box-shadow:0 0 0 1px var(--line)}
+.tdk-lc__b{padding:1.6em 1.7em 1.7em;display:flex;flex-direction:column;flex:1}
+.tdk-lc h3{font-size:1.15em;font-weight:600;line-height:1.25}
+.tdk-lc__b>p{font-size:.84em;font-weight:300;line-height:1.6;color:#555;margin-top:.5em}
+.tdk-meter{display:flex;align-items:center;gap:.8em;margin-top:1.3em;font-size:.74em;color:var(--tx2)}
+.tdk-meter b{font-weight:500;color:var(--tx)}
+.tdk-meter i{display:flex;gap:.2em}
+.tdk-meter i u{width:1.4em;height:.35em;border-radius:1em;background:#E7EBE9;text-decoration:none}
+.tdk-meter i u.on{background:var(--g)}
+.tdk-path{margin-top:1.3em;padding-top:1.2em;border-top:1px dashed #E3E6E4;display:flex;flex-direction:column;gap:.7em}
+.tdk-path div{display:grid;grid-template-columns:1.6em 1fr;gap:.7em;align-items:start;font-size:.82em;line-height:1.4}
+.tdk-path div::before{content:attr(data-n);width:1.6em;height:1.6em;border-radius:50%;background:var(--soft);color:var(--gd);font-size:.85em;font-weight:600;display:flex;align-items:center;justify-content:center}
+.tdk-path b{font-weight:500}
+.tdk-path span{color:var(--tx2);font-weight:300}
+.tdk-lc__f{margin-top:auto;padding-top:1.6em}
+.tdk-lc .tdk-btn{width:100%;height:3.3em}
+.tdk-lc--hl{background:var(--dk);color:#fff;box-shadow:none}
+.tdk-lc--hl .tdk-lc__q{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);box-shadow:none}
+.tdk-lc--hl .tdk-lc__b>p,.tdk-lc--hl .tdk-path span{color:rgba(255,255,255,.6)}
+.tdk-lc--hl .tdk-meter,.tdk-lc--hl .tdk-meter b{color:rgba(255,255,255,.75)}
+.tdk-lc--hl .tdk-meter i u{background:rgba(255,255,255,.12)}
+.tdk-lc--hl .tdk-meter i u.on{background:var(--g)}
+.tdk-lc--hl .tdk-path{border-top-color:rgba(255,255,255,.12)}
+.tdk-lc--hl .tdk-path div::before{background:rgba(14,208,162,.16);color:var(--g)}
+.tdk-sw{display:inline-flex;padding:.3em;border-radius:999px;background:#fff;box-shadow:0 0 0 1px var(--line) inset;position:relative;flex:none}
+.tdk-sw button{position:relative;z-index:1;height:2.6em;padding:0 1.2em;border-radius:999px;font-size:.82em;color:var(--tx2);transition:color .3s;display:inline-flex;align-items:center;gap:.45em}
+.tdk-sw button.is-on{color:#fff}
+.tdk-sw button em{font-style:normal;font-size:.85em;color:var(--gt);font-weight:500}
+.tdk-sw button.is-on em{color:var(--g)}
+.tdk-sw__p{position:absolute;top:.3em;bottom:.3em;left:.3em;border-radius:999px;background:var(--dk);transition:left .4s cubic-bezier(.4,0,.2,1),width .4s cubic-bezier(.4,0,.2,1)}
+.tdk-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:1em;align-items:stretch}
+.tdk-plans>*{min-width:0}
+.tdk-pl{position:relative;background:#fff;border-radius:1.2em;padding:1.9em 1.9em 2em;display:flex;flex-direction:column;box-shadow:0 0 0 1px var(--line);overflow:hidden}
+.tdk-pl__head{display:flex;align-items:center;gap:.9em}
+.tdk-pl__ic{width:2.8em;height:2.8em;border-radius:.85em;background:var(--soft);color:var(--gd);display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-pl__ic svg{width:1.3em;height:1.3em}
+.tdk-pl__name{display:block;font-size:.98em;font-weight:600}
+.tdk-pl__for{display:block;font-size:.78em;font-weight:300;color:var(--tx2)}
+.tdk-pl__tag{position:absolute;right:1.4em;top:1.4em;font-size:.68em;font-weight:500;letter-spacing:.03em;padding:.4em .8em;border-radius:999px}
+.tdk-pl__price{display:flex;align-items:baseline;gap:.45em;margin-top:1.7em}
+.tdk-pl__price b{font-size:2.15em;font-weight:600;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tdk-pl__price span{font-size:.8em;color:var(--tx2)}
+.tdk-pl__note{font-size:.76em;margin-top:.5em;min-height:1.3em;color:var(--tx2)}
+.tdk-pl .tdk-btn{margin-top:1.4em;height:3.3em}
+.tdk-pl__hr{height:1px;background:var(--line);margin:1.6em 0 1.3em}
+.tdk-pl__sub{font-size:.72em;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:1em}
+.tdk-pl--pro{background:var(--dk);color:#fff;box-shadow:none}
+.tdk-pl--pro::before{content:"";position:absolute;left:-30%;right:-30%;top:-9em;height:16em;background:radial-gradient(closest-side,rgba(14,208,162,.35),transparent);pointer-events:none}
+.tdk-pl--pro>*{position:relative}
+.tdk-pl--pro .tdk-pl__ic{background:rgba(14,208,162,.16);color:var(--g)}
+.tdk-pl--pro .tdk-pl__for,.tdk-pl--pro .tdk-pl__price span{color:rgba(255,255,255,.55)}
+.tdk-pl--pro .tdk-pl__note{color:var(--g)}
+.tdk-pl--pro .tdk-pl__hr{background:rgba(255,255,255,.1)}
+.tdk-pl--pro .tdk-pl__sub{color:rgba(255,255,255,.4)}
+.tdk-pl--pro .tdk-pl__tag{position:absolute;background:var(--g);color:var(--dk)}
+.tdk-pl--corp .tdk-pl__ic{background:#FFF4E2;color:#D9861C}
+.tdk-pl--corp .tdk-pl__tag{background:#FFF4E2;color:#B06A10}
+.tdk-incl{display:grid;grid-template-columns:auto repeat(4,1fr);gap:1.6em;align-items:center;margin-top:1em;padding:1.2em 1.6em;border-radius:1.2em;background:#fff;box-shadow:0 0 0 1px var(--line)}
+.tdk-incl>b{font-size:.78em;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--tx2);padding-right:1.6em;border-right:1px solid var(--line)}
+.tdk-incl div{display:flex;align-items:center;gap:.7em;font-size:.82em;line-height:1.3}
+.tdk-incl div span{width:2.2em;height:2.2em;border-radius:.7em;background:var(--gl);color:var(--gt);display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-incl div span svg{width:1.05em;height:1.05em}
+.tdk-cmpbtn{display:flex;align-items:center;gap:.5em;margin:1.8em auto 0;font-size:.85em;color:var(--tx);border-bottom:1px solid #CFCFCF;padding-bottom:.15em;transition:border-color .25s}
+.tdk-cmpbtn:hover{border-color:var(--tx)}
+.tdk-cmpbtn svg{width:.75em;height:.75em;transition:transform .35s}
+.tdk-cmpbtn.is-on svg{transform:rotate(180deg)}
+.tdk-tbl{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.4,0,.2,1)}
+.tdk-tbl.is-on{grid-template-rows:1fr}
+.tdk-tbl>div{overflow:hidden}
+.tdk-tbl__in{margin-top:1.4em;background:#fff;border-radius:1.2em;padding:.4em 2em 1.2em;overflow-x:auto;box-shadow:0 0 0 1px var(--line)}
+.tdk-tbl table{width:100%;border-collapse:collapse;font-size:.84em;min-width:36em}
+.tdk-tbl th{text-align:center;font-weight:500;font-size:.82em;letter-spacing:.07em;text-transform:uppercase;padding:1.3em .6em .9em;color:var(--tx2)}
+.tdk-tbl th:first-child{text-align:left}
+.tdk-tbl td{padding:.7em .6em;border-top:1px solid #F1F1F1;font-weight:300;line-height:1.4;color:#444}
+.tdk-tbl td:not(:first-child){width:14%;text-align:center}
+.tdk-tbl td .tdk-ck{display:inline-block;margin:0;vertical-align:middle}
+.tdk-tbl tr.gr td{font-weight:500;font-size:.78em;letter-spacing:.08em;text-transform:uppercase;color:var(--gt);padding-top:1.5em;border-top:0}
+.tdk-why{display:grid;grid-template-columns:1fr 1.25fr;gap:4em;align-items:center}
+.tdk-why>*{min-width:0}
+.tdk-why .tdk-sub{margin-top:1.2em;max-width:28em}
+.tdk-why__svc{display:flex;flex-wrap:wrap;gap:.4em;margin-top:1.8em}
+.tdk-why__svc span{font-size:.76em;padding:.45em .9em;border-radius:999px;background:var(--soft);box-shadow:0 0 0 1px var(--line) inset;color:#444}
+.tdk-why .tdk-more{margin-top:1.8em}
+.tdk-stats{display:grid;grid-template-columns:1fr 1fr;gap:1em}
+.tdk-stat{position:relative;border-radius:1.2em;background:var(--soft);padding:1.6em 1.7em;min-height:11em;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.tdk-stat b{font-size:2.6em;font-weight:300;line-height:1;letter-spacing:-.03em}
+.tdk-stat b span{color:var(--gt);font-weight:400}
+.tdk-stat p{font-size:.84em;font-weight:300;line-height:1.5;color:#555;max-width:15em}
+.tdk-stat--dk{background:var(--dk);color:#fff}
+.tdk-stat--dk p{color:rgba(255,255,255,.6)}
+.tdk-stat--dk::after{content:"";position:absolute;right:-5em;bottom:-6em;width:16em;height:16em;border-radius:50%;background:radial-gradient(circle,rgba(14,208,162,.35),transparent 65%)}
+.tdk-stat__lg{position:absolute;right:1.4em;top:1.4em;height:1.8em;width:auto;opacity:.9}
+.tdk-cl{display:grid;grid-template-columns:repeat(4,1fr);gap:1em}
+.tdk-cl>*{min-width:0}
+.tdk-lg{position:relative;height:10em;border-radius:1.2em;background:var(--soft);display:flex;align-items:center;justify-content:center;padding:2.2em 2.6em;overflow:hidden;transition:background .35s,box-shadow .35s}
+.tdk-lg img{max-height:3.6em;width:auto;max-width:100%;object-fit:contain;filter:grayscale(1);opacity:.62;transition:filter .4s,opacity .4s,transform .5s cubic-bezier(.2,.7,.2,1)}
+.tdk-lg small{position:absolute;left:1.3em;bottom:1em;font-size:.7em;color:var(--tx2);opacity:0;transform:translateY(.4em);transition:.35s}
+.tdk-lg:hover{background:#fff;box-shadow:0 0 0 1px var(--line)}
+.tdk-lg:hover img{filter:none;opacity:1;transform:translateY(-.3em)}
+.tdk-lg:hover small{opacity:1;transform:none}
+.tdk-lgc{grid-column:span 2;position:relative;border-radius:1.2em;background:var(--dk);color:#fff;padding:1.8em 2em;display:flex;align-items:center;justify-content:space-between;gap:1.5em;overflow:hidden}
+.tdk-lgc::after{content:"";position:absolute;right:-4em;top:-8em;width:20em;height:20em;border-radius:50%;background:radial-gradient(circle,rgba(14,208,162,.3),transparent 65%);pointer-events:none}
+.tdk-lgc>*{position:relative;z-index:1}
+.tdk-lgc b{display:block;font-size:1.15em;font-weight:500;line-height:1.3}
+.tdk-lgc p{font-size:.82em;font-weight:300;color:rgba(255,255,255,.6);margin-top:.35em}
+.tdk-lgc .tdk-btn{height:3.2em;padding:0 1.6em;flex:none}
+.tdk-demo{position:relative;border-radius:1.6em;overflow:hidden;background:var(--dk);color:#fff;display:grid;grid-template-columns:1fr 1fr;min-height:32em}
+.tdk-demo>*{min-width:0}
+.tdk-demo::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:3em 3em;-webkit-mask-image:radial-gradient(55% 75% at 75% 50%,#000,transparent);mask-image:radial-gradient(55% 75% at 75% 50%,#000,transparent);pointer-events:none}
+.tdk-demo::after{content:"";position:absolute;right:5%;top:50%;width:34em;height:34em;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle,rgba(14,208,162,.32),transparent 62%);pointer-events:none}
+.tdk-demo__b{position:relative;z-index:2;padding:3.6em 3.4em}
+.tdk-demo .tdk-h2{font-size:2.15em}
+.tdk-demo .tdk-sub{margin-top:1em}
+.tdk-demo__steps{margin-top:1.8em;display:flex;flex-direction:column;gap:.75em}
+.tdk-demo__steps div{display:flex;align-items:center;gap:.8em;font-size:.84em;color:rgba(255,255,255,.8)}
+.tdk-demo__steps div span{width:1.9em;height:1.9em;border-radius:50%;border:1px solid rgba(14,208,162,.4);color:var(--g);display:flex;align-items:center;justify-content:center;font-size:.8em;font-weight:600;flex:none}
+.tdk-demo__btns{display:flex;flex-wrap:wrap;align-items:center;gap:.8em;margin-top:2.2em}
+.tdk-demo__art{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:28em}
+.tdk-orb{position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(255,255,255,.1);transform:translate(-50%,-50%)}
+.tdk-orb--1{width:17em;height:17em}
+.tdk-orb--2{width:25em;height:25em;border-style:dashed;border-color:rgba(255,255,255,.09);animation:tdkSpin 70s linear infinite}
+.tdk-orb--3{width:33em;height:33em;border-color:rgba(255,255,255,.05);animation:tdkSpin 110s linear infinite reverse}
+.tdk-orb i{position:absolute;width:.7em;height:.7em;border-radius:50%;background:var(--g);box-shadow:none;left:50%;top:-.35em;margin-left:-.35em}
+.tdk-orb--3 i{top:auto;bottom:-.35em;width:.5em;height:.5em;background:#fff;box-shadow:none}
+@keyframes tdkSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.tdk-demo__icon{position:relative;width:15em;animation:tdkFloat 6s ease-in-out infinite}
+@keyframes tdkFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-.7em)}}
+.tdk-feed{position:absolute;right:6%;bottom:9%;width:15.5em;height:12.5em;z-index:2}
+.tdk-ev{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:.7em;padding:.7em .85em;border-radius:.85em;background:rgba(30,36,41,.88);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:.74em;line-height:1.3;opacity:0;transition:transform .7s cubic-bezier(.3,.7,.2,1),opacity .7s}
+.tdk-ev span{width:2.1em;height:2.1em;border-radius:.6em;display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-ev span svg{width:1em;height:1em}
+.tdk-ev b{display:block;font-weight:500}
+.tdk-ev small{color:rgba(255,255,255,.55)}
+.tdk-ev[data-p="0"]{opacity:1;transform:none}
+.tdk-ev[data-p="1"]{opacity:.65;transform:translateY(-4.3em) scale(.96)}
+.tdk-ev[data-p="2"]{opacity:.3;transform:translateY(-8.4em) scale(.92)}
+.tdk-ev[data-p="3"]{opacity:0;transform:translateY(-11em) scale(.88)}
+.tdk-ev[data-p="-1"]{opacity:0;transform:translateY(2em);transition:none}
+.tdk-demo__chip{position:absolute;left:8%;top:14%;display:flex;align-items:center;gap:.5em;padding:.5em .85em;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-size:.74em;z-index:2;animation:tdkFloat 7s ease-in-out infinite}
+.tdk-demo__chip i{width:.45em;height:.45em;border-radius:50%;background:var(--g)}
+@media (max-width:1259px){
+  .tdk-fl{grid-template-columns:12.5em minmax(6em,1fr) 9.5em 4em 25em}
+  .tdk-ab{grid-template-columns:1fr 1fr}
+  .tdk-art{grid-column:1/-1;order:-1;min-height:26em}
+}
+@media (max-width:959px){
+  .tdk{font-size:14px;--top:150px}
+  .tdk-wrap{padding:0 20px}
+  .tdk-sec{padding:4.2em 0}
+  .tdk-hd{flex-direction:column;align-items:flex-start;gap:1em;margin-bottom:2em}
+  .tdk-h2{font-size:1.85em}
+  .tdk-hero{padding-bottom:0;min-height:0}
+  .tdk-hero__circle{left:45%;top:-10em;width:40em;height:40em}
+  .tdk-hero__wm,.tdk-hero__frame{display:none}
+  .tdk-h1{font-size:2.1em}
+  .tdk-hero__media{position:relative;left:auto;bottom:auto;width:100%;max-width:560px;margin:2.5em auto 0}
+  .tdk-chip{font-size:.7em}.tdk-chip--a{left:0;top:60%}.tdk-chip--b{right:0;top:6%}
+  .tdk-ab{grid-template-columns:1fr}
+  .tdk-art{min-height:22em}
+  .tdk-fl{grid-template-columns:1fr;min-height:0;gap:1.6em;justify-items:center}
+  .tdk-fl__ph{width:13em}
+  .tdk-fl__user{display:none}
+  .tdk-fl__mid{height:auto;width:100%}
+  .tdk-fl__mid>svg{display:none}
+  .tdk-pills{position:relative;display:flex;justify-content:center;flex-wrap:wrap;gap:.5em}
+  .tdk-pill{position:relative;left:auto;top:auto!important;transform:none}
+  .tdk-ordc{position:relative;bottom:auto;left:auto;transform:none!important;margin-bottom:.4em}
+  .tdk-fl__arr{width:2px;height:2.5em;background-image:linear-gradient(var(--g) 50%,transparent 50%);background-size:2px 8px}
+  .tdk-fl__arr svg{display:none}
+  .tdk-msw{width:100%}
+  .tdk-msw__ok{top:-3.2em;right:.5em}
+  .tdk-win__b{grid-template-columns:1fr}
+  .tdk-win__nav{display:none}
+  .tdk-steps3{grid-template-columns:1fr;margin-top:2em}
+  .tdk-appg{grid-template-columns:1fr;gap:1em}
+  .tdk-cf__stage{height:30em;order:-1}
+  .tdk-cf__ph{width:12em;margin-left:-6em}
+  .tdk-c7,.tdk-c5,.tdk-c4{grid-column:1/-1}
+  .tdk-cat{grid-template-columns:1fr}
+  .tdk-own{grid-template-columns:1fr 9em}
+  .tdk-who{grid-template-columns:1fr}
+  .tdk-tree{display:none}
+  .tdk-ln3{grid-template-columns:1fr}
+  .tdk-plans{grid-template-columns:1fr}
+  .tdk-incl{grid-template-columns:1fr 1fr;gap:1em}
+  .tdk-incl>b{grid-column:1/-1;border-right:0;padding:0}
+  .tdk-tbl__in{padding:.3em 1em 1em}
+  .tdk-why{grid-template-columns:1fr;gap:2em}
+  .tdk-cl{grid-template-columns:1fr 1fr}
+  .tdk-lg{height:7.5em;padding:1.6em}
+  .tdk-lgc{grid-column:1/-1;flex-direction:column;align-items:flex-start}
+  .tdk-demo{grid-template-columns:1fr}
+  .tdk-demo__b{padding:2.4em 1.6em .5em}
+  .tdk-demo .tdk-h2{font-size:1.7em}
+  .tdk-demo__art{min-height:24em}
+  .tdk-orb--3{display:none}
+  .tdk-demo__icon{width:11em}
+  .tdk-feed{right:4%;bottom:4%;width:14em}
+}
+@media (max-width:479px){
+  .tdk{font-size:13.5px}
+  .tdk-h1{font-size:1.95em}
+  .tdk-hero__btns .tdk-btn{width:100%}
+  .tdk-chip--b{display:none}
+  .tdk-own{grid-template-columns:1fr}
+  .tdk-own__ph{width:60%;justify-self:center}
+  .tdk-stats{grid-template-columns:1fr}
+  .tdk-incl{grid-template-columns:1fr}
+  .tdk-art__bar b{font-size:1em}
+  .tdk-row small{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .tdk *,.tdk *::before,.tdk *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+.tdk-btn--line{border:1px solid #D5D8D6;color:var(--tx)!important}
+.tdk-btn--line:hover{background:transparent;border-color:#8E9390;color:var(--tx)!important}
+.tdk-btn--wline{border:1px solid rgba(255,255,255,.2)}
+.tdk-btn--wline:hover{background:transparent;border-color:rgba(255,255,255,.55);color:#fff!important}
+.tdk-hero__media{left:46%;width:51%}
+.tdk-hero__media>img{width:100%;display:block}
+.tdk-chip{gap:.85em;padding:.95em 1.45em .95em .95em;border-radius:1em;font-size:.76em;box-shadow:none;animation:tdkChipIn .9s cubic-bezier(.2,.7,.2,1) var(--d,0s) both}
+.tdk-chip__ic{width:2.6em;height:2.6em}
+.tdk-chip small{margin-top:.15em}
+.tdk-chip--a{left:-6%;top:62%}
+.tdk-chip--b{right:-4%;top:22%}
+.tdk-chip--c{left:2%;top:24%}
+@keyframes tdkChipIn{from{opacity:0;transform:translateY(.9em)}to{opacity:1;transform:none}}
+.tdk-tgw{background:#fff;border-radius:1em;box-shadow:0 0 0 1px var(--line);overflow:hidden;font-size:.76em}
+.tdk-tgw__h{display:flex;align-items:center;gap:.6em;padding:.7em .9em;border-bottom:1px solid #F0F0F0}
+.tdk-tgw__back{color:#2AABEE;flex:none}
+.tdk-tgw__h img{width:2.2em;height:2.2em;border-radius:50%;background:var(--gl);padding:.35em;flex:none}
+.tdk-tgw__h b{display:block;font-weight:600;line-height:1.2}
+.tdk-tgw__h small{color:#2AABEE;font-size:.88em}
+.tdk-tgw__h i{margin-left:auto;font-style:normal;font-size:.82em;color:var(--tx2);padding:.25em .6em;border-radius:999px;background:var(--soft);white-space:nowrap}
+.tdk-tgw__b{padding:.9em .8em;background:#E8F0EB radial-gradient(rgba(14,177,138,.1) 1px,transparent 1.3px) 0 0/1.1em 1.1em}
+.tdk-tgw__m{background:#fff;padding:.65em .85em .45em;border-radius:1em 1em 1em .3em;line-height:1.45;max-width:94%;box-shadow:none}
+.tdk-tgw__m small{display:block;text-align:right;font-size:.8em;color:var(--gt);margin-top:.1em}
+.tdk-tgw__k{display:grid;grid-template-columns:1fr 1fr;gap:.3em;margin-top:.35em}
+.tdk-tgw__k span{text-align:center;padding:.6em .3em;border-radius:.6em;background:rgba(255,255,255,.8);color:var(--gd);font-weight:500;white-space:nowrap}
+.tdk-tgw__in{display:flex;align-items:center;gap:.6em;padding:.65em .9em;color:#A3A3A3;border-top:1px solid #F0F0F0}
+.tdk-tgw__in span{flex:1}
+.tdk-tgw__in svg{color:#2AABEE}
+.tdk-int{background:#fff;border-radius:1em;box-shadow:0 0 0 1px var(--line);padding:.2em 1em .4em;font-size:.78em}
+.tdk-int__h{display:flex;align-items:center;gap:.6em;padding:.85em 0;border-bottom:1px solid #F1F1F1}
+.tdk-int__lg{display:flex;align-items:center;gap:.4em;flex:none}
+.tdk-int__lg img{height:1.2em;width:auto}
+.tdk-int__lg b{font-weight:600;color:var(--gd)}
+.tdk-int__x{flex:1;display:flex;align-items:center;gap:.4em;color:var(--gt)}
+.tdk-int__x i{flex:1;height:1px;background-image:linear-gradient(90deg,#9FDCC6 50%,transparent 50%);background-size:6px 1px}
+.tdk-int__x svg{animation:tdkRot 5s linear infinite}
+@keyframes tdkRot{to{transform:rotate(360deg)}}
+.tdk-int__r{display:flex;justify-content:space-between;align-items:center;gap:.8em;padding:.7em 0;border-bottom:1px solid #F4F4F4}
+.tdk-int__r:last-child{border-bottom:0}
+.tdk-int__r span{display:flex;align-items:center;gap:.55em;color:#444}
+.tdk-int__r span svg{width:1.15em;height:1.15em;color:var(--tx2)}
+.tdk-int__r em{font-style:normal;font-size:.9em;color:var(--gd);background:var(--gl);padding:.3em .7em;border-radius:999px;display:flex;align-items:center;gap:.35em;white-space:nowrap}
+.tdk-int__r em svg{width:1em;height:1em}
+.tdk-tagl--3{left:6%;top:47%}
+.tdk-art__bar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:1em;box-shadow:0 0 0 1px rgba(0,0,0,.03)}
+.tdk-art__bar>div{display:flex;align-items:center;gap:.75em;padding:.95em 1.1em;border-left:1px solid #EFEFEF}
+.tdk-art__bar>div:first-child{border-left:0}
+.tdk-art__ic{width:2.4em;height:2.4em;border-radius:.75em;background:var(--gl);color:var(--gt);display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-art__ic svg{width:1.15em;height:1.15em}
+.tdk-art__bar b{font-size:1.1em;font-weight:600;line-height:1.15}
+.tdk-art__bar small{margin-top:.1em}
+.tdk-fl__cap{position:absolute;left:50%;bottom:-2.6em;transform:translateX(-50%);font-size:.68em;letter-spacing:.09em;text-transform:uppercase;color:var(--tx3);white-space:nowrap}
+.tdk-msw .tdk-fl__cap{bottom:auto;top:calc(100% + 1.3em)}
+.tdk-fl__cap--hub{position:static;transform:none;order:3;margin-top:.2em}
+.tdk-pill__ok{position:absolute;right:-.5em;top:-.5em;width:1.55em;height:1.55em;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;transform:scale(0);transition:transform .4s cubic-bezier(.3,1.6,.5,1);font-style:normal}
+.tdk-fl[data-s="3"] .tdk-pill__ok{transform:scale(1)}
+.tdk-fl[data-s="3"] .tdk-pill:nth-child(2) .tdk-pill__ok,.tdk-fl[data-s="2"] .tdk-pill:nth-child(2){transition-delay:.15s}
+.tdk-fl[data-s="3"] .tdk-pill:nth-child(3) .tdk-pill__ok,.tdk-fl[data-s="2"] .tdk-pill:nth-child(3){transition-delay:.3s}
+.tdk-row__det{display:none;flex-wrap:wrap;gap:.35em;padding:.15em .7em .8em 1.95em;background:#F2FBF7;border-radius:0 0 .55em .55em;margin-bottom:.2em}
+.tdk-row__det span{font-size:.92em;padding:.2em .6em;border-radius:999px;background:#fff;color:#555;box-shadow:0 0 0 1px #E1EFE8}
+.tdk-row__det span.g{color:var(--gd);background:var(--gl)}
+.tdk-fl[data-s="3"] .tdk-row--new{border-radius:.55em .55em 0 0}
+.tdk-fl[data-s="3"] .tdk-row__det{display:flex;animation:tdkRowIn .6s .25s both}
+.tdk-win__f{display:flex;align-items:center;gap:.8em;margin-top:.9em;padding:.65em .8em;border-radius:.6em;background:var(--soft);font-size:.72em;color:#666}
+.tdk-win__f b{font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums}
+.tdk-win__f b .b{display:none}
+.tdk-fl[data-s="3"] .tdk-win__f b .a{display:none}
+.tdk-fl[data-s="3"] .tdk-win__f b .b{display:inline;animation:tdkPop .4s .4s}
+.tdk-win__f i{flex:1;height:.35em;border-radius:1em;background:#E3E8E5;overflow:hidden}
+.tdk-win__f u{display:block;height:100%;width:62%;background:var(--g);border-radius:1em;transition:width .8s .4s}
+.tdk-fl[data-s="3"] .tdk-win__f u{width:66%}
+.tdk-app .tdk-sub{max-width:24em}
+.tdk-app .tdk-h2{font-size:2.15em}
+.tdk-tab{grid-template-columns:2.5em 1fr auto;gap:.9em;align-items:start}
+.tdk-tab__ic{width:2.5em;height:2.5em;border-radius:.75em;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);transition:background .35s,border-color .35s,color .35s}
+.tdk-tab .tdk-tab__ic svg{width:1.1em;height:1.1em;opacity:1;transform:none;margin:0;color:inherit}
+.tdk-tab.is-on .tdk-tab__ic{background:rgba(14,208,162,.14);border-color:rgba(14,208,162,.35);color:var(--g)}
+.tdk-tab b{padding-top:.4em}
+.tdk-tab small{padding-top:.65em}
+.tdk-cf__wrap{position:relative}
+.tdk-cf__stage{height:34em}
+.tdk-cf__floor{position:absolute;left:50%;bottom:.2em;width:28em;height:3.4em;margin-left:-14em;border-radius:50%;background:radial-gradient(closest-side,rgba(14,208,162,.32),transparent)}
+.tdk-co{position:absolute;z-index:20;display:flex;align-items:center;gap:.55em;padding:.6em .95em .6em .6em;border-radius:.85em;background:rgba(28,34,39,.88);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:.76em;white-space:nowrap;box-shadow:none;transition:opacity .35s,transform .35s}
+.tdk-co i{width:1.7em;height:1.7em;border-radius:50%;flex:none;background:rgba(14,208,162,.2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230ED0A2' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5 10 17 19 7'/%3E%3C/svg%3E") center/.7em no-repeat}
+.tdk-co.is-swap{opacity:0;transform:translateY(.4em)}
+.tdk-co--1{right:calc(50% + 5.6em);top:20%}
+.tdk-co--2{left:calc(50% + 5.6em);top:44%}
+.tdk-co--3{right:calc(50% + 5.6em);top:68%}
+.tdk-cf__nav{display:flex;align-items:center;justify-content:center;gap:1.1em;margin-top:.8em;font-size:.82em;color:rgba(255,255,255,.45)}
+.tdk-cf__nav b{color:#fff;font-weight:500}
+.tdk-cf__nav button{width:2.9em;height:2.9em;border-radius:50%;border:1px solid rgba(255,255,255,.16);color:#fff;display:flex;align-items:center;justify-content:center;transition:border-color .3s}
+.tdk-cf__nav button:hover{border-color:rgba(255,255,255,.5)}
+.tdk-cf__nav button svg{width:1em;height:1em}
+.tdk-card{transition:background .7s ease,box-shadow .7s ease}
+.tdk-card::after{transition:opacity .9s ease}
+.tdk-ico{transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.tdk-card:hover .tdk-ico{transform:translateY(-.2em)}
+.tdk-cat img{transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.tdk-card:hover .tdk-cat img{transform:scale(1.02)}
+.tdk-mini{display:flex;align-items:center;gap:.75em;margin-top:1.1em;padding:.7em .85em;border-radius:.85em;background:#fff;box-shadow:0 0 0 1px var(--line);font-size:.76em}
+.tdk-mini__r{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.tdk-mini__r+.tdk-mini__r{padding-left:.75em;border-left:1px solid #EEE}
+.tdk-mini__r small{color:var(--tx2);font-size:.9em}
+.tdk-mini__r s{color:var(--tx3)}
+.tdk-mini__r b{font-weight:600}
+.tdk-mini em{margin-left:auto;font-style:normal;font-weight:600;font-size:.9em;padding:.3em .6em;border-radius:999px;background:var(--gl);color:var(--gd)}
+.tdk-mini em.dl{width:2.1em;height:2.1em;padding:0;display:flex;align-items:center;justify-content:center;color:var(--gt)}
+.tdk-mini__x{width:2.2em;height:2.2em;border-radius:.5em;background:#1F7A45;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-mini__tg{width:2.2em;height:2.2em;border-radius:50%;background:#2AABEE;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-wc__n{height:auto;overflow:visible}
+.tdk-tree{margin-bottom:0}
+.tdk-tree__ln{position:relative;height:2.8em}
+.tdk-tree__ln i{position:absolute;background:#CDD5D1;transition:transform .7s cubic-bezier(.4,0,.2,1)}
+.tdk-tree__ln .v0{left:50%;top:0;width:1px;height:1.4em;transform-origin:top;transform:scaleY(0)}
+.tdk-tree__ln .h{top:1.4em;height:1px;left:calc((100% - 2em) / 6);right:calc((100% - 2em) / 6);transform:scaleX(0);transition-delay:.5s}
+.tdk-tree__ln .v1,.tdk-tree__ln .v2,.tdk-tree__ln .v3{top:1.4em;width:1px;height:1.4em;transform-origin:top;transform:scaleY(0);transition-delay:1s}
+.tdk-tree__ln .v1{left:calc((100% - 2em) / 6)}
+.tdk-tree__ln .v2{left:50%}
+.tdk-tree__ln .v3{right:calc((100% - 2em) / 6)}
+.tdk-tree.is-in .tdk-tree__ln i{transform:none}
+.tdk-lc__tag{align-self:flex-start;font-size:.7em;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--gt);margin-bottom:.55em}
+.tdk-lc--hl .tdk-lc__tag{color:var(--g)}
+.tdk-lc__q{display:inline-flex;align-items:center}
+.tdk-lc__q i{width:.45em;height:.45em;border-radius:50%;background:var(--g);margin-right:.5em}
+.tdk-lc--hl .tdk-lc__q{background:#fff;color:var(--tx2);box-shadow:0 0 0 1px var(--line)}
+.tdk-gets{margin-top:1.3em}
+.tdk-gets small{display:block;font-size:.7em;letter-spacing:.07em;text-transform:uppercase;color:var(--tx3);margin-bottom:.5em}
+.tdk-gets div{display:flex;flex-wrap:wrap;gap:.35em}
+.tdk-gets span{font-size:.74em;padding:.35em .75em;border-radius:999px;background:var(--soft);box-shadow:0 0 0 1px var(--line) inset;color:#444}
+.tdk-lc--hl .tdk-gets small{color:rgba(255,255,255,.4)}
+.tdk-lc--hl .tdk-gets span{background:rgba(255,255,255,.06);box-shadow:0 0 0 1px rgba(255,255,255,.1) inset;color:rgba(255,255,255,.85)}
+.tdk-why{display:block;position:relative;border-radius:1.6em;overflow:hidden;padding:3.4em 3.4em 2.8em}
+.tdk-why::before{content:"";position:absolute;right:-10em;top:-14em;width:38em;height:38em;border-radius:50%;background:radial-gradient(circle,rgba(14,208,162,.22),transparent 62%);pointer-events:none}
+.tdk-why__wm{position:absolute;right:-1em;bottom:-2em;width:48em;opacity:.05;pointer-events:none}
+.tdk-why__top{position:relative;display:grid;grid-template-columns:1.1fr 1fr;gap:3em;align-items:end}
+.tdk-why__top>*{min-width:0}
+.tdk-why__logo{height:2.3em;width:auto;margin-bottom:1.1em}
+.tdk-why .tdk-sub{margin-top:0;max-width:30em}
+.tdk-why .tdk-more{margin-top:1.1em;color:var(--g)!important}
+.tdk-why__nums{position:relative;display:grid;grid-template-columns:repeat(4,1fr);margin-top:3em;border-top:1px solid rgba(255,255,255,.1)}
+.tdk-why__nums>div{padding:1.7em 1.6em 0 0}
+.tdk-why__nums>div+div{padding-left:1.7em;border-left:1px solid rgba(255,255,255,.1)}
+.tdk-why__nums b{display:flex;align-items:baseline;font-size:2.9em;font-weight:300;letter-spacing:-.03em;line-height:1;color:#fff}
+.tdk-why__nums b em{font-style:normal;font-variant-numeric:tabular-nums}
+.tdk-why__nums b i{font-style:normal;color:var(--g);font-weight:400}
+.tdk-why__nums span{display:block;margin-top:.8em;font-size:.82em;color:rgba(255,255,255,.55)}
+.tdk-why__ptn{position:relative;display:flex;align-items:center;gap:2em;margin-top:2.8em;padding-top:1.9em;border-top:1px solid rgba(255,255,255,.1)}
+.tdk-why__ptn small{flex:none;font-size:.72em;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.tdk-why__ptn div{display:flex;flex-wrap:wrap;gap:.6em;flex:1}
+.tdk-why__ptn span{height:3.1em;padding:0 1.4em;border-radius:.85em;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;transition:background .4s,border-color .4s}
+.tdk-why__ptn span:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}
+.tdk-why__ptn img{height:1.25em;width:auto;max-width:7.5em;filter:brightness(0) invert(1);opacity:.75}
+.tdk-demo{grid-template-columns:1fr 1.1fr;min-height:34em}
+.tdk-demo__icon{width:16.5em}
+.tdk-demo__chip{animation:tdkFloat 7s ease-in-out infinite;gap:.55em;padding:.6em 1em}
+.tdk-demo__chip svg{color:var(--g)}
+.tdk-demo__chip i.g{width:.45em;height:.45em;border-radius:50%;background:var(--g)}
+.tdk-demo__chip--1{left:6%;top:15%}
+.tdk-demo__chip--2{left:2%;top:auto;bottom:24%;animation-delay:-2.3s}
+.tdk-demo__chip--3{left:auto;right:9%;top:11%;animation-delay:-4.6s}
+.tdk-feed{right:5%;bottom:8%}
+.tdk-ev .tdk-ev__t{display:block;width:auto;height:auto;background:none}
+@media (max-width:959px){
+  .tdk-hero__media{left:auto;width:100%}
+  .tdk-chip--a{left:0;top:62%}.tdk-chip--b{right:0;top:6%}.tdk-chip--c{display:none}
+  .tdk-art__bar>div{padding:.8em .7em;gap:.5em}
+  .tdk-art__ic{display:none}
+  .tdk-fl__cap{display:none}
+  .tdk-co{display:none}
+  .tdk-cf__stage{height:30em}
+  .tdk-why{padding:2.4em 1.6em 2em}
+  .tdk-why__top{grid-template-columns:1fr;gap:1.6em}
+  .tdk-why__nums{grid-template-columns:1fr 1fr}
+  .tdk-why__nums>div,.tdk-why__nums>div+div{padding:1.4em 0 0;border-left:0}
+  .tdk-why__ptn{flex-direction:column;align-items:flex-start;gap:1em}
+  .tdk-demo{grid-template-columns:1fr}
+  .tdk-demo__chip--1{left:5%;top:6%}.tdk-demo__chip--2{left:4%;bottom:34%}.tdk-demo__chip--3{right:5%;top:6%}
+}
+@media (max-width:479px){
+  .tdk-art__bar small{font-size:.65em}
+  .tdk-why__nums b{font-size:2.3em}
+}
+@font-face{font-family:'Circle';src:url('https://static.tildacdn.net/tild3266-3536-4238-b965-643036373238/Circe-Light.woff') format('woff');font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:'Circle';src:url('https://static.tildacdn.net/tild6531-6561-4636-a533-656332303238/Circe-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Circle';src:url('https://static.tildacdn.net/tild3530-6336-4139-a235-356537336265/Circe-Bold.woff') format('woff');font-weight:600;font-style:normal;font-display:swap}
+.tdk-trk{background:#fff;border-radius:1em;border:1px solid var(--line);padding:.95em 1em 1em;font-size:.78em}
+.tdk-trk__h{display:flex;align-items:center;gap:.7em;padding-bottom:.85em;border-bottom:1px solid #F1F1F1}
+.tdk-trk__ic{width:2.4em;height:2.4em;border-radius:.7em;background:var(--gl);color:var(--gt);display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-trk__ic svg{width:1.15em;height:1.15em}
+.tdk-trk__h b{display:block;font-weight:600;line-height:1.2}
+.tdk-trk__h small{color:var(--tx2);font-size:.9em}
+.tdk-trk__h em{margin-left:auto;font-style:normal;font-size:.86em;font-weight:500;padding:.3em .7em;border-radius:999px;background:#FFF4E2;color:#B06A10;white-space:nowrap}
+.tdk-trk__st{position:relative;padding:.8em 0 .3em}
+.tdk-trk__st::before{content:"";position:absolute;left:.5em;top:1.35em;bottom:1.1em;width:1px;background:#E3E7E5}
+.tdk-trk__st div{position:relative;display:flex;align-items:center;gap:.8em;padding:.38em 0;color:var(--tx3)}
+.tdk-trk__st i{position:relative;width:1.05em;height:1.05em;border-radius:50%;background:#fff;border:1px solid #D3D8D6;flex:none}
+.tdk-trk__st span{flex:1}
+.tdk-trk__st small{font-size:.86em;color:var(--tx3)}
+.tdk-trk__st .ok{color:#444}
+.tdk-trk__st .ok i{border-color:var(--g);background:var(--g) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5 10 17 19 7'/%3E%3C/svg%3E") center/.6em no-repeat}
+.tdk-trk__st .cur{color:var(--tx);font-weight:500}
+.tdk-trk__st .cur i{border-color:var(--g)}
+.tdk-trk__st .cur i::after{content:"";position:absolute;inset:.22em;border-radius:50%;background:var(--g)}
+.tdk-trk__st .cur i::before{content:"";position:absolute;inset:-.35em;border-radius:50%;border:1px solid rgba(14,208,162,.5);animation:tdkPing 2s ease-out infinite}
+.tdk-trk__f{display:flex;align-items:center;justify-content:space-between;gap:.8em;margin-top:.5em;padding-top:.8em;border-top:1px solid #F1F1F1;color:#555}
+.tdk-trk__f span{display:flex;align-items:center;gap:.5em}
+.tdk-trk__f svg{width:1.15em;height:1.15em;color:var(--tx2)}
+.tdk-trk__f b{font-weight:500;color:var(--gd);padding:.35em .75em;border-radius:.55em;background:var(--gl)}
+.tdk-flowsec{background:#fff}
+.tdk-flowsec::before{display:none}
+.tdk-flpanel{position:relative;border-radius:1.6em;background:var(--soft);border:1px solid #EDEFEE;padding:3.2em 3em 2.4em;overflow:hidden}
+.tdk-flpanel::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(14,177,138,.13) 1px,transparent 1.3px);background-size:1.6em 1.6em;-webkit-mask-image:radial-gradient(60% 60% at 50% 45%,#000,transparent);mask-image:radial-gradient(60% 60% at 50% 45%,#000,transparent);pointer-events:none}
+.tdk-flpanel .tdk-fl{grid-template-columns:13em minmax(7em,1fr) 10.5em 4.5em 27em;min-height:31em}
+.tdk-flpanel .tdk-steps3{margin-top:4em}
+.tdk-flpanel .tdk-st3{border:1px solid var(--line);box-shadow:none;transition:border-color .5s}
+.tdk-flpanel .tdk-st3.is-on{border-color:rgba(14,208,162,.6);box-shadow:none}
+.tdk-flpanel .tdk-st3__img{background:var(--soft)}
+.tdk-fl__user{border:1px solid var(--line)}
+.tdk-fl__cart{border:1px solid var(--line)}
+.tdk-fl__toast{border:1px solid rgba(0,0,0,.06)}
+.tdk-pill{border:1px solid var(--line);box-shadow:none!important;transition:border-color .4s}
+.tdk-fl[data-s="2"] .tdk-pill,.tdk-fl[data-s="3"] .tdk-pill{border-color:rgba(14,208,162,.6)}
+.tdk-hub{border:1px solid var(--line);box-shadow:none}
+.tdk-ordc,.tdk-prog,.tdk-msw__ok{border:1px solid var(--line);box-shadow:none}
+.tdk-win{border:1px solid var(--line);box-shadow:none}
+.tdk-newrow{display:grid;grid-template-rows:0fr;transition:grid-template-rows .7s cubic-bezier(.4,0,.2,1)}
+.tdk-newrow>div{overflow:hidden;min-height:0}
+.tdk-fl[data-s="3"] .tdk-newrow{grid-template-rows:1fr}
+.tdk-newrow .tdk-row--new{display:grid;animation:none!important;border-radius:.55em .55em 0 0}
+.tdk-newrow .tdk-row__det{display:flex;animation:none!important}
+.tdk-newrow>div>*{opacity:0;transition:opacity .4s}
+.tdk-fl[data-s="3"] .tdk-newrow>div>*{opacity:1;transition:opacity .5s .3s}
+.tdk-app{padding-bottom:0}
+.tdk-appg{align-items:start}
+.tdk-appg>div:first-child{padding-bottom:6em}
+.tdk-cf__wrap{align-self:end}
+.tdk-cf__stage{height:35em;overflow:hidden}
+.tdk-cf__ph{top:1.5em;width:19em;margin-left:-9.5em;transform-origin:50% 0}
+.tdk-co{background:#fff;color:var(--tx);border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;font-weight:500}
+.tdk-co--1{top:16%}.tdk-co--2{top:36%}.tdk-co--3{top:58%}
+.tdk-co--1,.tdk-co--3{right:calc(50% + 7.6em)}
+.tdk-co--2{left:calc(50% + 7.6em)}
+.tdk-card{box-shadow:0 0 0 1px transparent;transition:background .6s ease,box-shadow .6s ease}
+.tdk-card:hover{box-shadow:0 0 0 1px var(--line)}
+.tdk-own:hover{box-shadow:0 0 0 1px transparent}
+.tdk-nums2{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.tdk-nums2>div{padding:2em 1.8em 1.8em}
+.tdk-nums2>div:first-child{padding-left:0}
+.tdk-nums2>div+div{border-left:1px solid var(--line)}
+.tdk-nums2 b{display:flex;align-items:baseline;font-size:3.4em;font-weight:300;line-height:1;letter-spacing:-.03em;color:var(--tx)}
+.tdk-nums2 b em{font-style:normal;font-variant-numeric:tabular-nums}
+.tdk-nums2 b i{font-style:normal;color:var(--gt)}
+.tdk-nums2 span{display:block;margin-top:.8em;font-size:.84em;font-weight:300;color:#555}
+.tdk-sv4{display:grid;grid-template-columns:repeat(4,1fr);gap:1em;margin-top:2.4em}
+.tdk-sv4>*{min-width:0}
+.tdk-sv{position:relative;background:var(--soft);border-radius:var(--r);padding:1.7em 1.7em 1.6em;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 0 1px transparent;transition:background .6s ease,box-shadow .6s ease}
+.tdk-sv::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--gt));transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.tdk-sv:hover{background:#fff;box-shadow:0 0 0 1px var(--line)}
+.tdk-sv:hover::before{transform:scaleX(1)}
+.tdk-sv__top{display:flex;justify-content:space-between;align-items:flex-start}
+.tdk-sv__ic{width:3em;height:3em;border-radius:.9em;background:#fff;color:var(--gt);display:flex;align-items:center;justify-content:center;border:1px solid var(--line);transition:background .5s,color .5s,border-color .5s}
+.tdk-sv__ic svg{width:1.35em;height:1.35em}
+.tdk-sv:hover .tdk-sv__ic{background:var(--g);border-color:var(--g);color:#fff}
+.tdk-sv__top small{font-size:.72em;color:var(--tx3);letter-spacing:.06em}
+.tdk-sv h3{margin-top:1.2em;font-size:1.05em;font-weight:500;color:var(--tx)}
+.tdk-sv p{margin-top:.45em;font-size:.84em;font-weight:300;line-height:1.6;color:#555}
+.tdk-sv ul{margin-top:auto;padding-top:1.2em;display:flex;flex-wrap:wrap;gap:.35em}
+.tdk-sv li{font-size:.72em;padding:.3em .7em;border-radius:999px;background:#fff;color:#555;transition:background .5s,color .5s}
+.tdk-sv:hover li{background:var(--gl);color:var(--gd)}
+.tdk-cl{display:grid;grid-template-columns:repeat(4,1fr);gap:1em}
+.tdk-cl>*{min-width:0}
+.tdk-lg{position:relative;height:10em;border-radius:1.2em;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8em;padding:1.6em 1.8em 1.1em;box-shadow:0 0 0 1px var(--line);transition:box-shadow .6s ease}
+.tdk-lg:hover{box-shadow:0 0 0 1px rgba(14,208,162,.5)}
+.tdk-lg__i{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
+.tdk-lg img{max-height:3.3em;width:auto;max-width:100%;object-fit:contain;filter:none;opacity:1}
+.tdk-lg small{position:static;opacity:1;transform:none;font-size:.72em;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tdk-lgc{grid-column:span 2;position:relative;border-radius:1.2em;background:var(--dk);color:#fff;padding:1.6em 1.8em;display:flex;align-items:center;gap:1.4em;overflow:hidden}
+.tdk-lgc::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:2em 2em;-webkit-mask-image:linear-gradient(90deg,#000,transparent 70%);mask-image:linear-gradient(90deg,#000,transparent 70%);pointer-events:none}
+.tdk-lgc::after{content:"";position:absolute;right:-6em;top:-8em;width:20em;height:20em;border-radius:50%;background:radial-gradient(circle,rgba(14,208,162,.3),transparent 65%);pointer-events:none}
+.tdk-lgc>*{position:relative;z-index:1}
+.tdk-lgc__ic{width:4.4em;height:4.4em;border-radius:1.2em;background:linear-gradient(145deg,rgba(14,208,162,.22),rgba(14,208,162,.06));border:1px solid rgba(14,208,162,.3);display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-lgc__ic img{width:2.6em}
+.tdk-lgc__b{flex:1;min-width:0}
+.tdk-lgc .tdk-lgc__t{display:block;font-size:1.25em;font-weight:600;line-height:1.25}
+.tdk-lgc__t span{color:var(--g)}
+.tdk-lgc__ch{display:flex;flex-wrap:wrap;gap:.4em 1.1em;margin-top:.7em;font-size:.78em;color:rgba(255,255,255,.75)}
+.tdk-lgc__ch span{display:flex;align-items:center;gap:.45em}
+.tdk-lgc__ch .tdk-ck{margin-top:0;background-color:rgba(14,208,162,.22)}
+.tdk-lgc .tdk-btn{height:3.2em;padding:0 1.6em;flex:none}
+.tdk-demo__chip--4{left:auto;right:1%;top:43%;animation-delay:-1.2s}
+.tdk-demo__chip--5{left:16%;top:auto;bottom:6%;animation-delay:-3.4s}
+.tdk-demo__chip--6{left:32%;top:4%;animation-delay:-5.6s}
+@media (max-width:959px){
+  .tdk-flpanel{padding:1.8em 1.2em;border-radius:1.2em}
+  .tdk-flpanel .tdk-fl{grid-template-columns:1fr;min-height:0}
+  .tdk-flpanel .tdk-steps3{margin-top:2em}
+  .tdk-appg>div:first-child{padding-bottom:1em}
+  .tdk-cf__stage{height:24em;order:2}
+  .tdk-cf__wrap{align-self:auto}
+  .tdk-cf__ph{width:12.5em;margin-left:-6.25em;top:1em}
+  .tdk-nums2{grid-template-columns:1fr 1fr}
+  .tdk-nums2>div{padding:1.5em 1em 1.4em 0}
+  .tdk-nums2>div+div{border-left:0}
+  .tdk-nums2>div:nth-child(n+3){border-top:1px solid var(--line)}
+  .tdk-nums2 b{font-size:2.6em}
+  .tdk-sv4{grid-template-columns:1fr}
+  .tdk-cl{grid-template-columns:1fr 1fr}
+  .tdk-lg{height:7.5em;padding:1.2em}
+  .tdk-lgc{grid-column:1 / -1;flex-wrap:wrap}
+  .tdk-lgc .tdk-btn{width:100%}
+  .tdk-demo__chip--4,.tdk-demo__chip--6{display:none}
+  .tdk-demo__chip--5{left:auto;right:6%;bottom:auto;top:38%}
+}
+.tdk-flowsec{padding-top:1.5em}
+.tdk-phone{border-radius:2.7em;padding:.36em;background:linear-gradient(150deg,#4A5057 0%,#1C1F23 22%,#121417 60%,#3A3F45 100%);box-shadow:none}
+.tdk-phone__s{border-radius:2.36em;box-shadow:0 0 0 .16em #08090A}
+.tdk-phone::before{content:"";position:absolute;left:-.2em;top:7.5em;width:.2em;height:6em;border-radius:.2em 0 0 .2em;background:linear-gradient(#2E3338 0 40%,transparent 40% 55%,#2E3338 55%)}
+.tdk-phone::after{content:"";position:absolute;right:-.2em;top:9em;width:.2em;height:3.6em;border-radius:0 .2em .2em 0;background:#2E3338}
+.tdk-cf__ph .tdk-phone{box-shadow:none}
+.tdk-fl__ph{padding:1.1em;border-radius:3.6em;background:#fff;border:1px solid var(--line)}
+.tdk-fl__ph::before{content:"";position:absolute;inset:-.9em;border-radius:4.3em;border:1px dashed #D9E2DE;pointer-events:none}
+.tdk-fl__user{left:-1.6em;top:-1.2em}
+.tdk-fl__cart{right:-.4em;top:16%}
+.tdk-fl__toast{left:1.9em;right:1.9em;bottom:2.4em}
+.tdk-fl__cap{bottom:-3.4em}
+.tdk-flpanel .tdk-fl{grid-template-columns:15em minmax(6em,1fr) 10.5em 4.5em 27em}
+.tdk-app{background:linear-gradient(180deg,#161A1E 0%,#13171A 100%)}
+.tdk-app__c1,.tdk-app__c2{position:absolute;border-radius:50%;pointer-events:none}
+.tdk-app__c1{right:-12%;top:-30%;width:62em;height:62em;background:linear-gradient(200deg,rgba(255,255,255,.045),rgba(255,255,255,.01) 60%)}
+.tdk-app__c2{right:-4%;top:-14%;width:46em;height:46em;border:1px solid rgba(255,255,255,.06)}
+.tdk-app__wm{position:absolute;left:0;bottom:0;width:39em;opacity:.035;pointer-events:none}
+.tdk-cf__stage{height:38em;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 16%,#000 84%,transparent 100%)}
+.tdk-cf__ph{top:1em;width:20.5em;margin-left:-10.25em}
+.tdk-co--1,.tdk-co--3{right:calc(50% + 8.4em)}
+.tdk-co--2{left:calc(50% + 8.4em)}
+.tdk-co--1{top:14%}.tdk-co--2{top:34%}.tdk-co--3{top:56%}
+.tdk-demo{align-items:center;min-height:38em}
+.tdk-demo__art{align-self:stretch;margin:2.5em 3em 2.5em 0;min-height:33em}
+.tdk-orb--1{width:14em;height:14em}
+.tdk-orb--2{width:21em;height:21em}
+.tdk-orb--3{width:28em;height:28em}
+.tdk-demo__icon{width:14em}
+.tdk-demo__chip--1{left:8%;top:12%}
+.tdk-demo__chip--2{left:2%;bottom:22%}
+.tdk-demo__chip--3{right:4%;top:6%}
+.tdk-demo__chip--4{right:0;top:42%}
+.tdk-demo__chip--5{left:14%;bottom:4%}
+.tdk-demo__chip--6{left:34%;top:0}
+.tdk-feed{right:0;bottom:3%}
+@media (max-width:959px){
+  .tdk-flowsec{padding-top:1em}
+  .tdk-flpanel .tdk-fl{grid-template-columns:1fr}
+  .tdk-fl__ph{width:15em;padding:.8em}
+  .tdk-cf__stage{height:26em}
+  .tdk-cf__ph{width:13em;margin-left:-6.5em}
+  .tdk-app__c1{width:30em;height:30em;right:-30%;top:auto;bottom:-6em}
+  .tdk-app__c2,.tdk-app__wm{display:none}
+  .tdk-demo__art{margin:0 1em 1.5em;min-height:24em}
+}
+.tdk-appg{gap:7em}
+.tdk-cf__stage{height:38em}
+.tdk-cf__ph .tdk-phone__s{background:#14161A}
+.tdk-cf__ph .tdk-phone__s>img{top:1.1em;height:calc(100% - 1.1em)}
+.tdk-cf__ph .tdk-phone__s--sb>img{top:2.6em;height:calc(100% - 2.6em)}
+.tdk-sb{position:absolute;left:0;right:0;top:0;height:2.6em;display:flex;align-items:center;justify-content:space-between;padding:0 1.7em 0 1.9em;color:#fff;font-size:.78em;z-index:1}
+.tdk-sb b{font-weight:600}
+.tdk-sb i{width:3.6em;height:.8em;background:linear-gradient(90deg,#fff 0 .25em,transparent .25em .4em,#fff .4em .65em,transparent .65em .8em,#fff .8em 1.05em,transparent 1.05em 1.7em,#fff 1.7em 3.4em,transparent 3.4em);border-radius:.15em;opacity:.9}
+.tdk-lg img{max-height:2.2em;max-width:72%}
+.tdk-lg{gap:1em}
+.tdk-adv__hd{display:flex;justify-content:space-between;align-items:flex-start;gap:3em;margin-bottom:3.6em}
+.tdk-adv__lg{width:8.6em;height:8.6em;border-radius:50%;border:1px solid #DCDFDD;display:flex;align-items:center;justify-content:center;flex:none}
+.tdk-adv__lg img{width:4.4em}
+.tdk-adv{display:grid;grid-template-columns:1fr 1fr;gap:3em 4.5em}
+.tdk-adv>*{min-width:0}
+.tdk-adv__i{display:flex;gap:1.3em;align-items:flex-start}
+.tdk-hex{width:2.4em;height:2.4em;color:var(--gt);flex:none;margin-top:-.25em}
+.tdk-adv__i h3{font-size:1.15em;font-weight:400;color:var(--tx);line-height:1.3}
+.tdk-adv__i p{margin-top:.6em;font-size:.95em;font-weight:300;line-height:1.65;color:#8A8A8A;max-width:30em}
+@media (max-width:959px){
+  .tdk-appg{gap:1em}
+  .tdk-cf__stage{height:26em}
+  .tdk-adv__hd{margin-bottom:2.2em}
+  .tdk-adv__lg{width:5.4em;height:5.4em}
+  .tdk-adv__lg img{width:2.8em}
+  .tdk-adv{grid-template-columns:1fr;gap:1.8em}
+}
+.tdk-cf__ph .tdk-phone__s>img{top:0;height:100%}
+.tdk-cf__stage{-webkit-mask-image:none;mask-image:none;overflow:visible;clip-path:inset(-10em -40em 0 -40em);transform:translateX(3.5em)}
+.tdk-cf__ph{transition:transform .8s cubic-bezier(.3,.7,.2,1),opacity .8s ease,filter .8s ease}
+.tdk-appg{position:relative}
+.tdk-cf__arr{position:absolute;right:6.6667vw;top:0;display:flex;gap:.6em;z-index:5}
+.tdk-cf__arr button{width:3.2em;height:3.2em;border-radius:50%;border:1px solid rgba(255,255,255,.16);color:#fff;display:flex;align-items:center;justify-content:center;transition:border-color .4s,background .4s}
+.tdk-cf__arr button:hover{border-color:rgba(255,255,255,.5)}
+.tdk-cf__arr svg{width:1.05em;height:1.05em}
+.tdk-tab::after{display:none}
+.tdk-tab__bar{position:absolute;left:0;bottom:-1px;height:1px;width:0;background:var(--g);pointer-events:none}
+.tdk-tab.is-on .tdk-tab__bar{animation:tdkW var(--cfd,5s) linear forwards}
+.tdk-cf.is-paused .tdk-tab.is-on .tdk-tab__bar{animation-play-state:paused}
+.tdk-lg img{max-height:none;max-width:82%;width:auto;object-fit:contain}
+@media (max-width:959px){
+  .tdk-cf__stage{transform:none;clip-path:inset(-10em 0 0 0)}
+  .tdk-cf__arr{position:relative;right:auto;order:3;justify-content:center;margin-top:1em}
+  .tdk-lg img{max-width:85%;font-size:.8em}
+}
+.tdk-appg>div:first-child{padding-bottom:0}
+.tdk-appg__txt{padding-bottom:6em}
+.tdk-cf__ph{transition:transform .8s cubic-bezier(.3,.7,.2,1),opacity .35s ease,filter .8s ease}
+.tdk-tab__ic{border:0;background:rgba(255,255,255,.06);color:rgba(255,255,255,.45)}
+.tdk-tab.is-on .tdk-tab__ic{background:var(--g);border:0;color:var(--dk)}
+.tdk-cf.is-manual .tdk-tab__bar{display:none}
+.tdk-lc__img{background:#fff;padding:0;height:13em}
+.tdk-lc__img img{width:100%;height:100%;object-fit:cover;object-position:center}
+.tdk-lc:hover .tdk-lc__img img{transform:scale(1.03)}
+@media (max-width:959px){.tdk-appg__txt{padding-bottom:1em}}
+.tdk-lc__img{height:auto}
+.tdk-lc__img img{height:auto}
+.tdk-adv__i>div{min-width:0}
+@media (max-width:959px){
+  .tdk-cf__stage{clip-path:inset(-10em -20px 0 -20px)}
+  .tdk-demo__art{min-height:19em;margin:0 1em 1em}
+  .tdk-feed,.tdk-demo__chip--2,.tdk-demo__chip--4,.tdk-demo__chip--5,.tdk-demo__chip--6{display:none}
+  .tdk-demo__chip--1{left:2%;top:8%}.tdk-demo__chip--3{right:2%;top:auto;bottom:8%}
+  .tdk-orb--2{width:17em;height:17em}.tdk-orb--1{width:11em;height:11em}
+  .tdk-demo__icon{width:9.5em}
+}
+.tdk-demo__chip{background:#fff;border:0;color:var(--tx);backdrop-filter:none;-webkit-backdrop-filter:none}
+.tdk-demo__chip svg{color:var(--gt)}
+.tdk-demo__chip i.g{background:var(--g)}
+.tdk-lc--hl,.tdk-pl--pro{background:linear-gradient(160deg,#12C497 0%,#0EA982 55%,#0B8C6C 100%);color:#fff;border:0;box-shadow:none}
+.tdk-lc--hl .tdk-lc__img{border-bottom-color:transparent}
+.tdk-lc--hl .tdk-lc__tag{color:rgba(255,255,255,.75)}
+.tdk-lc--hl h3{color:#fff}
+.tdk-lc--hl .tdk-lc__b>p,.tdk-lc--hl .tdk-path span{color:rgba(255,255,255,.85)}
+.tdk-lc--hl .tdk-path b{color:#fff}
+.tdk-lc--hl .tdk-path{border-top-color:rgba(255,255,255,.3)}
+.tdk-lc--hl .tdk-path div::before{background:rgba(255,255,255,.2);color:#fff}
+.tdk-lc--hl .tdk-gets small{color:rgba(255,255,255,.7)}
+.tdk-lc--hl .tdk-gets span{background:rgba(255,255,255,.16);box-shadow:none;color:#fff}
+.tdk-lc--hl .tdk-btn--fill,.tdk-pl--pro .tdk-btn--fill{background:#fff;color:var(--gd)!important}
+.tdk-lc--hl .tdk-btn--fill:hover,.tdk-pl--pro .tdk-btn--fill:hover{background:#F1FBF7;box-shadow:none}
+.tdk-lc--hl:hover{box-shadow:none}
+.tdk-pl--pro::before{background:radial-gradient(closest-side,rgba(255,255,255,.22),transparent)}
+.tdk-pl--pro .tdk-pl__ic{background:rgba(255,255,255,.2);color:#fff}
+.tdk-pl--pro .tdk-pl__for,.tdk-pl--pro .tdk-pl__price span{color:rgba(255,255,255,.75)}
+.tdk-pl--pro .tdk-pl__note{color:#fff;opacity:.85}
+.tdk-pl--pro .tdk-pl__hr{background:rgba(255,255,255,.25)}
+.tdk-pl--pro .tdk-pl__sub{color:rgba(255,255,255,.7)}
+.tdk-pl--pro .tdk-list li{color:#fff}
+.tdk-pl--pro .tdk-ck{background-color:#fff}
+.tdk-pl--pro .tdk-pl__tag{background:#fff;color:var(--gd)}
+.tdk-lgc,.tdk-own{background:linear-gradient(160deg,#12C497 0%,#0EA982 55%,#0B8C6C 100%)}
+.tdk-lgc::before{display:none}
+.tdk-lgc::after,.tdk-own::after{background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%)}
+.tdk-own:hover{background:linear-gradient(160deg,#14CA9C 0%,#0FAE86 55%,#0B8F6E 100%)}
+.tdk-lgc__t span,.tdk-own h3 span{color:#fff;opacity:.85}
+.tdk-lgc__ic{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3)}
+.tdk-lgc__ch{color:#fff}
+.tdk-lgc__ch .tdk-ck,.tdk-own .tdk-ck{background-color:#fff}
+.tdk-own p{color:rgba(255,255,255,.8)}
+.tdk-own .tdk-list li{color:#fff}
+.tdk-lgc .tdk-btn--fill{background:#fff;color:var(--gd)!important}
+.tdk-lgc .tdk-btn--fill:hover{background:#F1FBF7;box-shadow:none}
+.tdk-demo__chip,.tdk-feed{right:auto;bottom:auto}
+.tdk-demo__chip--1{left:calc(50% - 15em);top:calc(50% - 9.5em)}
+.tdk-demo__chip--6{left:calc(50% - 4.5em);top:calc(50% - 14em)}
+.tdk-demo__chip--3{left:calc(50% + 7em);top:calc(50% - 11em)}
+.tdk-demo__chip--4{left:calc(50% + 9.5em);top:calc(50% - 1.6em)}
+.tdk-demo__chip--2{left:calc(50% - 16em);top:calc(50% + 4.5em)}
+.tdk-demo__chip--5{left:calc(50% - 10em);top:calc(50% + 10.5em)}
+.tdk-feed{left:calc(50% + 3.5em);top:calc(50% + 1em)}
+@media (max-width:959px){
+  .tdk-demo__chip--1{left:2%;top:8%}
+  .tdk-demo__chip--3{left:auto;right:2%;top:auto;bottom:8%}
+}
+.tdk-demo__chip--5{left:calc(50% - 15.5em);top:calc(50% + 9.5em)}
+.tdk-feed{left:calc(50% + 4em);top:calc(50% + 2.5em)}
+.tdk-feed{top:calc(50% + .5em)}
+.tdk-demo__chip--1{left:calc(50% - 18.5em);top:calc(50% - 11.5em)}
+.tdk-demo__chip--6{left:calc(50% - 5em);top:calc(50% - 16.5em)}
+.tdk-demo__chip--3{left:calc(50% + 9.5em);top:calc(50% - 13em)}
+.tdk-demo__chip--4{left:calc(50% + 12.5em);top:calc(50% - 2em)}
+.tdk-demo__chip--2{left:calc(50% - 20em);top:calc(50% + 4em)}
+.tdk-demo__chip--5{left:calc(50% - 17em);top:calc(50% + 11.5em)}
+.tdk-feed{left:calc(50% + 6.5em);top:calc(50% + 1.5em)}
+.tdk-lgc__ic img{filter:brightness(0) invert(1)}
+@media (max-width:959px){
+  .tdk-demo__chip--1{left:2%;top:8%}
+  .tdk-demo__chip--3{left:auto;right:2%;top:auto;bottom:8%}
+}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
+  <symbol id="tdk-ok" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5 10 17 19 7"/></symbol>
+  <symbol id="tdk-arr" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <g id="tdk-def" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></g>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></g></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.2 10.5a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2"/><circle cx="9.5" cy="19.5" r="1.2"/><circle cx="17" cy="19.5" r="1.2"/></g></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3 20 7v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4M12 11v10"/></g></symbol>
+  <symbol id="i-price" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></g></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></g></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></g></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></g></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-shop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9 5.5 4h13L20 9"/><path d="M4 9h16v1.5a2.7 2.7 0 0 1-5.3 0 2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 10.5z"/><path d="M5.5 13v7h13v-7M10 20v-4h4v4"/></g></symbol>
+  <symbol id="i-brick" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 9.7h18M3 14.3h18M9 5v4.7M15 9.7v4.6M9 14.3V19"/></g></symbol>
+  <symbol id="i-hanger" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6.5a2 2 0 1 1 3 1.7c-.6.4-1 .9-1 1.6V11"/><path d="M12 11 3.5 16.6a1 1 0 0 0 .6 1.9h15.8a1 1 0 0 0 .6-1.9z"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></g></symbol>
+  <symbol id="i-basket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-1.8 9.2a1.5 1.5 0 0 1-1.5 1.2H6.3a1.5 1.5 0 0 1-1.5-1.2z"/><path d="M8 10l3-6M16 10l-3-6M9 14v3M15 14v3M12 14v3"/></g></symbol>
+  <symbol id="i-build" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V5l7-2v18M12 9h7v12"/><path d="M8 8h1M8 12h1M8 16h1M15 13h1M15 17h1"/></g></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4c3-1 5-1 6 0 1 1 1 3 0 6l-7 7-6-6z"/><path d="M7 11 4 12l-1 3 4-1M13 17l-1 3 3-1 1-3"/><circle cx="15.5" cy="8.5" r="1.4"/></g></symbol>
+  <symbol id="i-crown" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></g></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13v1M15 13v1M2 13v3M22 13v3"/></g></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></g></symbol>
+  <symbol id="i-sync" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.5-4.5M4 13a8 8 0 0 0 14.5 4.5"/><path d="M5 3v4h4M19 21v-4h-4"/></g></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></g></symbol>
+</svg>
+
+<!-- ============ 1. HERO ============ -->
+<section class="tdk-hero">
+  <div class="tdk-hero__circle"></div>
+  <img class="tdk-hero__wm" src="https://static.tildacdn.net/tild3665-3163-4936-b661-636337353065/ICORdfgP_1.svg" alt="" aria-hidden="true">
+  <div class="tdk-hero__frame"></div>
+  <div class="tdk-wrap">
+    <div class="tdk-hero__text">
+      <img class="tdk-hero__logo" src="https://teledukon.uz/img/logo-header.svg" alt="Teledukon" width="162" height="48">
+      <h1 class="tdk-h1">Интернет-магазин<br><span>в Telegram</span> за 1 день</h1>
+      <div class="tdk-hero__sub">Teledukon — разработка iCORP</div>
+      <p class="tdk-hero__p">Каталог, корзина и оформление заказа прямо в мессенджере — с автоматической синхронизацией товаров, цен, остатков и заказов с МойСклад</p>
+      <div class="tdk-hero__btns">
+        <a href="#form" class="tdk-btn tdk-btn--fill">Обсудить проект</a>
+        <a href="#tdk-how" class="tdk-btn tdk-btn--line" data-scroll>Как это работает</a>
+      </div>
+    </div>
+  </div>
+  <div class="tdk-hero__media">
+    <img src="https://teledukon.uz/img/hero-art.webp" alt="Магазин Teledukon в Telegram: заказы, витрина и остатки" width="1500" height="1166">
+    <div class="tdk-chip tdk-chip--a" style="--d:.5s">
+      <span class="tdk-chip__ic" style="background:#2AABEE;color:#fff"><svg width="14" height="14"><use href="#tdk-tg"/></svg></span>
+      <span><b>Приём заказов 24/7</b><small>прямо в Telegram</small></span>
+    </div>
+    <div class="tdk-chip tdk-chip--b" style="--d:.8s">
+      <span class="tdk-chip__ic" style="background:#E8F8F2;color:#0EB18A"><svg width="13" height="13"><use href="#tdk-ok"/></svg></span>
+      <span><b>Заказы сразу в МойСклад</b><small>с резервом, без менеджера</small></span>
+    </div>
+    <div class="tdk-chip tdk-chip--c" style="--d:1.1s">
+      <span class="tdk-chip__ic" style="background:#F1EDFF;color:#6E56CF"><svg width="15" height="15"><use href="#i-sync"/></svg></span>
+      <span><b>Синхронизация остатков</b><small>автоматически, по всем складам</small></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. О ПРОДУКТЕ ============ -->
+<section class="tdk-sec">
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>01</b><i></i>О продукте</div>
+        <h2 class="tdk-h2">Ваш магазин и учётная система —<br><span>единое целое</span></h2>
+      </div>
+      <p class="tdk-sub" data-r style="--d:.1s">Teledukon превращает Telegram-бота в полноценный интернет-магазин: покупатели заказывают там, где уже общаются, а всё остальное делает связка с МойСклад.</p>
+    </div>
+    <div class="tdk-ab">
+      <div class="tdk-abc" data-r>
+        <div class="tdk-abc__top"><span class="tdk-icn"><svg><use href="#i-user"/></svg></span><span><small>Покупателю</small><b>Удобно заказывать</b></span></div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Каталог с фото, ценами и наличием</li>
+          <li><i class="tdk-ck"></i>Корзина и заказ за пару минут</li>
+          <li><i class="tdk-ck"></i>Доставка с точкой на карте</li>
+          <li><i class="tdk-ck"></i>История заказов и баланс</li>
+        </ul>
+        <div class="tdk-abc__ui">
+          <div class="tdk-trk">
+            <div class="tdk-trk__h"><span class="tdk-trk__ic"><svg><use href="#i-box"/></svg></span><span><b>Заказ №1042</b><small>5 товаров · 540 000 сум</small></span><em>В пути</em></div>
+            <div class="tdk-trk__st">
+              <div class="ok"><i></i><span>Заказ оформлен</span><small>14:02</small></div>
+              <div class="ok"><i></i><span>Собран на складе</span><small>15:10</small></div>
+              <div class="cur"><i></i><span>Передан в доставку</span><small>16:40</small></div>
+              <div><i></i><span>Доставлен</span><small>сегодня</small></div>
+            </div>
+            <div class="tdk-trk__f"><span><svg><use href="#i-truck"/></svg>Ташкент, Юнусабад</span><b>Повторить заказ</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="tdk-art" data-r style="--d:.08s">
+        <img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-objects.webp" alt="Товары разных категорий в магазине Teledukon" width="620" height="572">
+        <span class="tdk-tagl tdk-tagl--1"><i></i>Любые категории товаров</span>
+        <span class="tdk-tagl tdk-tagl--2"><i></i>Свой бот магазина</span>
+        <span class="tdk-tagl tdk-tagl--3"><i></i>Акции и новинки</span>
+        <div class="tdk-art__bar">
+          <div><span class="tdk-art__ic"><svg><use href="#i-rocket"/></svg></span><span><b>1 день</b><small>запуск магазина</small></span></div>
+          <div><span class="tdk-art__ic"><svg><use href="#i-bolt"/></svg></span><span><b>24/7</b><small>приём заказов</small></span></div>
+          <div><span class="tdk-art__ic"><svg><use href="#i-globe"/></svg></span><span><b>RU · UZ</b><small>два языка</small></span></div>
+        </div>
+      </div>
+      <div class="tdk-abc" data-r style="--d:.16s">
+        <div class="tdk-abc__top"><span class="tdk-icn"><svg><use href="#i-sync"/></svg></span><span><small>Бизнесу</small><b>Без ручной работы</b></span></div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Товары, цены и остатки из МойСклад</li>
+          <li><i class="tdk-ck"></i>Заказы сразу в учёт, с резервом</li>
+          <li><i class="tdk-ck"></i>Персональные цены для опта</li>
+          <li><i class="tdk-ck"></i>Магазин работает 24/7</li>
+        </ul>
+        <div class="tdk-abc__ui">
+          <div class="tdk-int">
+            <div class="tdk-int__h">
+              <span class="tdk-int__lg"><img src="https://static.tildacdn.net/tild3937-3336-4364-a136-393339323136/header-logo.svg" alt="МойСклад"></span>
+              <span class="tdk-int__x"><i></i><svg width="14" height="14"><use href="#i-sync"/></svg><i></i></span>
+              <span class="tdk-int__lg"><img src="https://teledukon.uz/img/logo-mark.webp" alt="" style="height:1.5em"><b>Teledukon</b></span>
+            </div>
+            <div class="tdk-int__r"><span><svg><use href="#i-box"/></svg>Товары, цены, остатки</span><em>в бот <svg><use href="#tdk-arr"/></svg></em></div>
+            <div class="tdk-int__r"><span><svg><use href="#i-cart"/></svg>Заказы и резерв</span><em><svg style="transform:scaleX(-1)"><use href="#tdk-arr"/></svg> в учёт</em></div>
+            <div class="tdk-int__r"><span><svg><use href="#i-user"/></svg>Клиенты и баланс</span><em>в обе стороны</em></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. КАК ЭТО РАБОТАЕТ ============ -->
+<section class="tdk-sec tdk-flowsec" id="tdk-how">
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>02</b><i></i>Как это работает</div>
+        <h2 class="tdk-h2">Путь одного заказа —<br><span>от Telegram до склада</span></h2>
+      </div>
+      <p class="tdk-sub" data-r style="--d:.1s">Покупатель оформляет заказ в Telegram, Teledukon сверяет цены и остатки и передаёт заказ в МойСклад. Без менеджера и ручного переноса.</p>
+    </div>
+
+    <div data-how class="tdk-flpanel">
+      <div class="tdk-fl" data-s="0" data-r>
+        <div class="tdk-fl__ph">
+          <div class="tdk-fl__user"><span><svg width="12" height="12"><use href="#i-user"/></svg></span>Покупатель<br>выбирает товары</div>
+          <div class="tdk-phone">
+            <div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-catalog.webp" alt="Каталог магазина в Telegram" width="320" height="698"></div>
+            <div class="tdk-fl__toast k1"><span><svg width="11" height="11"><use href="#tdk-ok"/></svg></span><span style="width:auto;height:auto;background:none;display:block;color:inherit"><b>Заказ оформлен</b><small>5 товаров · 540 000 сум</small></span></div>
+            <div class="tdk-fl__toast k3"><span><svg width="11" height="11"><use href="#tdk-tg"/></svg></span><span style="width:auto;height:auto;background:none;display:block;color:inherit"><b>Заказ №1042 принят</b><small>сообщим, когда отгрузим</small></span></div>
+          </div>
+          <span class="tdk-fl__cap">Telegram · покупатель</span>
+          <span class="tdk-fl__cart"><svg width="15" height="15"><use href="#i-cart"/></svg><i data-cart>0</i></span>
+        </div>
+
+        <div class="tdk-fl__mid">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path class="tdk-ln" d="M0 50 C20 50 25 24 50 24 C75 24 80 50 100 50"/>
+            <path class="tdk-ln" d="M0 50 L100 50"/>
+            <path class="tdk-ln" d="M0 50 C20 50 25 76 50 76 C75 76 80 50 100 50"/>
+          </svg>
+          <div class="tdk-pills">
+            <span class="tdk-pill"><span style="background:#EEF4FF;color:#1E6FD9"><svg><use href="#i-box"/></svg></span>Товары<em class="tdk-pill__ok"><svg width="9" height="9"><use href="#tdk-ok"/></svg></em></span>
+            <span class="tdk-pill"><span style="background:#E8F8F2;color:#0EB18A"><svg><use href="#i-price"/></svg></span>Цены<em class="tdk-pill__ok"><svg width="9" height="9"><use href="#tdk-ok"/></svg></em></span>
+            <span class="tdk-pill"><span style="background:#F1EDFF;color:#6E56CF"><svg><use href="#i-chart"/></svg></span>Остатки<em class="tdk-pill__ok"><svg width="9" height="9"><use href="#tdk-ok"/></svg></em></span>
+          </div>
+        </div>
+
+        <div class="tdk-fl__hub">
+          <div class="tdk-ordc"><span><svg width="14" height="14"><use href="#i-cart"/></svg></span><span style="display:block;width:auto;height:auto;background:none"><b>Заказ №1042</b><small>5 товаров · 540 000 сум</small></span></div>
+          <div class="tdk-hub"><img src="https://teledukon.uz/img/logo-mark.webp" alt=""><b>Teledukon</b></div>
+          <span class="tdk-fl__cap tdk-fl__cap--hub">Teledukon · обработка</span>
+          <div class="tdk-prog" data-prog><div><span>Обработка заказа</span><b>0%</b></div><i></i></div>
+        </div>
+
+        <div class="tdk-fl__arr"><svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path class="tdk-ln" d="M4 5 H88"/><path class="tdk-ah" d="M88 1 L98 5 L88 9z"/></svg></div>
+
+        <div class="tdk-msw">
+          <span class="tdk-fl__cap">МойСклад · ваш учёт</span>
+          <div class="tdk-msw__ok"><span><svg width="11" height="11"><use href="#tdk-ok"/></svg></span>Заказ передан в МойСклад</div>
+          <div class="tdk-win">
+            <div class="tdk-win__bar"><i></i><i></i><i></i></div>
+            <div class="tdk-win__b">
+              <div class="tdk-win__nav">
+                <img src="https://static.tildacdn.net/tild3937-3336-4364-a136-393339323136/header-logo.svg" alt="МойСклад">
+                <span class="is-on"><svg><use href="#i-cart"/></svg>Заказы</span>
+                <span><svg><use href="#i-box"/></svg>Товары</span>
+                <span><svg><use href="#i-user"/></svg>Клиенты</span>
+                <span><svg><use href="#i-chart"/></svg>Аналитика</span>
+                <span><svg><use href="#i-doc"/></svg>Документы</span>
+              </div>
+              <div class="tdk-win__m">
+                <div class="tdk-win__h"><b>Заказы покупателей</b><span>+ Заказ</span></div>
+                <div class="tdk-rows">
+                  <div class="tdk-newrow"><div><div class="tdk-row tdk-row--new"><b>№1042 <span class="tdk-badge">Новый</span></b><small>сегодня, 14:02</small><em>540 000</em></div>
+                  <div class="tdk-row__det"><span>5 позиций</span><span>MCHJ «Qurilish»</span><span>Склад «Основной»</span><span class="g">Резерв ✓</span></div></div></div>
+                                    <div class="tdk-row"><b>№1041</b><small>сегодня, 11:24</small><em>420 000</em></div>
+                  <div class="tdk-row"><b>№1040</b><small>вчера, 18:17</small><em>1 280 000</em></div>
+                  <div class="tdk-row"><b>№1039</b><small>вчера, 16:03</small><em>230 000</em></div>
+                </div>
+                <div class="tdk-win__f"><span>Заказов из Telegram сегодня</span><b><span class="a">17</span><span class="b">18</span></b><i><u></u></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tdk-steps3">
+        <button class="tdk-st3" type="button" data-go="1"><span class="tdk-st3__img"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-phone-products.webp" alt=""></span><span><small>ЭТАП 01</small><b>Выбор и оформление</b><span>Покупатель открывает магазин в Telegram и оформляет заказ в пару нажатий.</span></span><i></i></button>
+        <button class="tdk-st3" type="button" data-go="2"><span class="tdk-st3__img"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-ring.webp" alt=""></span><span><small>ЭТАП 02</small><b>Автоматическая обработка</b><span>Teledukon сверяет цены и остатки и формирует заказ без менеджера.</span></span><i></i></button>
+        <button class="tdk-st3" type="button" data-go="3"><span class="tdk-st3__img"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-ms-boxes.webp" alt=""></span><span><small>ЭТАП 03</small><b>Получение и отгрузка</b><span>Заказ с резервом уже в МойСклад, клиент получает уведомление.</span></span><i></i></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. ВНУТРИ ПРИЛОЖЕНИЯ ============ -->
+<section class="tdk-sec tdk-app tdk-dark">
+  <span class="tdk-app__c1"></span><span class="tdk-app__c2"></span>
+  <img class="tdk-app__wm" src="https://static.tildacdn.net/tild3665-3163-4936-b661-636337353065/ICORdfgP_1.svg" alt="" aria-hidden="true">
+  <div class="tdk-wrap tdk-appg tdk-cf" data-cf>
+    <div class="tdk-cf__arr"><button type="button" data-prev aria-label="Предыдущий экран"><svg style="transform:scaleX(-1)"><use href="#tdk-arr"/></svg></button><button type="button" data-next aria-label="Следующий экран"><svg><use href="#tdk-arr"/></svg></button></div>
+    <div class="tdk-appg__txt" data-r>
+      <div class="tdk-eye"><b>03</b><i></i>Внутри магазина</div>
+      <h2 class="tdk-h2">Всё для онлайн-продаж<br><span>в одном приложении</span></h2>
+      <p class="tdk-sub" style="margin-top:1em">Так выглядит магазин для покупателя и панель управления для вас. Выберите экран, чтобы рассмотреть подробнее.</p>
+      <div class="tdk-tabs">
+        <button class="tdk-tab is-on" type="button"><span class="tdk-tab__ic"><svg><use href="#i-shop"/></svg></span><span><b>Главная покупателя</b><span class="tdk-tab__d"><span>Баланс, задолженность, витрины организаций и товары, которые клиент заказывает чаще всего.</span></span></span><small>01</small><i class="tdk-tab__bar"></i></button>
+        <button class="tdk-tab" type="button"><span class="tdk-tab__ic"><svg><use href="#i-box"/></svg></span><span><b>Каталог</b><span class="tdk-tab__d"><span>Категории, поиск по названию, артикулу и штрихкоду, фильтры, акции и новинки.</span></span></span><small>02</small><i class="tdk-tab__bar"></i></button>
+        <button class="tdk-tab" type="button"><span class="tdk-tab__ic"><svg><use href="#i-price"/></svg></span><span><b>Карточка товара</b><span class="tdk-tab__d"><span>Галерея фото, остаток, комплектации — штука, коробка, набор — и цена по типу клиента.</span></span></span><small>03</small><i class="tdk-tab__bar"></i></button>
+        <button class="tdk-tab" type="button"><span class="tdk-tab__ic"><svg><use href="#i-cart"/></svg></span><span><b>Корзина</b><span class="tdk-tab__d"><span>Количество, итоговая сумма и оформление заказа, который сразу уходит в МойСклад.</span></span></span><small>04</small><i class="tdk-tab__bar"></i></button>
+        <button class="tdk-tab" type="button"><span class="tdk-tab__ic"><svg><use href="#i-gear"/></svg></span><span><b>Панель владельца</b><span class="tdk-tab__d"><span>Бренд и витрина, товары и цены, заказы, акты сверки и аналитика — прямо в Telegram.</span></span></span><small>05</small><i class="tdk-tab__bar"></i></button>
+      </div>
+    </div>
+    <div class="tdk-cf__wrap" data-r style="--d:.1s">
+      <div class="tdk-cf__stage">
+                <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-home2.webp" alt="Главная покупателя" loading="lazy"></div></div></div>
+        <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-build.webp" alt="Каталог" loading="lazy"></div></div></div>
+        <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-product.webp" alt="Карточка товара" loading="lazy"></div></div></div>
+        <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-cart.webp" alt="Корзина" loading="lazy"></div></div></div>
+        <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-owner.webp" alt="Панель владельца" loading="lazy"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. ВОЗМОЖНОСТИ ============ -->
+<section class="tdk-sec">
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>04</b><i></i>Возможности</div>
+        <h2 class="tdk-h2">Продуманный функционал<br><span>для онлайн-продаж</span></h2>
+      </div>
+      <p class="tdk-sub" data-r style="--d:.1s">Всё, что нужно магазину, — в одном боте: от витрины и персональных цен до взаиморасчётов и повторных продаж.</p>
+    </div>
+    <div class="tdk-feat">
+      <div class="tdk-card tdk-c7" data-r>
+        <div class="tdk-cat">
+          <div>
+            <h3>Каталог и витрина</h3>
+            <p>Актуальные товары, цены и остатки прямо в Telegram — без ручного обновления.</p>
+            <ul class="tdk-list">
+              <li><i class="tdk-ck"></i>Категории, подкатегории и поиск</li>
+              <li><i class="tdk-ck"></i>Акции, новинки и фото товаров</li>
+              <li><i class="tdk-ck"></i>Размеры, цвета, модификации</li>
+              <li><i class="tdk-ck"></i>Упаковки: блоки, мешки, коробки</li>
+            </ul>
+            <div class="tdk-chips"><span>Артикул</span><span>Штрихкод</span><span>Фильтры</span><span>В наличии</span></div>
+          </div>
+          <img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-ic-shop.webp" alt="Витрина магазина" loading="lazy">
+        </div>
+      </div>
+      <div class="tdk-card tdk-own tdk-dark tdk-c5" data-r style="--d:.08s">
+        <div>
+          <h3>Панель владельца<br><span>прямо в Telegram</span></h3>
+          <p>Управляйте магазином с телефона.</p>
+          <ul class="tdk-list">
+            <li><i class="tdk-ck"></i>Витрина, склады, бренд</li>
+            <li><i class="tdk-ck"></i>Заказы и акты сверки</li>
+            <li><i class="tdk-ck"></i>Аналитика и рассылки</li>
+            <li><i class="tdk-ck"></i>Доступ сотрудникам</li>
+          </ul>
+        </div>
+        <div class="tdk-own__ph"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-owner.webp" alt="Панель управления магазином в Telegram" loading="lazy"></div>
+      </div>
+      <div class="tdk-card tdk-c4" data-r>
+        <div class="tdk-ico"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-ic-price.webp" alt="" loading="lazy"></div>
+        <h3>Цены и заказы</h3>
+        <p>Розница и опт в одном магазине — каждый клиент видит свою цену.</p>
+        <div class="tdk-mini"><span class="tdk-mini__r"><small>Розница</small><s>120 000 сум</s></span><span class="tdk-mini__r"><small>Оптовик</small><b>98 400 сум</b></span><em>−18%</em></div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Персональные цены для оптовиков</li>
+          <li><i class="tdk-ck"></i>Скидки и спецпредложения</li>
+          <li><i class="tdk-ck"></i>Доставка, самовывоз, оплата</li>
+        </ul>
+      </div>
+      <div class="tdk-card tdk-c4" data-r style="--d:.08s">
+        <div class="tdk-ico"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-ic-chart.webp" alt="" loading="lazy"></div>
+        <h3>Финансы и управление</h3>
+        <p>Контроль продаж и взаиморасчётов с покупателями.</p>
+        <div class="tdk-mini"><span class="tdk-mini__x">X</span><span class="tdk-mini__r"><b>Акт сверки.xlsx</b><small>за октябрь</small></span><em class="dl"><svg width="12" height="12" style="transform:rotate(90deg)"><use href="#tdk-arr"/></svg></em></div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Баланс, задолженность, история</li>
+          <li><i class="tdk-ck"></i>Аналитика продаж и возвратов</li>
+          <li><i class="tdk-ck"></i>Акты сверки и выгрузка в Excel</li>
+        </ul>
+      </div>
+      <div class="tdk-card tdk-c4" data-r style="--d:.16s">
+        <div class="tdk-ico"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-ic-bell.webp" alt="" loading="lazy"></div>
+        <h3>Уведомления и рассылки</h3>
+        <p>Связь с покупателями и повторные продажи через Telegram.</p>
+        <div class="tdk-mini"><span class="tdk-mini__tg"><svg width="12" height="12"><use href="#tdk-tg"/></svg></span><span class="tdk-mini__r"><b>Заказ №1042 отгружен</b><small>уведомление · только что</small></span></div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Статусы заказов</li>
+          <li><i class="tdk-ck"></i>Рассылки новинок и акций</li>
+          <li><i class="tdk-ck"></i>Брошенные корзины и оплата</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. КОМУ ПОДОЙДЁТ ============ -->
+<section class="tdk-sec tdk-soft">
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>05</b><i></i>Кому подойдёт</div>
+        <h2 class="tdk-h2">Один Teledukon —<br><span>разные модели продаж</span></h2>
+      </div>
+      <p class="tdk-sub" data-r style="--d:.1s">Решение одинаково хорошо работает в рознице и в опте — меняется только набор функций, которые вы включаете.</p>
+    </div>
+    <div class="tdk-who">
+      <div class="tdk-wc" data-r><div class="tdk-wc__top"><span class="tdk-wc__ic"><svg><use href="#i-shop"/></svg></span><span class="tdk-wc__n">01</span></div><h3>Розничные магазины</h3><p>Покупатели собирают корзину и оформляют заказ с доставкой или самовывозом прямо в Telegram.</p><ul><li>Корзина</li><li>Доставка</li><li>Акции</li></ul></div>
+      <div class="tdk-wc" data-r style="--d:.06s"><div class="tdk-wc__top"><span class="tdk-wc__ic"><svg><use href="#i-brick"/></svg></span><span class="tdk-wc__n">02</span></div><h3>Строительные материалы</h3><p>Большой ассортимент и несколько складов. Покупатель видит, что есть в наличии, и сразу заказывает.</p><ul><li>Остатки по складам</li><li>Упаковки</li><li>Резерв</li></ul></div>
+      <div class="tdk-wc" data-r style="--d:.12s"><div class="tdk-wc__top"><span class="tdk-wc__ic"><svg><use href="#i-hanger"/></svg></span><span class="tdk-wc__n">03</span></div><h3>Одежда и обувь</h3><p>Каталог с размерами, цветами и актуальными остатками — покупатель сам выбирает нужный вариант.</p><ul><li>Модификации</li><li>Фото</li><li>Новинки</li></ul></div>
+      <div class="tdk-wc" data-r><div class="tdk-wc__top"><span class="tdk-wc__ic"><svg><use href="#i-truck"/></svg></span><span class="tdk-wc__n">04</span></div><h3>Опт и дистрибуция</h3><p>Персональные цены, баланс и задолженность для каждого клиента. Заказы сразу уходят в учёт.</p><ul><li>Свои цены</li><li>Акт сверки</li><li>Приватная витрина</li></ul></div>
+      <div class="tdk-wc" data-r style="--d:.06s"><div class="tdk-wc__top"><span class="tdk-wc__ic"><svg><use href="#i-basket"/></svg></span><span class="tdk-wc__n">05</span></div><h3>Продукты и бытовая химия</h3><p>Быстрые повседневные покупки и повторные заказы из истории — клиенты экономят время.</p><ul><li>История заказов</li><li>Поиск</li><li>Статусы</li></ul></div>
+      <div class="tdk-wc" data-r style="--d:.12s"><div class="tdk-wc__top"><span class="tdk-wc__ic"><svg><use href="#i-build"/></svg></span><span class="tdk-wc__n">06</span></div><h3>Сети и группы компаний</h3><p>Отдельная витрина для каждой организации — со своими товарами, складами и сотрудниками.</p><ul><li>Несколько юр. лиц</li><li>Права доступа</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. ЗАПУСК ============ -->
+<section class="tdk-sec">
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>06</b><i></i>Запуск</div>
+        <h2 class="tdk-h2">Три способа запустить магазин —<br><span>выберите подходящий вам</span></h2>
+      </div>
+      <p class="tdk-sub" data-r style="--d:.1s">Неважно, с чего вы начинаете: подключим готовую систему, внедрим учёт с нуля или интегрируемся с вашей.</p>
+    </div>
+    <div class="tdk-tree" data-tree>
+      <div class="tdk-tree__root"><span><i>?</i>Какая у вас учётная система</span></div>
+      <div class="tdk-tree__ln"><i class="v0"></i><i class="h"></i><i class="v1"></i><i class="v2"></i><i class="v3"></i></div>
+    </div>
+    <div class="tdk-ln3">
+      <div class="tdk-lc" data-r>
+        <div class="tdk-lc__img"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-launch-1.webp" alt="Синхронизация МойСклад и Telegram" loading="lazy"></div>
+        <div class="tdk-lc__b">
+          <span class="tdk-lc__tag">Быстрый старт</span>
+          <h3>Подключим магазин к вашему МойСклад</h3>
+          <p>Товары, цены и остатки у вас уже есть — остаётся показать их покупателям.</p>
+          <div class="tdk-path">
+            <div data-n="1"><span><b>Подключение</b> — связываем аккаунты</span></div>
+            <div data-n="2"><span><b>Настройка</b> — витрина, склады, бренд</span></div>
+            <div data-n="3"><span><b>Запуск</b> — бот принимает заказы</span></div>
+          </div>
+          <div class="tdk-gets"><small>Вы получите</small><div><span>Свой бот</span><span>Витрину</span><span>Заказы в МойСклад</span></div></div>
+          <div class="tdk-lc__f"><a href="#form" class="tdk-btn tdk-btn--line">Получить демо</a></div>
+        </div>
+      </div>
+      <div class="tdk-lc tdk-lc--hl tdk-dark" data-r style="--d:.08s">
+        <div class="tdk-lc__img"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-launch-2.webp" alt="Внедрение МойСклад" loading="lazy"></div>
+        <div class="tdk-lc__b">
+          <span class="tdk-lc__tag">Под ключ</span>
+          <h3>Внедрим МойСклад и запустим продажи</h3>
+          <p>Наведём порядок в учёте и сразу подготовим всё для онлайн-продаж.</p>
+          <div class="tdk-path">
+            <div data-n="1"><span><b>Внедрение</b> — МойСклад под ваш бизнес</span></div>
+            <div data-n="2"><span><b>Загрузка</b> — товары, цены, остатки</span></div>
+            <div data-n="3"><span><b>Магазин</b> — подключаем Teledukon</span></div>
+          </div>
+          <div class="tdk-gets"><small>Вы получите</small><div><span>Учёт в МойСклад</span><span>Каталог</span><span>Магазин в Telegram</span></div></div>
+          <div class="tdk-lc__f"><a href="#form" class="tdk-btn tdk-btn--fill">Обсудить внедрение</a></div>
+        </div>
+      </div>
+      <div class="tdk-lc" data-r style="--d:.16s">
+        <div class="tdk-lc__img"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-launch-3.webp" alt="Интеграция с другой системой" loading="lazy"></div>
+        <div class="tdk-lc__b">
+          <span class="tdk-lc__tag">Индивидуально</span>
+          <h3>Подключим бота к вашей системе</h3>
+          <p>Изучим ваш учёт и предложим решение под ваши процессы.</p>
+          <div class="tdk-path">
+            <div data-n="1"><span><b>Аудит</b> — изучаем систему и процессы</span></div>
+            <div data-n="2"><span><b>Решение</b> — формат интеграции</span></div>
+            <div data-n="3"><span><b>Запуск</b> — бот работает с вашим учётом</span></div>
+          </div>
+          <div class="tdk-gets"><small>Работаем с</small><div><span>1С</span><span>Битрикс24</span><span>Excel</span><span>другими</span></div></div>
+          <div class="tdk-lc__f"><a href="#form" class="tdk-btn tdk-btn--line">Обсудить интеграцию</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. ТАРИФЫ ============ -->
+<section class="tdk-sec tdk-soft" data-pricing>
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>07</b><i></i>Тарифы</div>
+        <h2 class="tdk-h2">Тарифы для бизнеса<br><span>любого масштаба</span></h2>
+      </div>
+      <div class="tdk-sw" data-r style="--d:.1s"><span class="tdk-sw__p"></span><button type="button" class="is-on" data-period="m">Помесячно</button><button type="button" data-period="y">За год <em>−20%</em></button></div>
+    </div>
+    <div class="tdk-plans">
+      <div class="tdk-pl" data-r>
+        <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-shop"/></svg></span><span><span class="tdk-pl__name">Базовый</span><span class="tdk-pl__for">Первый магазин и розница</span></span></div>
+        <div class="tdk-pl__price"><b data-m="350000" data-y="280000">350 000</b><span>сум / мес.</span></div>
+        <div class="tdk-pl__note" data-m="при оплате помесячно" data-y="3 360 000 сум при оплате за год">при оплате помесячно</div>
+        <a href="#form" class="tdk-btn tdk-btn--line tdk-btn--block">Выбрать тариф</a>
+        <div class="tdk-pl__hr"></div>
+        <div class="tdk-pl__sub">Главное в тарифе</div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Каталог и остатки из МойСклада</li>
+          <li><i class="tdk-ck"></i>Заказы в МойСклад с резервом</li>
+          <li><i class="tdk-ck"></i>Доставка и самовывоз, точка на карте</li>
+          <li><i class="tdk-ck"></i>Персональные цены по типу клиента</li>
+          <li><i class="tdk-ck"></i>Напоминание о брошенной корзине</li>
+        </ul>
+      </div>
+      <div class="tdk-pl tdk-pl--pro tdk-dark" data-r style="--d:.08s">
+        <span class="tdk-pl__tag">14 дней бесплатно</span>
+        <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-rocket"/></svg></span><span><span class="tdk-pl__name">Профессиональный</span><span class="tdk-pl__for">Когда заказы уже идут</span></span></div>
+        <div class="tdk-pl__price"><b data-m="450000" data-y="360000">450 000</b><span>сум / мес.</span></div>
+        <div class="tdk-pl__note" data-m="при оплате помесячно" data-y="4 320 000 сум при оплате за год">при оплате помесячно</div>
+        <a href="#form" class="tdk-btn tdk-btn--fill tdk-btn--block">Попробовать бесплатно</a>
+        <div class="tdk-pl__hr"></div>
+        <div class="tdk-pl__sub">Всё из «Базового», плюс</div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Аналитика продаж и отчёты</li>
+          <li><i class="tdk-ck"></i>Рассылки новостей и акций</li>
+          <li><i class="tdk-ck"></i>Обязательный способ оплаты</li>
+          <li><i class="tdk-ck"></i>Акт сверки с выгрузкой в Excel</li>
+          <li><i class="tdk-ck"></i>Приватная витрина для своих клиентов</li>
+        </ul>
+      </div>
+      <div class="tdk-pl tdk-pl--corp" data-r style="--d:.16s">
+        <span class="tdk-pl__tag">Для групп компаний</span>
+        <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-crown"/></svg></span><span><span class="tdk-pl__name">Корпоративный</span><span class="tdk-pl__for">Несколько юр. лиц и сотрудники</span></span></div>
+        <div class="tdk-pl__price"><b data-m="550000" data-y="440000">550 000</b><span>сум / мес.</span></div>
+        <div class="tdk-pl__note" data-m="при оплате помесячно" data-y="5 280 000 сум при оплате за год">при оплате помесячно</div>
+        <a href="#form" class="tdk-btn tdk-btn--line tdk-btn--block">Выбрать тариф</a>
+        <div class="tdk-pl__hr"></div>
+        <div class="tdk-pl__sub">Всё из «Профессионального», плюс</div>
+        <ul class="tdk-list">
+          <li><i class="tdk-ck"></i>Своя витрина на каждое юр. лицо</li>
+          <li><i class="tdk-ck"></i>Баланс и цены по каждой компании</li>
+          <li><i class="tdk-ck"></i>Панель сотрудника и права доступа</li>
+          <li><i class="tdk-ck"></i>До 3 юр. лиц и 5 сотрудников</li>
+          <li><i class="tdk-ck"></i>До 3 номеров владельца</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tdk-incl" data-r>
+      <b>В каждом тарифе</b>
+      <div><span><svg><use href="#i-bot"/></svg></span>Свой Telegram-бот без доплаты</div>
+      <div><span><svg><use href="#i-sync"/></svg></span>Синхронизация с МойСклад</div>
+      <div><span><svg><use href="#i-globe"/></svg></span>Русский и узбекский</div>
+      <div><span><svg><use href="#i-chat"/></svg></span>Помощь команды iCORP</div>
+    </div>
+
+    <button class="tdk-cmpbtn" type="button" data-cmp><span>Сравнить все функции</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="tdk-tbl" data-tbl><div><div class="tdk-tbl__in">
+      <table>
+        <thead><tr><th>Функция</th><th>Базовый</th><th>Профессиональный</th><th>Корпоративный</th></tr></thead>
+        <tbody>
+          <tr class="gr"><td colspan="4">Магазин и каталог</td></tr>
+          <tr><td>Каталог из МойСклада: товары, модификации, фото, категории, остатки</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Упаковки товара: блоки, мешки, коробки</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Акции и новинки из МойСклада</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Русский и узбекский языки</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Свой Telegram-бот магазина без доплаты</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Приватная витрина: вход только своим клиентам</td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Отдельная витрина на каждое юр. лицо</td><td><i class="tdk-no"></i></td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr class="gr"><td colspan="4">Заказы и клиенты</td></tr>
+          <tr><td>Корзина и заказы в МойСклад с резервом</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Доставка и самовывоз, точка на карте</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Вход по номеру Telegram, баланс и история заказов</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Персональные цены по типу цены клиента</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Напоминание о брошенной корзине</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Обязательный способ оплаты при оформлении</td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Баланс, цены и история по каждой компании</td><td><i class="tdk-no"></i></td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr class="gr"><td colspan="4">Управление и финансы</td></tr>
+          <tr><td>Панель владельца: склады, категории, брендирование</td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Аналитика продаж и выгрузка отчётов</td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Рассылка новостей и акций по клиентам</td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Акт сверки с выгрузкой в Excel</td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Панель сотрудника: заказы, остатки, контрагенты</td><td><i class="tdk-no"></i></td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Права доступа на каждого сотрудника</td><td><i class="tdk-no"></i></td><td><i class="tdk-no"></i></td><td><i class="tdk-ck"></i></td></tr>
+          <tr><td>Юр. лица / сотрудники / номера владельца</td><td>1 / — / 1</td><td>1 / — / 1</td><td>3 / 5 / 3</td></tr>
+        </tbody>
+      </table>
+    </div></div></div>
+  </div>
+</section>
+
+<!-- ============ 9. ПОЧЕМУ iCORP ============ -->
+<section class="tdk-sec">
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>08</b><i></i>Кто стоит за Teledukon</div>
+        <h2 class="tdk-h2">Разработано и внедряется<br><span>командой iCORP</span></h2>
+      </div>
+      <div data-r style="--d:.1s">
+        <p class="tdk-sub">Teledukon — собственный продукт iCORP. Мы с 2016 года автоматизируем бизнес в Узбекистане, поэтому запускаем не просто бота, а магазин, встроенный в ваши процессы и учёт.</p>
+        <a href="https://icorp.uz/" class="tdk-more" style="margin-top:1em">Подробнее об iCORP <svg><use href="#tdk-arr"/></svg></a>
+      </div>
+    </div>
+    <div class="tdk-nums2" data-r>
+      <div><b data-count="2016" data-plain>2016</b><span>год основания iCORP</span></div>
+      <div><b><em data-count="250">250</em><i>+</i></b><span>клиентов в Узбекистане</span></div>
+      <div><b><em data-count="20">20</em><i>+</i></b><span>сертифицированных экспертов</span></div>
+      <div><b>IT<i>&nbsp;Park</i></b><span>резидент технопарка</span></div>
+    </div>
+    <div class="tdk-sv4">
+      <div class="tdk-sv" data-r><div class="tdk-sv__top"><span class="tdk-sv__ic"><svg><use href="#i-gear"/></svg></span><small>01</small></div><h3>Внедрение и настройка</h3><p>Подключим МойСклад и бота, настроим витрину, цены и склады под ваш бизнес.</p><ul><li>МойСклад</li><li>Витрина</li><li>Склады</li></ul></div>
+      <div class="tdk-sv" data-r style="--d:.06s"><div class="tdk-sv__top"><span class="tdk-sv__ic"><svg><use href="#i-sync"/></svg></span><small>02</small></div><h3>Интеграции</h3><p>Свяжем магазин с учётом и CRM, чтобы данные не приходилось переносить вручную.</p><ul><li>amoCRM</li><li>Битрикс24</li><li>1С</li></ul></div>
+      <div class="tdk-sv" data-r style="--d:.12s"><div class="tdk-sv__top"><span class="tdk-sv__ic"><svg><use href="#i-user"/></svg></span><small>03</small></div><h3>Обучение команды</h3><p>Покажем сотрудникам, как работать с заказами, ценами и панелью владельца.</p><ul><li>Менеджеры</li><li>Склад</li><li>Владелец</li></ul></div>
+      <div class="tdk-sv" data-r style="--d:.18s"><div class="tdk-sv__top"><span class="tdk-sv__ic"><svg><use href="#i-chat"/></svg></span><small>04</small></div><h3>Поддержка после запуска</h3><p>Остаёмся на связи: отвечаем на вопросы, дорабатываем и развиваем магазин.</p><ul><li>Консультации</li><li>Доработки</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. КЛИЕНТЫ ============ -->
+<section class="tdk-sec tdk-soft">
+  <div class="tdk-wrap">
+    <div class="tdk-hd">
+      <div data-r>
+        <div class="tdk-eye"><b>09</b><i></i>Клиенты</div>
+        <h2 class="tdk-h2">Уже продают<br><span>через Teledukon</span></h2>
+      </div>
+      <p class="tdk-sub" data-r style="--d:.1s">Розница, производство и дистрибуция в Узбекистане принимают заказы в Telegram.</p>
+    </div>
+    <div class="tdk-cl">
+      <div class="tdk-lg" data-r style="--d:0.00s"><span class="tdk-lg__i"><img src="https://teledukon.uz/img/clients/turon.webp" style="height:2.47em" alt="Turon noshirlik ijodiy uyi" loading="lazy"></span><small>Turon noshirlik ijodiy uyi</small></div>
+      <div class="tdk-lg" data-r style="--d:0.05s"><span class="tdk-lg__i"><img src="https://teledukon.uz/img/clients/xon-matras.webp" style="height:4.6em;clip-path:inset(4%)" alt="Xon Matras" loading="lazy"></span><small>Xon Matras</small></div>
+      <div class="tdk-lg" data-r style="--d:0.10s"><span class="tdk-lg__i"><img src="https://teledukon.uz/img/clients/forge-group.webp" style="height:1.6em" alt="Forge Group" loading="lazy"></span><small>Forge Group</small></div>
+      <div class="tdk-lg" data-r style="--d:0.15s"><span class="tdk-lg__i"><img src="https://teledukon.uz/img/clients/leo-pump.webp" style="height:2.81em" alt="Leo Pump" loading="lazy"></span><small>Leo Pump</small></div>
+      <div class="tdk-lg" data-r style="--d:0.00s"><span class="tdk-lg__i"><img src="https://teledukon.uz/img/clients/flowers-garden.webp" style="height:2.28em" alt="Flowers Garden" loading="lazy"></span><small>Flowers Garden</small></div>
+      <div class="tdk-lg" data-r style="--d:0.05s"><span class="tdk-lg__i"><img src="https://teledukon.uz/img/clients/cheksiz.webp" style="height:1.38em" alt="Cheksiz" loading="lazy"></span><small>Cheksiz</small></div>
+      <div class="tdk-lgc tdk-dark" data-r style="--d:.1s">
+        <span class="tdk-lgc__ic"><img src="https://teledukon.uz/img/logo-mark.webp" alt=""></span>
+        <div class="tdk-lgc__b">
+          <b class="tdk-lgc__t">Обсудим <span>ваш проект</span></b>
+          <div class="tdk-lgc__ch"><span><i class="tdk-ck"></i>Запуск за 1 день</span><span><i class="tdk-ck"></i>14 дней бесплатно</span></div>
+        </div>
+        <a href="#form" class="tdk-btn tdk-btn--fill">Оставить заявку</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10b. ПОЧЕМУ TELEDUKON ============ -->
+<section class="tdk-sec">
+  <div class="tdk-wrap">
+    <div class="tdk-adv__hd">
+      <div data-r>
+        <div class="tdk-eye"><b>10</b><i></i>Почему Teledukon</div>
+        <h2 class="tdk-h2">Преимущества <span>Teledukon</span></h2>
+        <p class="tdk-sub" style="margin-top:1.2em;max-width:32em">Магазин в Telegram, который работает вместе с вашим учётом</p>
+      </div>
+      <span class="tdk-adv__lg" data-r style="--d:.1s"><img src="https://teledukon.uz/img/logo-mark.webp" alt="Teledukon"></span>
+    </div>
+    <div class="tdk-adv">
+      <div class="tdk-adv__i" data-r style="--d:0.00s"><svg class="tdk-hex" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2.5 35.2 11.25v17.5L20 37.5 4.8 28.75v-17.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13.5 20.5l4.5 4.5 8.5-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Собственная разработка iCORP</h3><p>Продукт развиваем сами, поэтому быстро добавляем функции и дорабатываем бота под задачи клиентов</p></div></div>
+      <div class="tdk-adv__i" data-r style="--d:0.08s"><svg class="tdk-hex" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2.5 35.2 11.25v17.5L20 37.5 4.8 28.75v-17.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13.5 20.5l4.5 4.5 8.5-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Глубокая связка с МойСклад</h3><p>Товары, цены, остатки, заказы и взаиморасчёты синхронизируются автоматически — без ручного переноса</p></div></div>
+      <div class="tdk-adv__i" data-r style="--d:0.00s"><svg class="tdk-hex" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2.5 35.2 11.25v17.5L20 37.5 4.8 28.75v-17.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13.5 20.5l4.5 4.5 8.5-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Запуск за 1 день</h3><p>Если вы уже работаете в МойСклад, магазин в Telegram заработает на следующий день после подключения</p></div></div>
+      <div class="tdk-adv__i" data-r style="--d:0.08s"><svg class="tdk-hex" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2.5 35.2 11.25v17.5L20 37.5 4.8 28.75v-17.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13.5 20.5l4.5 4.5 8.5-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Гибкость под ваш бизнес</h3><p>Розница, опт, персональные цены, несколько юр. лиц и складов — настраиваем под ваши процессы</p></div></div>
+      <div class="tdk-adv__i" data-r style="--d:0.00s"><svg class="tdk-hex" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2.5 35.2 11.25v17.5L20 37.5 4.8 28.75v-17.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13.5 20.5l4.5 4.5 8.5-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Русский и узбекский</h3><p>Магазин, бот и панель владельца работают на двух языках — удобно и вам, и вашим покупателям</p></div></div>
+      <div class="tdk-adv__i" data-r style="--d:0.08s"><svg class="tdk-hex" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2.5 35.2 11.25v17.5L20 37.5 4.8 28.75v-17.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13.5 20.5l4.5 4.5 8.5-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Поддержка после запуска</h3><p>Обучим команду, ответим на вопросы и будем развивать магазин вместе с вашим бизнесом</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. ДЕМО ============ -->
+<section class="tdk-sec" style="padding-top:0">
+  <div class="tdk-wrap">
+    <div class="tdk-demo tdk-dark" data-r>
+      <div class="tdk-demo__b">
+        <div class="tdk-eye"><b>11</b><i></i>Бесплатное демо</div>
+        <h2 class="tdk-h2">Покажем Teledukon<br><span>на живом примере</span></h2>
+        <p class="tdk-sub">Оставьте заявку — менеджер iCORP свяжется с вами и проведёт демонстрацию.</p>
+        <div class="tdk-demo__steps">
+          <div><span>1</span>Обсудим ваш ассортимент и процессы</div>
+          <div><span>2</span>Покажем магазин и панель владельца в работе</div>
+          <div><span>3</span>Подберём сценарий запуска и тариф</div>
+        </div>
+        <div class="tdk-demo__btns">
+          <a href="#form" class="tdk-btn tdk-btn--fill">Получить демо</a>
+          <a href="https://teledukon.uz" target="_blank" rel="noopener" class="tdk-btn tdk-btn--wline">teledukon.uz</a>
+        </div>
+      </div>
+      <div class="tdk-demo__art">
+        <span class="tdk-orb tdk-orb--3"><i></i></span>
+        <span class="tdk-orb tdk-orb--2"><i></i></span>
+        <span class="tdk-orb tdk-orb--1"></span>
+        <img class="tdk-demo__icon" src="https://teledukon.uz/img/app-icon.webp" alt="Teledukon" width="890" height="714" loading="lazy">
+        <span class="tdk-demo__chip tdk-demo__chip--1"><i class="g"></i>14 дней бесплатно</span>
+        <span class="tdk-demo__chip tdk-demo__chip--2"><svg width="13" height="13"><use href="#i-rocket"/></svg>Запуск за 1 день</span>
+        <span class="tdk-demo__chip tdk-demo__chip--3"><svg width="13" height="13"><use href="#i-globe"/></svg>RU · UZ</span>
+        <span class="tdk-demo__chip tdk-demo__chip--4"><svg width="13" height="13"><use href="#i-bot"/></svg>Свой бот магазина</span>
+        <span class="tdk-demo__chip tdk-demo__chip--5"><svg width="13" height="13"><use href="#i-sync"/></svg>Синхронизация с МойСклад</span>
+        <span class="tdk-demo__chip tdk-demo__chip--6"><svg width="13" height="13"><use href="#i-chat"/></svg>Поддержка iCORP</span>
+        <div class="tdk-feed" data-feedstack>
+          <div class="tdk-ev"><span style="background:#2AABEE;color:#fff"><svg><use href="#tdk-tg"/></svg></span><span class="tdk-ev__t"><b>Новый заказ №1045</b><small>320 000 сум · Telegram</small></span></div>
+          <div class="tdk-ev"><span style="background:rgba(14,208,162,.18);color:#0ED0A2"><svg><use href="#i-box"/></svg></span><span class="tdk-ev__t"><b>Резерв создан</b><small>склад «Основной»</small></span></div>
+          <div class="tdk-ev"><span style="background:rgba(255,255,255,.1);color:#fff"><svg><use href="#i-sync"/></svg></span><span class="tdk-ev__t"><b>Остатки обновлены</b><small>синхронизация с МойСклад</small></span></div>
+          <div class="tdk-ev"><span style="background:rgba(14,208,162,.18);color:#0ED0A2"><svg><use href="#tdk-ok"/></svg></span><span class="tdk-ev__t"><b>Клиент уведомлён</b><small>заказ №1045 отгружен</small></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var root=document.getElementById('tdk-root'); if(!root) return;
+  root.classList.add('tdk-js');
+  Array.prototype.forEach.call(root.querySelectorAll('[data-same]'),function(im){var s=root.querySelector('[data-img="'+im.getAttribute('data-same')+'"]');if(s)im.src=s.src;});
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasIO='IntersectionObserver' in window;
+  function $(s,c){return (c||root).querySelector(s);}
+  function $$(s,c){return Array.prototype.slice.call((c||root).querySelectorAll(s));}
+  function pill(box,sel){var p=$(sel,box),b=$('button.is-on',box);if(p&&b){p.style.left=b.offsetLeft+'px';p.style.width=b.offsetWidth+'px';}}
+  function onFonts(fn){fn();window.addEventListener('resize',fn);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fn);}
+  function watch(el,cb,th){if(!hasIO){cb(true);return;}new IntersectionObserver(function(es){es.forEach(function(e){cb(e.isIntersecting);});},{threshold:th||0}).observe(el);}
+
+  /* появление */
+  var rs=$$('[data-r],[data-tree]');
+  if(hasIO&&!reduce){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target);}});},{rootMargin:'0px 0px -6% 0px'});
+    rs.forEach(function(el){io.observe(el);});
+  } else rs.forEach(function(el){el.classList.add('is-in');});
+
+  /* якоря */
+  $$('[data-scroll]').forEach(function(a){a.addEventListener('click',function(e){
+    var t=$(a.getAttribute('href')); if(!t) return; e.preventDefault();
+    window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-80,behavior:'smooth'});
+  });});
+
+  /* КАК ЭТО РАБОТАЕТ */
+  var how=$('[data-how]');
+  if(how){
+    var fl=$('.tdk-fl',how),cards=$$('[data-go]',how),cart=$('[data-cart]',how),prog=$('[data-prog]',how),pb=$('b',prog);
+    var D=[700,2300,2700,4400],cur=-1,timer=null,sub=[],vis=false;
+    function clr(){clearTimeout(timer);sub.forEach(clearTimeout);sub=[];}
+    function later(fn,ms){sub.push(setTimeout(fn,ms));}
+    function setProg(p){prog.style.setProperty('--p',p+'%');pb.textContent=p+'%';}
+    function setCart(n){cart.textContent=n;cart.classList.remove('is-pop');void cart.offsetWidth;cart.classList.add('is-pop');}
+    function go(s,auto){
+      clr(); cur=s; fl.setAttribute('data-s',s); fl.classList.remove('t1','t3');
+      cards.forEach(function(c){var k=+c.getAttribute('data-go');c.classList.toggle('is-on',k===s);c.style.setProperty('--dur',(D[k]||3000)+'ms');var b=$('i',c);b.style.animation='none';void b.offsetWidth;b.style.animation='';});
+      if(s===0){cart.textContent='0';setProg(0);}
+      if(s===1){cart.textContent='0';setProg(0);[0,1,2,3,4].forEach(function(n){later(function(){setCart(n+1);},120+n*200);});later(function(){fl.classList.add('t1');},1250);}
+      if(s===2){cart.textContent='5';var p=0;(function tick(){p=Math.min(100,p+4);setProg(p);if(p<100)later(tick,70);})();}
+      if(s===3){cart.textContent='5';setProg(100);later(function(){fl.classList.add('t3');},1200);}
+      if(auto!==false&&vis&&!reduce) timer=setTimeout(function(){go((s+1)%4);},D[s]);
+    }
+    cards.forEach(function(c){c.addEventListener('click',function(){go(+c.getAttribute('data-go'));});});
+    var rows=$('.tdk-rows',how);
+    function reserve(){
+      if(!rows) return; rows.style.minHeight='';
+      var nr=$('.tdk-newrow',rows),prev=fl.getAttribute('data-s');
+      nr.style.transition='none'; fl.setAttribute('data-s','3');
+      var h=rows.offsetHeight; fl.setAttribute('data-s',prev); void nr.offsetWidth; nr.style.transition='';
+      rows.style.minHeight=h+'px';
+    }
+    reserve(); window.addEventListener('resize',reserve);
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(reserve);
+    if(reduce){go(3,false);}
+    else watch(how,function(v){vis=v; if(v){go(cur<0?0:cur);} else clr();},.25);
+  }
+
+  /* ВНУТРИ ПРИЛОЖЕНИЯ: карусель телефонов */
+  var cf=$('[data-cf]');
+  if(cf){
+    var DUR=4500,tabs=$$('.tdk-tab',cf),phs=$$('.tdk-cf__ph',cf),n=phs.length,ci=0,ct=null,cv=false,hov=false,left=DUR,t0=0;
+    cf.style.setProperty('--cfd',DUR+'ms');
+    function layout(){
+      var mob=window.innerWidth<960,step=mob?8:13.5;
+      phs.forEach(function(p,i){
+        var o=i-ci; if(o>n/2)o-=n; if(o<-n/2)o+=n;
+        var a=Math.abs(o),sc=a?0.86:1;
+        if(a>1){o=o>0?2:-2;}
+        p.style.transform='translateX('+(o*step)+'em) translateY('+(a?1.4:0)+'em) scale('+(a>1?.75:sc)+')';
+        p.style.opacity=a>1?0:1; p.style.zIndex=10-a; p.style.filter=a?'brightness(.5)':'none';
+        p.style.pointerEvents=a===1?'auto':(a?'none':'auto');
+      });
+      tabs.forEach(function(t,i){t.classList.toggle('is-on',i===ci);});
+    }
+    function bar(){var t=tabs[ci],b=$('.tdk-tab__bar',t);b.style.animation='none';void b.offsetWidth;b.style.animation='';}
+    var manual=false;
+    function run(ms){clearTimeout(ct);if(manual||!cv||reduce)return;ct=setTimeout(function(){show(ci+1);},ms);}
+    function show(i){ci=(i+n)%n;layout();bar();run(DUR);}
+    function pick(i){manual=true;clearTimeout(ct);cf.classList.add('is-manual');show(i);}
+    tabs.forEach(function(t,i){t.addEventListener('click',function(){pick(i);});});
+    phs.forEach(function(p,i){p.addEventListener('click',function(){pick(i);});});
+    var pv=$('[data-prev]',cf),nx=$('[data-next]',cf);
+    if(pv)pv.addEventListener('click',function(){pick(ci-1);});
+    if(nx)nx.addEventListener('click',function(){pick(ci+1);});
+    var tbox=$('.tdk-tabs',cf);
+    function lock(){
+      tbox.style.minHeight=''; var mx=0;
+      tabs.forEach(function(t,i){
+        tabs.forEach(function(x,k){x.classList.toggle('is-on',k===i);$('.tdk-tab__d',x).style.transition='none';});
+        mx=Math.max(mx,tbox.offsetHeight);
+      });
+      tabs.forEach(function(x,k){x.classList.toggle('is-on',k===ci);void x.offsetWidth;$('.tdk-tab__d',x).style.transition='';});
+      tbox.style.minHeight=mx+'px';
+    }
+    lock(); window.addEventListener('resize',function(){lock();layout();});
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(lock);
+    layout();
+    watch(cf,function(v){var was=cv;cv=v;if(v&&!was){bar();run(DUR);}else if(!v)clearTimeout(ct);},.3);
+  }
+
+  /* счётчики */
+  $$('[data-count]').forEach(function(el){
+    var to=+el.getAttribute('data-count'),plain=el.hasAttribute('data-plain'),done=false;
+    if(reduce) return;
+    var from=plain?to-10:0; el.textContent=from;
+    watch(el,function(v){
+      if(!v||done) return; done=true; var t0=null;
+      requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min((ts-t0)/1400,1),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(st);});
+    },.6);
+  });
+
+  /* ТАРИФЫ */
+  var pr=$('[data-pricing]');
+  if(pr){
+    var sw=$('.tdk-sw',pr),sb=$$('[data-period]',sw);
+    function fmt(x){return String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
+    function setP(p){
+      sb.forEach(function(b){b.classList.toggle('is-on',b.getAttribute('data-period')===p);});
+      pill(sw,'.tdk-sw__p');
+      $$('.tdk-pl__price b',pr).forEach(function(el){
+        var to=+el.getAttribute('data-'+p),from=+el.textContent.replace(/\s/g,''),t0=null;
+        if(reduce||from===to){el.textContent=fmt(to);return;}
+        requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min((ts-t0)/450,1),e=1-Math.pow(1-k,3);el.textContent=fmt(from+(to-from)*e);if(k<1)requestAnimationFrame(st);});
+      });
+      $$('.tdk-pl__note',pr).forEach(function(x){x.textContent=x.getAttribute('data-'+p);});
+    }
+    sb.forEach(function(b){b.addEventListener('click',function(){setP(b.getAttribute('data-period'));});});
+    onFonts(function(){pill(sw,'.tdk-sw__p');});
+    var cb=$('[data-cmp]',pr),tbl=$('[data-tbl]',pr);
+    cb.addEventListener('click',function(){var on=tbl.classList.toggle('is-on');cb.classList.toggle('is-on',on);$('span',cb).textContent=on?'Скрыть сравнение':'Сравнить все функции';});
+  }
+
+  /* ДЕМО: лента событий */
+  var fs=$('[data-feedstack]');
+  if(fs){
+    var ev=$$('.tdk-ev',fs),k=0,fv=false;
+    function paint(){ev.forEach(function(e,i){var p=(k-i+ev.length)%ev.length;e.setAttribute('data-p',p);});}
+    paint();
+    if(!reduce){
+      watch(fs,function(v){fv=v;},0);
+      setInterval(function(){
+        if(!fv||document.hidden) return;
+        k=(k+1)%ev.length;
+        var nw=ev[k]; nw.setAttribute('data-p','-1'); void nw.offsetWidth;
+        paint();
+      },2400);
+    }
+  }
+})();
+</script>
+</div>
