@@ -641,6 +641,14 @@ body.menu-open .hdr-wrap .logo img{filter:brightness(0) invert(1)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}html{scroll-behavior:auto}.pre{opacity:1;transform:none}}
 
+
+/* inside: video */
+.xp__frame>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transform:scale(var(--fs,1.15));background:var(--navy-dark)}
+.xp__play{position:absolute;top:clamp(16px,2vw,28px);right:clamp(16px,2vw,28px);z-index:3;display:inline-flex;align-items:center;gap:10px;padding:6px 18px 6px 6px;border:0;border-radius:999px;background:rgba(255,255,255,.94);color:var(--ink);font:500 14.5px/1 inherit;font-family:inherit;cursor:pointer;transition:background .3s}
+.xp__play span{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;transition:transform .4s var(--ease)}
+.xp__play svg{width:14px;height:14px;margin-left:2px}
+.xp__play:hover{background:#fff}.xp__play:hover span{transform:scale(1.08)}
+.xp__vid:fullscreen{object-fit:contain;transform:none;background:#000}
 /* ===== MOBILE TIDY ===== */
 @media(max-width:560px){
   :root{--gl:max(10px,env(safe-area-inset-left,0px));--gr:max(10px,env(safe-area-inset-right,0px));--pad:20px;--gap:10px;--r:20px;--r-lg:24px}
@@ -652,6 +660,7 @@ body.menu-open .hdr-wrap .logo img{filter:brightness(0) invert(1)}
   .xp__stats b{font-size:26px}
   .xp__stats span,.hs>span{font-size:13px;line-height:1.35;overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
 }
+@media(max-width:900px){.xp__play{left:clamp(20px,4vw,28px);right:auto;top:20px}.xp__frame .xp__in{padding-top:86px}}
 </style>
 </head>
 <body>
@@ -927,7 +936,8 @@ addEventListener('load',finish);setTimeout(finish,3500);requestAnimationFrame(st
       <div class="xp__side s3"><img decoding="async" src="img/fabric-dye.webp" alt="Окрашенные ткани" loading="lazy"></div>
       <div class="xp__side s4"><img decoding="async" src="img/sampling.webp" alt="Разработка образца" loading="lazy"></div>
       <div class="xp__frame" id="xpFrame">
-        <img decoding="async" src="img/sewing-line.webp" alt="Швейный цех Daud Textile" loading="lazy">
+        <video class="xp__vid" id="xpVid" muted loop playsinline preload="none" poster="img/video-poster.webp" aria-label="Видео о производстве Daud Textile"></video>
+        <button class="xp__play" id="xpPlay" type="button"><span><svg viewBox="0 0 16 16" fill="currentColor"><path d="M5 3.2v9.6L12.6 8z"/></svg></span>Смотреть видео</button>
         <div class="xp__in">
           <div class="xp__txt"><span class="eyebrow">Фабрика изнутри</span><h3>Всё производство под одной крышей</h3><p>Пряжа, полотно, окрашивание, раскрой, печать, пошив и упаковка проходят на одной площадке в Ташкентской области.</p><a class="btn btn--white" href="#request">Записаться на экскурсию</a></div>
           <div class="xp__stats"><div><b>12 000 м²</b><span>производственных площадей</span></div><div><b>20</b><span>швейных линий</span></div><div><b>600+</b><span>единиц оборудования</span></div><div><b>1 400</b><span>сотрудников</span></div></div>
@@ -1122,6 +1132,18 @@ addEventListener('load',finish);setTimeout(finish,3500);requestAnimationFrame(st
     requestAnimationFrame(loop);
   }
 
+
+  /* inside: factory video — load near viewport, play only while visible */
+  const xv=$('#xpVid'),xb=$('#xpPlay');
+  if(xv){let loaded=false,full=false;const SRC='video/factory.mp4';
+    const load=()=>{if(!loaded){loaded=true;xv.src=SRC}};
+    if(IO){new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){load();if(!RM&&!full)xv.play().catch(()=>{})}else if(!full)xv.pause()}),{rootMargin:'200px 0px'}).observe(xv)}else load();
+    const exit=()=>{full=false;xv.muted=true;xv.controls=false;if(RM)xv.pause()};
+    xb.addEventListener('click',()=>{load();full=true;xv.muted=false;xv.controls=true;xv.currentTime=0;xv.play().catch(()=>{});
+      if(xv.requestFullscreen)xv.requestFullscreen().catch(()=>{});else if(xv.webkitEnterFullscreen)xv.webkitEnterFullscreen()});
+    document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&full)exit()});
+    xv.addEventListener('webkitendfullscreen',exit);
+  }
   /* inside: frame expands to full width while scrolling */
   const xp=$('#xp'),xf=$('#xpFrame'),xs=$$('.xp__side'),xpMQ=matchMedia('(min-width:901px)');
   const xpUpdate=()=>{if(RM||!xpMQ.matches)return;const r=xp.getBoundingClientRect(),vh=innerHeight;
