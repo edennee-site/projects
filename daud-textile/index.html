@@ -640,6 +640,18 @@ body.menu-open .hdr-wrap .logo img{filter:brightness(0) invert(1)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-size:15px;z-index:70;transition:opacity .3s,transform .3s;pointer-events:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}html{scroll-behavior:auto}.pre{opacity:1;transform:none}}
+
+/* ===== MOBILE TIDY ===== */
+@media(max-width:560px){
+  :root{--gl:max(10px,env(safe-area-inset-left,0px));--gr:max(10px,env(safe-area-inset-right,0px));--pad:20px;--gap:10px;--r:20px;--r-lg:24px}
+  .hero__l,.rq__l,.rq__r,.xp__in,.visit2{padding:24px 20px}
+  .ft-cta{padding:22px 20px}
+  .step{min-height:0;gap:22px}
+  .xp__stats{gap:8px}
+  .xp__stats div{padding:16px 14px}
+  .xp__stats b{font-size:26px}
+  .xp__stats span,.hs>span{font-size:13px;line-height:1.35;overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
+}
 </style>
 </head>
 <body>
@@ -789,7 +801,7 @@ addEventListener('load',finish);setTimeout(finish,3500);requestAnimationFrame(st
       <li class="card adv__item rv"><span class="adv__num">02</span><div><h3>Собственное ткацкое и трикотажное производство</h3><p>Контролируем состав и качество полотна с самого начала и не зависим от сторонних поставщиков.</p></div></li>
       <li class="card adv__item rv"><span class="adv__num">03</span><div><h3>Одежда для взрослых, детей и младенцев</h3><p>Включая верхнюю одежду. Заказы по разным категориям можно разместить на одной фабрике.</p></div></li>
       <li class="card adv__item rv"><span class="adv__num">04</span><div><h3>Собственный бренд и контрактное производство</h3><p>Мы сами продаём одежду под своим брендом, поэтому хорошо знаем требования розницы и маркетплейсов к качеству, маркировке и упаковке.</p></div></li>
-      <li class="card adv__item rv"><span class="adv__num">05</span><div><h3>Мощности для крупных оптовых заказов</h3><p>До 25 000 изделий в сутки и до 650 000 в месяц. Средний срок выполнения заказа — 35–40 дней.</p></div></li>
+      <li class="card adv__item rv"><span class="adv__num">05</span><div><h3>Мощности для крупных оптовых заказов</h3><p>До 25 000 изделий в сутки и до 650 000 в месяц. Средний срок выполнения заказа — <span style="white-space:nowrap">35–40 дней</span>.</p></div></li>
     </ol>
   </div>
 </section>
@@ -884,7 +896,7 @@ addEventListener('load',finish);setTimeout(finish,3500);requestAnimationFrame(st
   <div class="inner">
     <div class="head">
       <div class="head__t rv"><span class="eyebrow">Как работаем</span><h2 class="h2">Шесть шагов к готовой партии</h2></div>
-      <p class="lead rv">Средний срок выполнения заказа — 35–40 дней в зависимости от объёма.</p>
+      <p class="lead rv">Средний срок выполнения заказа — <span style="white-space:nowrap">35–40 дней</span> в зависимости от объёма.</p>
     </div>
     <div class="grid g3" id="steps">
       <div class="card step rv"><div class="step__top"><span class="step__ic"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H8a2 2 0 00-2 2v18a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M16 3v6h6M10 15h8M10 19h5"/></svg></span><span class="step__no">Шаг 01</span></div><div><h3>Заявка и техзадание</h3><p>Изучаем ТЗ, эскизы или образец изделия.</p></div></div>
