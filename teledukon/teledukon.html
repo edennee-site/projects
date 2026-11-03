@@ -1042,25 +1042,9 @@ body{margin:0}
 .tdk-pk canvas{position:absolute;left:0;top:0;pointer-events:none}
 .tdk-hub__ring{position:absolute;inset:-7px;width:auto;height:auto;border-radius:calc(2em + 7px);padding:2px;background:conic-gradient(from 0deg,var(--g) calc(var(--p,0) * 1%),transparent 0);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:var(--o,1);transition:opacity .6s ease;pointer-events:none}
 .tdk-pk__i{transition:none}
-.tdk-cf__stage{perspective:1700px;perspective-origin:50% 30%}
-.tdk-cf__ph{transform-style:preserve-3d;transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .5s ease,filter .9s ease}
-.tdk-cf__ph .tdk-phone{transition:transform .5s cubic-bezier(.22,1,.36,1);transform:rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg))}
 .tdk-cf__ph .tdk-phone__s::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.16) 47%,rgba(255,255,255,.04) 53%,transparent 62%);background-size:260% 100%;background-position:120% 0;opacity:0}
-.tdk-cf__ph.is-glare .tdk-phone__s::after{animation:tdkGlare 1.3s .25s cubic-bezier(.4,0,.2,1)}
+.tdk-cf__ph.is-glare .tdk-phone__s::after{animation:tdkGlare 1.3s .3s cubic-bezier(.4,0,.2,1)}
 @keyframes tdkGlare{0%{background-position:120% 0;opacity:1}100%{background-position:-20% 0;opacity:1}}
-.tdk-cf__ph.is-act .tdk-phone__s::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),rgba(255,255,255,.09),transparent 45%);opacity:var(--go,0);transition:opacity .4s}
-.tdk-cf__ghost{position:absolute;left:50%;top:-.15em;transform:translateX(-50%);white-space:nowrap;pointer-events:none;z-index:0;font-size:7.4em;font-weight:600;letter-spacing:-.03em;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.12)}
-.tdk-cf__ghost span{display:inline-block;transition:opacity .45s ease,transform .7s cubic-bezier(.22,1,.36,1)}
-.tdk-cf__ghost.is-out span{opacity:0;transform:translateY(.25em)}
-.tdk-cf__ph{z-index:1}
-.tdk-tab__ic{transition:background .45s ease,color .45s ease,transform .45s cubic-bezier(.34,1.56,.64,1)}
-.tdk-tab.is-on .tdk-tab__ic{transform:scale(1.06)}
-.tdk-tab b{transition:transform .45s cubic-bezier(.22,1,.36,1),color .3s}
-.tdk-tab.is-on b{transform:translateX(.15em)}
-@media (max-width:959px){
-  .tdk-cf__ghost{font-size:4.4em;top:.2em}
-  .tdk-cf__ph .tdk-phone{transform:none}
-}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
@@ -1297,7 +1281,6 @@ body{margin:0}
     </div>
     <div class="tdk-cf__wrap" data-r style="--d:.1s">
       <div class="tdk-cf__stage">
-        <div class="tdk-cf__ghost" aria-hidden="true"><span>Главная</span></div>
                 <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-home2.webp" alt="Главная покупателя" loading="lazy"></div></div></div>
         <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-build.webp" alt="Каталог" loading="lazy"></div></div></div>
         <div class="tdk-cf__ph"><div class="tdk-phone"><div class="tdk-phone__s"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-product.webp" alt="Карточка товара" loading="lazy"></div></div></div>
@@ -1866,10 +1849,8 @@ body{margin:0}
         var o=i-ci; if(o>n/2)o-=n; if(o<-n/2)o+=n;
         var a=Math.abs(o),sc=a?0.86:1;
         if(a>1){o=o>0?2:-2;}
-        var ry=o?(o>0?-22:22):0,tz=a?-160*Math.min(a,2):0;
-        p.style.transform='translateX('+(o*step)+'em) translateY('+(a?1.4:0)+'em) translateZ('+tz+'px) rotateY('+(mob?0:ry)+'deg) scale('+(a>1?.8:(a?.92:1))+')';
-        p.style.opacity=a>1?0:1; p.style.zIndex=10-a; p.style.filter=a?'brightness(.45) saturate(.8)':'none';
-        p.classList.toggle('is-act',a===0);
+        p.style.transform='translateX('+(o*step)+'em) translateY('+(a?1.4:0)+'em) scale('+(a>1?.75:sc)+')';
+        p.style.opacity=a>1?0:1; p.style.zIndex=10-a; p.style.filter=a?'brightness(.5)':'none';
         p.style.pointerEvents=a===1?'auto':(a?'none':'auto');
       });
       tabs.forEach(function(t,i){t.classList.toggle('is-on',i===ci);});
@@ -1877,25 +1858,14 @@ body{margin:0}
     function bar(){var t=tabs[ci],b=$('.tdk-tab__bar',t);b.style.animation='none';void b.offsetWidth;b.style.animation='';}
     var manual=false;
     function run(ms){clearTimeout(ct);if(manual||!cv||reduce)return;ct=setTimeout(function(){show(ci+1);},ms);}
-    var ghost=$('.tdk-cf__ghost',cf),gs=$('span',ghost),NAMES=['Главная','Каталог','Товар','Корзина','Панель'];
-    function setGhost(){ghost.classList.add('is-out');setTimeout(function(){gs.textContent=NAMES[ci]||'';ghost.classList.remove('is-out');},reduce?0:300);}
-    function glare(){if(reduce)return;var p=phs[ci];p.classList.remove('is-glare');void p.offsetWidth;p.classList.add('is-glare');setTimeout(function(){p.classList.remove('is-glare');},1700);}
-    function show(i){ci=(i+n)%n;layout();bar();setGhost();glare();run(DUR);}
+    function glare(){if(reduce)return;var p=phs[ci];p.classList.remove('is-glare');void p.offsetWidth;p.classList.add('is-glare');setTimeout(function(){p.classList.remove('is-glare');},1800);}
+    function show(i){ci=(i+n)%n;layout();bar();glare();run(DUR);}
     function pick(i){manual=true;clearTimeout(ct);cf.classList.add('is-manual');show(i);}
     tabs.forEach(function(t,i){t.addEventListener('click',function(){pick(i);});});
     phs.forEach(function(p,i){p.addEventListener('click',function(){pick(i);});});
     var pv=$('[data-prev]',cf),nx=$('[data-next]',cf);
     if(pv)pv.addEventListener('click',function(){pick(ci-1);});
     if(nx)nx.addEventListener('click',function(){pick(ci+1);});
-    var stg2=$('.tdk-cf__stage',cf);
-    if(!reduce&&window.matchMedia('(hover:hover)').matches){
-      stg2.addEventListener('mousemove',function(e){
-        var p=phs[ci],r=p.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
-        var ph=$('.tdk-phone',p);ph.style.setProperty('--ty',((x-.5)*10).toFixed(2)+'deg');ph.style.setProperty('--tx',((.5-y)*7).toFixed(2)+'deg');
-        p.style.setProperty('--gx',(x*100).toFixed(1)+'%');p.style.setProperty('--gy',(y*100).toFixed(1)+'%');p.style.setProperty('--go',1);
-      });
-      stg2.addEventListener('mouseleave',function(){phs.forEach(function(p){var ph=$('.tdk-phone',p);ph.style.setProperty('--ty','0deg');ph.style.setProperty('--tx','0deg');p.style.setProperty('--go',0);});});
-    }
     var tbox=$('.tdk-tabs',cf);
     function lock(){
       tbox.style.minHeight=''; var mx=0;
