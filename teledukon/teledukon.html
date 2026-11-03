@@ -1209,6 +1209,22 @@ body{margin:0}
 .tdk-hc__c--r{left:58.339%;top:42.328%;width:29.106%}
 .tdk-hc__c--m{left:36.466%;top:38.821%;width:27.06%}
 .tdk-hero__media .tdk-chip{background:#fff;box-shadow:0 .9em 2em -.9em rgba(16,40,32,.22), 0 .15em .5em rgba(16,40,32,.06)}
+.tdk-own__ph{overflow:hidden}
+.tdk-own__ph img{height:17.5em}
+.tdk-ntf{position:absolute;left:.75em;right:.75em;top:2.35em;z-index:2;display:flex;gap:.55em;align-items:center;padding:.6em .7em;border-radius:1em;background:rgba(44,48,54,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;color:#fff;font-size:.6em;line-height:1.3;opacity:0;transform:translateY(-140%) scale(.96);pointer-events:none}
+.tdk-ntf__ic{flex:none;width:2.6em;height:2.6em;border-radius:.7em;background:linear-gradient(145deg,#12C497,#0B8C6C);display:flex;align-items:center;justify-content:center}
+.tdk-ntf__ic img{width:68%;height:auto;filter:brightness(0) invert(1)}
+.tdk-ntf__b{min-width:0;flex:1}
+.tdk-ntf__h{display:flex;justify-content:space-between;gap:.5em;font-size:.86em;color:rgba(255,255,255,.55)}
+.tdk-ntf__h b{font-weight:500;color:rgba(255,255,255,.7);letter-spacing:.02em}
+.tdk-ntf__t{display:block;font-weight:600;font-size:1.04em;margin-top:.1em}
+.tdk-ntf__s{display:block;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdk-own__ph.is-ntf .tdk-ntf{animation:tdkNtf 5.2s cubic-bezier(.22,1,.36,1) both}
+.tdk-own__ph.is-ntf{animation:tdkBuzz .5s ease-in-out .35s 1}
+@keyframes tdkNtf{0%{opacity:0;transform:translateY(-140%) scale(.96)}10%{opacity:1;transform:translateY(0) scale(1)}13%{transform:translateY(0) scale(1.03)}16%,82%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-140%) scale(.96)}}
+@keyframes tdkBuzz{0%,100%{rotate:0deg}20%{rotate:-1.2deg}40%{rotate:1.2deg}60%{rotate:-.8deg}80%{rotate:.5deg}}
+@media (prefers-reduced-motion:reduce){.tdk-own__ph.is-ntf .tdk-ntf{animation:none;opacity:1;transform:none}.tdk-own__ph.is-ntf{animation:none}}
+.tdk-ntf{top:3.1em}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
@@ -1532,7 +1548,12 @@ body{margin:0}
             <li><i class="tdk-ck"></i>Доступ сотрудникам</li>
           </ul>
         </div>
-        <div class="tdk-own__ph"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-owner.webp" alt="Панель управления магазином в Telegram" loading="lazy"></div>
+        <div class="tdk-own__ph" data-ntf><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-scr-owner.webp" alt="Панель управления магазином в Telegram" loading="lazy">
+          <div class="tdk-ntf" aria-hidden="true">
+            <span class="tdk-ntf__ic"><img src="https://teledukon.uz/img/logo-mark.webp" alt=""></span>
+            <span class="tdk-ntf__b"><span class="tdk-ntf__h"><b>Teledukon</b><small>сейчас</small></span><b class="tdk-ntf__t">🛒 Новый заказ №1043</b><span class="tdk-ntf__s">3 товара · 412 000 сум</span></span>
+          </div>
+        </div>
       </div>
       <div class="tdk-card tdk-c4" data-r>
         <div class="tdk-ico"><img src="https://cdn.jsdelivr.net/gh/edennee-site/projects@teledukon/teledukon/img/tdk-ic-price.webp" alt="" loading="lazy"></div>
@@ -2210,6 +2231,11 @@ body{margin:0}
     var t=setTimeout(go,1800);
     imgs.forEach(function(i){if(i.complete){n++;}else{i.addEventListener('load',function(){if(++n===imgs.length){clearTimeout(t);go();}});i.addEventListener('error',function(){if(++n===imgs.length){clearTimeout(t);go();}});}});
     if(n===imgs.length){clearTimeout(t);requestAnimationFrame(go);}
+  })();
+
+  /* ПАНЕЛЬ ВЛАДЕЛЬЦА: уведомление о заказе — один раз */
+  (function(){var ph=document.querySelector('#tdk-root [data-ntf]'); if(!ph) return; var done=false;
+    watch(ph,function(v){if(v&&!done){done=true;setTimeout(function(){ph.classList.add('is-ntf');},700);}},.6);
   })();
 })();
 </script>
