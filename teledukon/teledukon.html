@@ -1174,6 +1174,10 @@ body{margin:0}
 .tdk-burst__box{transform-origin:50% 100%;will-change:transform}
 .tdk-art:hover>.tdk-burst{transform:none}
 @media (prefers-reduced-motion:reduce){.tdk-burst__o{animation:none}}
+.tdk-burst{margin-bottom:4.3em}
+.tdk-art{align-items:flex-end}
+.tdk-burst{margin:0 0 5em}
+.tdk-tagl--1{top:3%}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
@@ -2108,7 +2112,6 @@ body{margin:0}
     var art=bu.closest('.tdk-art'), os=[].slice.call(bu.querySelectorAll('.tdk-burst__o')), fx=[].slice.call(bu.querySelectorAll('.tdk-burst__fx'));
     var box=bu.querySelector('.tdk-burst__box'), glow=bu.querySelector('.tdk-burst__glow');
     var MX=.51, MY=.88, raf=0, lastK='';
-    var fine=window.matchMedia&&window.matchMedia('(hover:hover) and (pointer:fine)').matches;
     var D=os.map(function(o,i){
       var a=o.offsetWidth||1;
       o.style.animationDelay=(-(i*0.73)%4.2).toFixed(2)+'s'; o.style.animationDuration=(3.6+(i%5)*.45).toFixed(2)+'s';
@@ -2122,7 +2125,7 @@ body{margin:0}
       var W=bu.offsetWidth,H=bu.offsetHeight;
       D.forEach(function(o){
         var t=cl((p-o.d*.5)/.5), ex=1-Math.pow(1-t,2), ey=1-Math.pow(1-t,4), e=1-Math.pow(1-t,3), sb=back(t);
-        var dx=(MX-o.cx)*W*(1-ex)+mx*o.z*14, dy=(MY-o.cy)*H*(1-ey)+my*o.z*10;
+        var dx=(MX-o.cx)*W*(1-ex)+mx*o.z*5, dy=(MY-o.cy)*H*(1-ey)+my*o.z*3.5;
         o.el.style.transform='translate3d('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px,0) scale('+(.1+.9*sb).toFixed(3)+') rotate('+(o.r*(1-e)).toFixed(1)+'deg)';
         o.el.style.opacity=t>=1?'':cl(t*5).toFixed(3);
       });
@@ -2130,9 +2133,13 @@ body{margin:0}
       /* вспышка из коробки и «толчок» коробки */
       var g=Math.sin(Math.PI*cl(p/.75));
       if(glow){glow.style.opacity=(g*.95).toFixed(3);glow.style.transform='translate(-50%,-50%) scale('+(.6+p*.9).toFixed(3)+')';}
-      if(box){var q=Math.sin(Math.PI*cl(p/.35));box.style.transform='translate3d('+(mx*4).toFixed(1)+'px,'+(my*3).toFixed(1)+'px,0) scale('+(1+q*.035).toFixed(4)+','+(1-q*.03).toFixed(4)+')';}
+      if(box){var q=Math.sin(Math.PI*cl(p/.35));box.style.transform='translate3d('+(mx*1.5).toFixed(1)+"px,"+(my*1).toFixed(1)+'px,0) scale('+(1+q*.035).toFixed(4)+','+(1-q*.03).toFixed(4)+')';}
       art.classList.toggle('is-done',p>.97);
     }
+    /* низ коробки заходит под плашку, чтобы не было щели */
+    var bar=art.querySelector('.tdk-art__bar');
+    function fitBox(){if(!bar)return;var ar=art.getBoundingClientRect(),br=bar.getBoundingClientRect();bu.style.marginBottom=Math.max(0,ar.bottom-br.top-br.height*.25)+'px';}
+    fitBox(); window.addEventListener('resize',fitBox);
     if(reduce){art.classList.add('is-burst','is-done');paint(1);return;}
     art.classList.add('is-burst');
     function prog(){
@@ -2144,17 +2151,13 @@ body{margin:0}
     function tick(){
       raf=0; var t=prog(); if(cur<0)cur=t;
       cur+=(t-cur)*.14; if(Math.abs(t-cur)<.001)cur=t;
-      mx+=(tx-mx)*.08; my+=(ty-my)*.08; if(Math.abs(tx-mx)<.002)mx=tx; if(Math.abs(ty-my)<.002)my=ty;
+      mx+=(tx-mx)*.03; my+=(ty-my)*.03; if(Math.abs(tx-mx)<.0005)mx=tx; if(Math.abs(ty-my)<.0005)my=ty;
       paint(cur);
       if(cur!==t||mx!==tx||my!==ty) raf=requestAnimationFrame(tick);
     }
     function on(){if(!raf)raf=requestAnimationFrame(tick);}
     window.addEventListener('scroll',on,{passive:true});
     window.addEventListener('resize',function(){lastK='';on();});
-    if(fine){
-      art.addEventListener('mousemove',function(ev){var r=art.getBoundingClientRect();tx=((ev.clientX-r.left)/r.width-.5)*2;ty=((ev.clientY-r.top)/r.height-.5)*2;on();});
-      art.addEventListener('mouseleave',function(){tx=0;ty=0;on();});
-    }
     cur=prog();paint(cur);
   })();
 })();
