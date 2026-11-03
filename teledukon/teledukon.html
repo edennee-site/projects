@@ -1145,21 +1145,16 @@ body{margin:0}
 .tdk-grow svg{clip-path:inset(-20% 100% -20% 0);transition:clip-path 1.6s cubic-bezier(.4,0,.2,1) .2s}
 .tdk-grow.is-in svg{clip-path:inset(-20% 0 -20% 0)}
 @media (max-width:959px){.tdk-pl__head{padding-top:1.3em}}
-.tdk-pl--corp{--au:#E3C48F;--au2:#B8925A;background:linear-gradient(160deg,#23292E 0%,#181C20 55%,#121518 100%);color:#fff;box-shadow:inset 0 0 0 1px rgba(227,196,143,.28);isolation:isolate}
-.tdk-pl--corp::before{content:"";position:absolute;right:-8em;top:-8em;width:20em;height:20em;border-radius:50%;background:radial-gradient(closest-side,rgba(227,196,143,.16),transparent);pointer-events:none;z-index:0}
-.tdk-pl--corp::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(227,196,143,.8),transparent);pointer-events:none}
+.tdk-pl--corp{border:1.5px solid transparent;background:radial-gradient(120% 60% at 100% 0%,#E6F7F1 0%,rgba(230,247,241,0) 60%) padding-box,linear-gradient(#fff,#fff) padding-box,linear-gradient(150deg,#0ED0A2 0%,#0C6F58 55%,#1F3B33 100%) border-box;box-shadow:none;isolation:isolate}
+.tdk-pl.tdk-pl--corp:hover{box-shadow:none}
 .tdk-pl--corp>*{position:relative;z-index:1}
-.tdk-pl--corp .tdk-pl__tag{position:absolute;background:transparent;color:var(--au);box-shadow:inset 0 0 0 1px rgba(227,196,143,.5)}
-.tdk-pl--corp .tdk-pl__ic{background:linear-gradient(145deg,rgba(227,196,143,.24),rgba(184,146,90,.1));color:var(--au)}
-.tdk-pl--corp .tdk-pl__for,.tdk-pl--corp .tdk-pl__price span,.tdk-pl--corp .tdk-pl__note{color:rgba(255,255,255,.55)}
-.tdk-pl--corp .tdk-pl__hr{background:linear-gradient(90deg,rgba(227,196,143,.35),rgba(255,255,255,.06))}
-.tdk-pl--corp .tdk-pl__sub{color:var(--au);opacity:.75}
-.tdk-pl--corp .tdk-ck{background-color:rgba(227,196,143,.18);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E3C48F' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5 10 17 19 7'/%3E%3C/svg%3E")}
-.tdk-pl--corp .tdk-btn--line{border:0;background:linear-gradient(135deg,#EDD3A4,#C9A266);color:#1A1D20!important;transition:filter .4s,transform .4s}
-.tdk-pl--corp .tdk-btn--line:hover,.tdk-pl.tdk-pl--corp:hover .tdk-btn--line{background:linear-gradient(135deg,#F3DDB5,#D2AC70);color:#1A1D20!important;border:0}
-.tdk-pl.tdk-pl--corp:hover{box-shadow:inset 0 0 0 1px rgba(227,196,143,.6)}
-.tdk-pl--corp .tdk-pl__save s{color:rgba(255,255,255,.45)}
-.tdk-pl--corp .tdk-pl__save em{background:rgba(227,196,143,.16);color:var(--au)}
+.tdk-pl--corp .tdk-pl__ic{background:linear-gradient(145deg,#12B48C,#0C6F58 70%,#174A3D);color:#fff}
+.tdk-pl--corp .tdk-pl__tag{position:absolute;background:var(--gd);color:#fff}
+.tdk-pl--corp .tdk-pl__sub{color:var(--gd)}
+.tdk-pl--corp .tdk-ck{background-color:var(--gd);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5 10 17 19 7'/%3E%3C/svg%3E")}
+.tdk-pl--corp .tdk-btn--line,.tdk-pl.tdk-pl--corp:hover .tdk-btn--line{border:0;background:var(--gd);color:#fff!important;transition:background .4s}
+.tdk-pl--corp .tdk-btn--line:hover{background:#0A5D4A}
+.tdk-pl--corp .tdk-pl__hr{background:linear-gradient(90deg,rgba(12,111,88,.35),var(--line))}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
@@ -1612,7 +1607,7 @@ body{margin:0}
           <li><i class="tdk-ck"></i>Приватная витрина для своих клиентов</li>
         </ul>
       </div>
-      <div class="tdk-pl tdk-pl--corp tdk-dark" data-r style="--d:.16s">
+      <div class="tdk-pl tdk-pl--corp" data-r style="--d:.16s">
         <span class="tdk-pl__tag">Для групп компаний</span>
         <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-crown"/></svg></span><span><span class="tdk-pl__name">Корпоративный</span><span class="tdk-pl__for">Несколько юр. лиц и сотрудники</span></span></div>
         <div class="tdk-pl__save"><s>550 000 сум</s><em>экономия 1 320 000 сум в год</em></div>
