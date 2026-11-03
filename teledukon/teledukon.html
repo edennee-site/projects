@@ -1101,6 +1101,50 @@ body{margin:0}
 @media (max-width:479px){
   .tdk{font-size:16px}
 }
+.tdk-sw__p{background:var(--g)}
+.tdk-sw button.is-on em{color:#fff}
+.tdk-grow{position:relative;height:4.6em;margin:-.6em 0 1.2em}
+.tdk-grow svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tdk-grow__base{fill:none;stroke:#DDE2DF;stroke-width:1;stroke-dasharray:3 5;vector-effect:non-scaling-stroke}
+.tdk-grow__ln{fill:none;stroke:var(--g);stroke-width:2;stroke-linecap:round;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1) .2s}
+.tdk-grow.is-in .tdk-grow__ln{stroke-dashoffset:0}
+.tdk-grow__n{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:.55em}
+.tdk-grow__n i{width:.85em;height:.85em;border-radius:50%;background:#fff;border:2px solid var(--g);flex:none;transform:scale(0);transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.tdk-grow__n em{font-style:normal;font-size:.72em;letter-spacing:.08em;text-transform:uppercase;color:var(--tx2);opacity:0;transition:opacity .5s}
+.tdk-grow__n:nth-of-type(1){transition-delay:0s}
+.tdk-grow.is-in .tdk-grow__n i{transform:scale(1)}
+.tdk-grow.is-in .tdk-grow__n em{opacity:1}
+.tdk-grow.is-in .tdk-grow__n:nth-of-type(1) i,.tdk-grow.is-in .tdk-grow__n:nth-of-type(1) em{transition-delay:.25s}
+.tdk-grow.is-in .tdk-grow__n:nth-of-type(2) i,.tdk-grow.is-in .tdk-grow__n:nth-of-type(2) em{transition-delay:.95s}
+.tdk-grow.is-in .tdk-grow__n:nth-of-type(3) i,.tdk-grow.is-in .tdk-grow__n:nth-of-type(3) em{transition-delay:1.65s}
+.tdk-grow__n:nth-of-type(2) i{background:var(--g)}
+.tdk-grow__n:nth-of-type(2) em{color:var(--gd);font-weight:500}
+.tdk-pl{transition:box-shadow .5s ease,transform .6s cubic-bezier(.22,1,.36,1)}
+.tdk-pl:not(.tdk-pl--pro):hover{box-shadow:0 0 0 1px rgba(14,208,162,.55);transform:translateY(-3px)}
+.tdk-pl__wm{position:absolute;right:.25em;bottom:-.18em;font-size:6.5em;font-weight:600;line-height:1;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(37,37,37,.07);pointer-events:none;z-index:0}
+.tdk-pl>*:not(.tdk-pl__wm):not(.tdk-pl__tag){position:relative;z-index:1}
+.tdk-pl--pro .tdk-pl__wm{-webkit-text-stroke-color:rgba(255,255,255,.22)}
+.tdk-pl:not(.tdk-pl--pro):hover .tdk-btn--line{border-color:var(--g);background:var(--g);color:#fff!important}
+.tdk-pl__save{display:flex;align-items:center;gap:.6em;height:0;margin-top:1.2em;overflow:hidden;opacity:0;transition:height .45s cubic-bezier(.22,1,.36,1),opacity .35s,margin .45s}
+.tdk-pl__save s{font-size:.8em;color:var(--tx3)}
+.tdk-pl__save em{font-style:normal;font-size:.7em;font-weight:500;padding:.25em .65em;border-radius:999px;background:var(--gl);color:var(--gd);white-space:nowrap}
+.tdk-pl__save+.tdk-pl__price{margin-top:1.2em}
+[data-pricing].is-year .tdk-pl__save{height:1.6em;opacity:1}
+[data-pricing].is-year .tdk-pl__save+.tdk-pl__price{margin-top:.3em}
+.tdk-pl--pro .tdk-pl__save s{color:rgba(255,255,255,.6)}
+.tdk-pl--pro .tdk-pl__save em{background:rgba(255,255,255,.2);color:#fff}
+.tdk-pl--pro{isolation:isolate}
+.tdk-pl--pro::after{content:"";position:absolute;right:-9em;top:-9em;width:22em;height:22em;border-radius:50%;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 0 0 3.5em transparent;pointer-events:none;z-index:0;background:radial-gradient(circle,transparent 62%,rgba(255,255,255,.12) 62.3%,transparent 62.8%)}
+@media (max-width:959px){
+  .tdk-grow{display:none}
+  .tdk-pl__wm{font-size:5em}
+}
+.tdk-grow__n{gap:0}
+.tdk-grow__n em{position:absolute;left:50%;bottom:calc(100% + .55em);transform:translateX(-50%);white-space:nowrap}
+.tdk-grow__ln{stroke-dasharray:none;stroke-dashoffset:0;transition:none}
+.tdk-grow svg{clip-path:inset(-20% 100% -20% 0);transition:clip-path 1.6s cubic-bezier(.4,0,.2,1) .2s}
+.tdk-grow.is-in svg{clip-path:inset(-20% 0 -20% 0)}
+@media (max-width:959px){.tdk-pl__head{padding-top:1.3em}}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
@@ -1519,9 +1563,17 @@ body{margin:0}
       </div>
       <div class="tdk-sw" data-r style="--d:.1s"><span class="tdk-sw__p"></span><button type="button" class="is-on" data-period="m">Помесячно</button><button type="button" data-period="y">За год <em>−20%</em></button></div>
     </div>
+    <div class="tdk-grow" data-grow aria-hidden="true">
+      <svg viewBox="0 0 300 40" preserveAspectRatio="none"><path class="tdk-grow__base" d="M0 34 H300"/><path class="tdk-grow__ln" pathLength="1" d="M50 30 C95 30 105 20 150 20 C195 20 205 8 250 8"/></svg>
+      <span class="tdk-grow__n" style="left:16.667%;top:75%"><i></i><em>Старт</em></span>
+      <span class="tdk-grow__n" style="left:50%;top:50%"><i></i><em>Рост</em></span>
+      <span class="tdk-grow__n" style="left:83.333%;top:20%"><i></i><em>Масштаб</em></span>
+    </div>
     <div class="tdk-plans">
       <div class="tdk-pl" data-r>
+        <span class="tdk-pl__wm" aria-hidden="true">01</span>
         <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-shop"/></svg></span><span><span class="tdk-pl__name">Базовый</span><span class="tdk-pl__for">Первый магазин и розница</span></span></div>
+        <div class="tdk-pl__save"><s>350 000 сум</s><em>экономия 840 000 сум в год</em></div>
         <div class="tdk-pl__price"><b data-m="350000" data-y="280000">350 000</b><span>сум / мес.</span></div>
         <div class="tdk-pl__note" data-m="при оплате помесячно" data-y="3 360 000 сум при оплате за год">при оплате помесячно</div>
         <a href="#form" class="tdk-btn tdk-btn--line tdk-btn--block">Выбрать тариф</a>
@@ -1536,8 +1588,10 @@ body{margin:0}
         </ul>
       </div>
       <div class="tdk-pl tdk-pl--pro tdk-dark" data-r style="--d:.08s">
+        <span class="tdk-pl__wm" aria-hidden="true">02</span>
         <span class="tdk-pl__tag">14 дней бесплатно</span>
         <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-rocket"/></svg></span><span><span class="tdk-pl__name">Профессиональный</span><span class="tdk-pl__for">Когда заказы уже идут</span></span></div>
+        <div class="tdk-pl__save"><s>450 000 сум</s><em>экономия 1 080 000 сум в год</em></div>
         <div class="tdk-pl__price"><b data-m="450000" data-y="360000">450 000</b><span>сум / мес.</span></div>
         <div class="tdk-pl__note" data-m="при оплате помесячно" data-y="4 320 000 сум при оплате за год">при оплате помесячно</div>
         <a href="#form" class="tdk-btn tdk-btn--fill tdk-btn--block">Попробовать бесплатно</a>
@@ -1552,8 +1606,10 @@ body{margin:0}
         </ul>
       </div>
       <div class="tdk-pl tdk-pl--corp" data-r style="--d:.16s">
+        <span class="tdk-pl__wm" aria-hidden="true">03</span>
         <span class="tdk-pl__tag">Для групп компаний</span>
         <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-crown"/></svg></span><span><span class="tdk-pl__name">Корпоративный</span><span class="tdk-pl__for">Несколько юр. лиц и сотрудники</span></span></div>
+        <div class="tdk-pl__save"><s>550 000 сум</s><em>экономия 1 320 000 сум в год</em></div>
         <div class="tdk-pl__price"><b data-m="550000" data-y="440000">550 000</b><span>сум / мес.</span></div>
         <div class="tdk-pl__note" data-m="при оплате помесячно" data-y="5 280 000 сум при оплате за год">при оплате помесячно</div>
         <a href="#form" class="tdk-btn tdk-btn--line tdk-btn--block">Выбрать тариф</a>
@@ -1749,7 +1805,7 @@ body{margin:0}
   function watch(el,cb,th){if(!hasIO){cb(true);return;}new IntersectionObserver(function(es){es.forEach(function(e){cb(e.isIntersecting);});},{threshold:th||0}).observe(el);}
 
   /* появление */
-  var rs=$$('[data-r],[data-tree]');
+  var rs=$$('[data-r],[data-tree],[data-grow]');
   if(hasIO&&!reduce){
     var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target);}});},{rootMargin:'0px 0px -6% 0px'});
     rs.forEach(function(el){io.observe(el);});
@@ -1968,6 +2024,7 @@ body{margin:0}
         requestAnimationFrame(function st(ts){if(!t0)t0=ts;var k=Math.min((ts-t0)/450,1),e=1-Math.pow(1-k,3);el.textContent=fmt(from+(to-from)*e);if(k<1)requestAnimationFrame(st);});
       });
       $$('.tdk-pl__note',pr).forEach(function(x){x.textContent=x.getAttribute('data-'+p);});
+      pr.classList.toggle('is-year',p==='y');
     }
     sb.forEach(function(b){b.addEventListener('click',function(){setP(b.getAttribute('data-period'));});});
     onFonts(function(){pill(sw,'.tdk-sw__p');});
