@@ -1145,6 +1145,21 @@ body{margin:0}
 .tdk-grow svg{clip-path:inset(-20% 100% -20% 0);transition:clip-path 1.6s cubic-bezier(.4,0,.2,1) .2s}
 .tdk-grow.is-in svg{clip-path:inset(-20% 0 -20% 0)}
 @media (max-width:959px){.tdk-pl__head{padding-top:1.3em}}
+.tdk-pl--corp{--au:#E3C48F;--au2:#B8925A;background:linear-gradient(160deg,#23292E 0%,#181C20 55%,#121518 100%);color:#fff;box-shadow:inset 0 0 0 1px rgba(227,196,143,.28);isolation:isolate}
+.tdk-pl--corp::before{content:"";position:absolute;right:-8em;top:-8em;width:20em;height:20em;border-radius:50%;background:radial-gradient(closest-side,rgba(227,196,143,.16),transparent);pointer-events:none;z-index:0}
+.tdk-pl--corp::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(227,196,143,.8),transparent);pointer-events:none}
+.tdk-pl--corp>*{position:relative;z-index:1}
+.tdk-pl--corp .tdk-pl__tag{position:absolute;background:transparent;color:var(--au);box-shadow:inset 0 0 0 1px rgba(227,196,143,.5)}
+.tdk-pl--corp .tdk-pl__ic{background:linear-gradient(145deg,rgba(227,196,143,.24),rgba(184,146,90,.1));color:var(--au)}
+.tdk-pl--corp .tdk-pl__for,.tdk-pl--corp .tdk-pl__price span,.tdk-pl--corp .tdk-pl__note{color:rgba(255,255,255,.55)}
+.tdk-pl--corp .tdk-pl__hr{background:linear-gradient(90deg,rgba(227,196,143,.35),rgba(255,255,255,.06))}
+.tdk-pl--corp .tdk-pl__sub{color:var(--au);opacity:.75}
+.tdk-pl--corp .tdk-ck{background-color:rgba(227,196,143,.18);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E3C48F' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5 10 17 19 7'/%3E%3C/svg%3E")}
+.tdk-pl--corp .tdk-btn--line{border:0;background:linear-gradient(135deg,#EDD3A4,#C9A266);color:#1A1D20!important;transition:filter .4s,transform .4s}
+.tdk-pl--corp .tdk-btn--line:hover,.tdk-pl.tdk-pl--corp:hover .tdk-btn--line{background:linear-gradient(135deg,#F3DDB5,#D2AC70);color:#1A1D20!important;border:0}
+.tdk-pl.tdk-pl--corp:hover{box-shadow:inset 0 0 0 1px rgba(227,196,143,.6)}
+.tdk-pl--corp .tdk-pl__save s{color:rgba(255,255,255,.45)}
+.tdk-pl--corp .tdk-pl__save em{background:rgba(227,196,143,.16);color:var(--au)}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
@@ -1165,7 +1180,7 @@ body{margin:0}
   <symbol id="i-truck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></g></symbol>
   <symbol id="i-basket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-1.8 9.2a1.5 1.5 0 0 1-1.5 1.2H6.3a1.5 1.5 0 0 1-1.5-1.2z"/><path d="M8 10l3-6M16 10l-3-6M9 14v3M15 14v3M12 14v3"/></g></symbol>
   <symbol id="i-build" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V5l7-2v18M12 9h7v12"/><path d="M8 8h1M8 12h1M8 16h1M15 13h1M15 17h1"/></g></symbol>
-  <symbol id="i-rocket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4c3-1 5-1 6 0 1 1 1 3 0 6l-7 7-6-6z"/><path d="M7 11 4 12l-1 3 4-1M13 17l-1 3 3-1 1-3"/><circle cx="15.5" cy="8.5" r="1.4"/></g></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></g></symbol>
   <symbol id="i-crown" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></g></symbol>
   <symbol id="i-bot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13v1M15 13v1M2 13v3M22 13v3"/></g></symbol>
   <symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></g></symbol>
@@ -1563,15 +1578,8 @@ body{margin:0}
       </div>
       <div class="tdk-sw" data-r style="--d:.1s"><span class="tdk-sw__p"></span><button type="button" class="is-on" data-period="m">Помесячно</button><button type="button" data-period="y">За год <em>−20%</em></button></div>
     </div>
-    <div class="tdk-grow" data-grow aria-hidden="true">
-      <svg viewBox="0 0 300 40" preserveAspectRatio="none"><path class="tdk-grow__base" d="M0 34 H300"/><path class="tdk-grow__ln" pathLength="1" d="M50 30 C95 30 105 20 150 20 C195 20 205 8 250 8"/></svg>
-      <span class="tdk-grow__n" style="left:16.667%;top:75%"><i></i><em>Старт</em></span>
-      <span class="tdk-grow__n" style="left:50%;top:50%"><i></i><em>Рост</em></span>
-      <span class="tdk-grow__n" style="left:83.333%;top:20%"><i></i><em>Масштаб</em></span>
-    </div>
     <div class="tdk-plans">
       <div class="tdk-pl" data-r>
-        <span class="tdk-pl__wm" aria-hidden="true">01</span>
         <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-shop"/></svg></span><span><span class="tdk-pl__name">Базовый</span><span class="tdk-pl__for">Первый магазин и розница</span></span></div>
         <div class="tdk-pl__save"><s>350 000 сум</s><em>экономия 840 000 сум в год</em></div>
         <div class="tdk-pl__price"><b data-m="350000" data-y="280000">350 000</b><span>сум / мес.</span></div>
@@ -1588,7 +1596,6 @@ body{margin:0}
         </ul>
       </div>
       <div class="tdk-pl tdk-pl--pro tdk-dark" data-r style="--d:.08s">
-        <span class="tdk-pl__wm" aria-hidden="true">02</span>
         <span class="tdk-pl__tag">14 дней бесплатно</span>
         <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-rocket"/></svg></span><span><span class="tdk-pl__name">Профессиональный</span><span class="tdk-pl__for">Когда заказы уже идут</span></span></div>
         <div class="tdk-pl__save"><s>450 000 сум</s><em>экономия 1 080 000 сум в год</em></div>
@@ -1605,8 +1612,7 @@ body{margin:0}
           <li><i class="tdk-ck"></i>Приватная витрина для своих клиентов</li>
         </ul>
       </div>
-      <div class="tdk-pl tdk-pl--corp" data-r style="--d:.16s">
-        <span class="tdk-pl__wm" aria-hidden="true">03</span>
+      <div class="tdk-pl tdk-pl--corp tdk-dark" data-r style="--d:.16s">
         <span class="tdk-pl__tag">Для групп компаний</span>
         <div class="tdk-pl__head"><span class="tdk-pl__ic"><svg><use href="#i-crown"/></svg></span><span><span class="tdk-pl__name">Корпоративный</span><span class="tdk-pl__for">Несколько юр. лиц и сотрудники</span></span></div>
         <div class="tdk-pl__save"><s>550 000 сум</s><em>экономия 1 320 000 сум в год</em></div>
