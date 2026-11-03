@@ -2175,8 +2175,11 @@ body{margin:0}
     }
     /* низ коробки заходит под плашку, чтобы не было щели */
     var bar=art.querySelector('.tdk-art__bar');
-    function fitBox(){if(!bar)return;var ar=art.getBoundingClientRect(),br=bar.getBoundingClientRect();bu.style.marginBottom=Math.max(0,ar.bottom-br.top-br.height*.25)+'px';}
-    fitBox(); window.addEventListener('resize',fitBox);
+    /* считаем по offset-размерам: на них не влияют анимации появления (transform) */
+    function fitBox(){if(!bar)return;var v=art.clientHeight-bar.offsetTop-bar.offsetHeight*.25;if(v>0&&v<art.clientHeight*.5)bu.style.marginBottom=v+'px';}
+    fitBox(); window.addEventListener('resize',fitBox); window.addEventListener('load',fitBox);
+    if(window.ResizeObserver){new ResizeObserver(fitBox).observe(art);new ResizeObserver(fitBox).observe(bar);}
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitBox);
     if(reduce){art.classList.add('is-burst','is-done');paint(1);return;}
     art.classList.add('is-burst');
     watch(art,function(v){art.classList.toggle('is-off',!v);},0);
