@@ -1178,6 +1178,32 @@ body{margin:0}
 .tdk-art{align-items:flex-end}
 .tdk-burst{margin:0 0 5em}
 .tdk-tagl--1{top:3%}
+.tdk-hc{position:relative;width:100%;aspect-ratio:1500/1166}
+.tdk-hc>*{position:absolute;display:block;max-width:none}
+.tdk-hc__ph{left:28.984%;top:2.877%;width:42.532%;height:auto}
+.tdk-hc__c{height:auto}
+.tdk-hc__c--l{left:12.275%;top:41.988%;width:29.634%}
+.tdk-hc__c--r{left:58.075%;top:41.988%;width:29.634%}
+.tdk-hc__c--m{left:36.202%;top:38.481%;width:27.588%}
+.tdk-hc__pl{top:49.76%;width:26.667%;height:41.767%;border-radius:11%/9%;background:linear-gradient(180deg,#359D7C,#6EB6A0)}
+.tdk-hc__pl--l{left:5.367%;transform:rotate(-9deg)}
+.tdk-hc__pl--r{left:67.967%;transform:rotate(9deg)}
+.tdk-hc.is-on .tdk-hc__ph{animation:tdkHcPh 1.1s cubic-bezier(.2,.8,.2,1) both}
+.tdk-hc.is-on .tdk-hc__c--m{animation:tdkHcM 1s cubic-bezier(.34,1.4,.5,1) .35s both,tdkHcBob 6s ease-in-out 1.6s infinite}
+.tdk-hc.is-on .tdk-hc__c--l{animation:tdkHcL 1s cubic-bezier(.3,1.25,.5,1) .6s both,tdkHcBob 6.6s ease-in-out 2.1s infinite}
+.tdk-hc.is-on .tdk-hc__c--r{animation:tdkHcR 1s cubic-bezier(.3,1.25,.5,1) .7s both,tdkHcBob 7s ease-in-out 2.4s infinite}
+.tdk-hc.is-on .tdk-hc__pl--l{animation:tdkHcPL 1s cubic-bezier(.3,1.2,.5,1) .85s both}
+.tdk-hc.is-on .tdk-hc__pl--r{animation:tdkHcPR 1s cubic-bezier(.3,1.2,.5,1) .95s both}
+.tdk-hc:not(.is-on)>*{opacity:0}
+@keyframes tdkHcPh{from{opacity:0;transform:translateY(12%)}to{opacity:1;transform:none}}
+@keyframes tdkHcM{from{opacity:0;transform:translateY(28%) scale(.86)}to{opacity:1;transform:none}}
+@keyframes tdkHcL{from{opacity:0;transform:translateX(62%) rotate(10deg) scale(.9)}to{opacity:1;transform:none}}
+@keyframes tdkHcR{from{opacity:0;transform:translateX(-62%) rotate(-10deg) scale(.9)}to{opacity:1;transform:none}}
+@keyframes tdkHcPL{from{opacity:0;transform:translateX(55%) rotate(0deg)}to{opacity:1;transform:rotate(-9deg)}}
+@keyframes tdkHcPR{from{opacity:0;transform:translateX(-55%) rotate(0deg)}to{opacity:1;transform:rotate(9deg)}}
+@keyframes tdkHcBob{0%,100%{translate:0 0}50%{translate:0 -2.2%}}
+.tdk-hero__media .tdk-chip{animation-delay:calc(var(--d,0s) + .9s)}
+@media (prefers-reduced-motion:reduce){.tdk-hc>*{animation:none!important;opacity:1!important}}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="tdk-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5L18 6.2c.4-.3-.1-.5-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1.1-1 .2-1.5L20.5 2.8c.9-.3 1.7.2 1.4 1.5z"/></symbol>
@@ -1224,7 +1250,13 @@ body{margin:0}
     </div>
   </div>
   <div class="tdk-hero__media">
-    <img src="https://teledukon.uz/img/hero-art.webp" alt="Магазин Teledukon в Telegram: заказы, витрина и остатки" width="1500" height="1166">
+    <div class="tdk-hc" data-hc role="img" aria-label="Магазин Teledukon в Telegram: заказы, витрина и остатки">
+      <i class="tdk-hc__pl tdk-hc__pl--l"></i><i class="tdk-hc__pl tdk-hc__pl--r"></i>
+      <img class="tdk-hc__ph" src="https://cdn.jsdelivr.net/gh/edennee-site/projects@db1773bf0a1f5b0a79d0bcc24e864d8d0d0a58d9/teledukon/img/tdk-hero-phone.webp" alt="" width="651" height="1315">
+      <img class="tdk-hc__c tdk-hc__c--l" src="https://cdn.jsdelivr.net/gh/edennee-site/projects@db1773bf0a1f5b0a79d0bcc24e864d8d0d0a58d9/teledukon/img/tdk-hero-orders.webp" alt="" width="449" height="630">
+      <img class="tdk-hc__c tdk-hc__c--r" src="https://cdn.jsdelivr.net/gh/edennee-site/projects@db1773bf0a1f5b0a79d0bcc24e864d8d0d0a58d9/teledukon/img/tdk-hero-stock.webp" alt="" width="449" height="630">
+      <img class="tdk-hc__c tdk-hc__c--m" src="https://cdn.jsdelivr.net/gh/edennee-site/projects@db1773bf0a1f5b0a79d0bcc24e864d8d0d0a58d9/teledukon/img/tdk-hero-shop.webp" alt="" width="418" height="662">
+    </div>
     <div class="tdk-chip tdk-chip--a" style="--d:.5s">
       <span class="tdk-chip__ic" style="background:#2AABEE;color:#fff"><svg width="14" height="14"><use href="#tdk-tg"/></svg></span>
       <span><b>Приём заказов 24/7</b><small>прямо в Telegram</small></span>
@@ -2159,6 +2191,15 @@ body{margin:0}
     window.addEventListener('scroll',on,{passive:true});
     window.addEventListener('resize',function(){lastK='';on();});
     cur=prog();paint(cur);
+  })();
+
+  /* HERO: сборка сцены */
+  (function(){var hc=document.querySelector('#tdk-root [data-hc]'); if(!hc) return;
+    var imgs=[].slice.call(hc.querySelectorAll('img')), n=0, rd=false, vis=false, fire=function(){if(rd&&vis)hc.classList.add('is-on');}, go=function(){rd=true;fire();};
+    watch(hc,function(v){if(v){vis=true;fire();}},.25);
+    var t=setTimeout(go,1800);
+    imgs.forEach(function(i){if(i.complete){n++;}else{i.addEventListener('load',function(){if(++n===imgs.length){clearTimeout(t);go();}});i.addEventListener('error',function(){if(++n===imgs.length){clearTimeout(t);go();}});}});
+    if(n===imgs.length){clearTimeout(t);requestAnimationFrame(go);}
   })();
 })();
 </script>
