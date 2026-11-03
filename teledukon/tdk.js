@@ -1,7 +1,8 @@
 
 (function(){
-  var root=document.getElementById('tdk-root'); if(!root) return;
-  root.classList.add('tdk-js');
+  var W=document.querySelectorAll('.tdk'); if(!W.length) return;
+  Array.prototype.forEach.call(W,function(w){w.classList.add('tdk-js');});
+  var root=document;
   Array.prototype.forEach.call(root.querySelectorAll('[data-same]'),function(im){var s=root.querySelector('[data-img="'+im.getAttribute('data-same')+'"]');if(s)im.src=s.src;});
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hasIO='IntersectionObserver' in window;
@@ -270,7 +271,7 @@
 
   /* ВЫЛЕТ ТОВАРОВ ИЗ КОРОБКИ — привязан к скроллу (v2) */
   (function(){
-    var bu=document.querySelector('#tdk-root [data-burst]'); if(!bu) return;
+    var bu=document.querySelector('.tdk [data-burst]'); if(!bu) return;
     var art=bu.closest('.tdk-art'), os=[].slice.call(bu.querySelectorAll('.tdk-burst__o')), fx=[].slice.call(bu.querySelectorAll('.tdk-burst__fx'));
     var box=bu.querySelector('.tdk-burst__box'), glow=bu.querySelector('.tdk-burst__glow');
     var MX=.51, MY=.88, raf=0, lastK='';
@@ -329,7 +330,7 @@
   })();
 
   /* HERO: сборка сцены */
-  (function(){var hc=document.querySelector('#tdk-root [data-hc]'); if(!hc) return;
+  (function(){var hc=document.querySelector('.tdk [data-hc]'); if(!hc) return;
     var imgs=[].slice.call(hc.querySelectorAll('img')), n=0, rd=false, vis=false, fire=function(){if(rd&&vis)hc.classList.add('is-on');}, go=function(){rd=true;fire();};
     watch(hc,function(v){if(v){vis=true;fire();}},.25);
     watch(hc,function(v){hc.classList.toggle('is-off',!v);},0);
@@ -339,7 +340,7 @@
   })();
 
   /* ПАНЕЛЬ ВЛАДЕЛЬЦА: уведомление о заказе — по кругу, пока блок на экране */
-  (function(){var ph=document.querySelector('#tdk-root [data-ntf]'); if(!ph) return;
+  (function(){var ph=document.querySelector('.tdk [data-ntf]'); if(!ph) return;
     var t1=null,t2=null,on=false,n=1043,tt=$('.tdk-ntf__t',ph),sums=['412 000','268 500','1 150 000','734 000'],ss=$('.tdk-ntf__s',ph);
     function play(){
       if(!on) return;
