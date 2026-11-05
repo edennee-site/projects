@@ -1228,3 +1228,9 @@ button, input, select, textarea { font: inherit; color: inherit; letter-spacing:
 .pstep__viz--photo > img { opacity: .72; }
 .pstep__viz--photo > img { opacity: .92; }
 .pstep__viz--photo::after { background: linear-gradient(0deg, rgba(0,26,40,.88) 0%, rgba(0,26,40,.35) 42%, rgba(0,26,40,.08) 75%); }
+/* длинные заголовки на узбекском и английском: перенос вместо выхода за край */
+@media (max-width: 860px) { .page-hero .h-mega { white-space: normal; } .page-hero .h-mega .line { display: block; } }
+html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .page-hero .h-mega { font-size: clamp(48px, 7vw, 132px); }
+/* на узбекском перевод девиза дублирует сам девиз */
+html[lang="uz"] .val__ru, html[lang="uz"] .motto__ru { display: none; }
+html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .page-hero .h-mega { font-size: clamp(44px, 6vw, 116px); }
