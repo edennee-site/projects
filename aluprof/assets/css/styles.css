@@ -1072,3 +1072,156 @@ button, input, select, textarea { font: inherit; color: inherit; letter-spacing:
 @media (max-width: 860px) { .swipe-hint { display: flex; } }
 @media (max-width: 860px) { .ds__tags span { background: #fff; } }
 .pstep__fact b { white-space: nowrap; }
+
+/* ==========================================================================
+   Правки по замечаниям клиента (05.11): слоган, направления, страница «Системы»,
+   партнёры, статус изображений, бренды THERMO / Silver / Platinum
+   ========================================================================== */
+
+/* ---------- статичный слоган вместо бегущей строки ---------- */
+.motto { background: var(--red); color: #fff; position: relative; z-index: 3; }
+.motto__in { display: flex; align-items: center; justify-content: space-between; gap: 20px 40px; flex-wrap: wrap; padding-top: 18px; padding-bottom: 18px; }
+.motto p { margin: 0; }
+.motto__uz { display: flex; align-items: center; gap: 22px; font-family: var(--f-display); font-weight: 500; font-size: clamp(22px, 2.2vw, 34px); letter-spacing: -0.04em; line-height: 1; }
+.motto__uz .para { background: #fff; width: 14px; height: 6px; }
+.motto__ru { font-size: 14px; color: rgba(255,255,255,.85); }
+
+/* ---------- метка статуса изображения ---------- */
+.vis-tag { position: absolute; z-index: 3; left: 14px; top: 14px; padding: 5px 9px; font-size: 11px; line-height: 1; letter-spacing: .02em; color: rgba(255,255,255,.85); background: rgba(0,26,40,.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); pointer-events: none; }
+.pstep__viz .vis-tag { left: auto; right: 16px; top: 16px; }
+.is-safari .vis-tag { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(0,26,40,.7); }
+.vis-note { margin: 0; font-size: 12px; color: rgba(205,218,228,.5); }
+
+/* ---------- главная: три направления ---------- */
+.dirs { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 14px; }
+.dir { position: relative; display: flex; flex-direction: column; gap: 18px; min-height: 420px; padding: clamp(24px, 2.4vw, 40px); background: #fff; color: var(--navy);
+  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%); transition: transform .5s var(--ease); }
+.dir:hover { transform: translateY(-6px); }
+.dir::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform .6s var(--ease); }
+.dir:hover::after { transform: scaleX(1); }
+.dir__top { display: flex; justify-content: space-between; font-size: 13px; color: var(--steel); }
+.dir__name { margin-top: auto; font-family: var(--f-display); font-weight: 500; font-size: clamp(48px, 4.6vw, 84px); letter-spacing: -0.06em; line-height: .9; }
+.dir p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-soft); max-width: 28em; }
+.dir__more { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+.dir__more .btn__ico { transition: transform .5s var(--ease); }
+.dir:hover .dir__more .btn__ico { transform: translateX(4px); }
+.dir--thermo { background: var(--navy-deep); color: #fff; }
+.dir--thermo .dir__top { color: rgba(205,218,228,.6); }
+.dir--thermo p { color: rgba(225,234,240,.75); }
+.dir__logo { margin-top: auto; width: min(100%, 340px); height: auto; }
+.dir__series { display: flex; align-items: center; gap: 10px; padding: 16px 0; border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); }
+.dir__series img { height: 26px; width: auto; }
+.dir__series b { font-family: var(--f-display); font-weight: 500; font-size: 22px; letter-spacing: -0.03em; }
+.dir__series span { width: 1px; height: 26px; background: var(--line-dark); margin: 0 10px; }
+
+/* ---------- партнёрам: четыре аудитории ---------- */
+.pcards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.pc { position: relative; display: flex; flex-direction: column; gap: 14px; min-height: 320px; padding: 28px 26px 28px; background: #fff;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%); }
+.pc__n { font-size: 13px; color: var(--steel); }
+.pc h3 { margin: auto 0 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(22px, 1.7vw, 28px); letter-spacing: -0.04em; line-height: 1.05; color: var(--navy); }
+.pc p { margin: 0 0 8px; color: var(--ink-soft); font-size: 15px; line-height: 1.5; }
+.pc .btn { align-self: flex-start; }
+
+/* ---------- контакты без фоновой фотографии ---------- */
+.cta { background: var(--navy-deep); }
+
+/* ---------- футер: логотипы брендов вместо крупной надписи ---------- */
+.footer__brands { display: flex; align-items: center; gap: clamp(26px, 4vw, 70px); flex-wrap: wrap; padding: 34px 0; border-bottom: 1px solid var(--line-dark); }
+.footer__brands img { height: clamp(26px, 2.6vw, 40px); width: auto; opacity: .85; }
+.footer__brands img:first-child { height: clamp(40px, 4vw, 62px); }
+
+/* ---------- страница «Системы» ---------- */
+.page-systems .page-hero { min-height: 78svh; }
+.page-systems .page-hero .h-mega { font-size: clamp(56px, 9vw, 180px); }
+.jump { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+.jump a { padding: 10px 14px; font-size: 13px; font-weight: 500; letter-spacing: .02em; border: 1px solid rgba(255,255,255,.25); transition: background-color .3s, border-color .3s; }
+.jump a:hover { background: var(--red); border-color: var(--red); }
+
+.thermo__head { display: grid; grid-template-columns: 1fr 1fr; gap: 30px var(--inset); align-items: end; margin-bottom: clamp(44px, 5vw, 80px); }
+.thermo__logo { width: min(100%, 520px); height: auto; margin-top: 8px; }
+
+.series { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.serie { background: var(--navy); display: grid; grid-template-rows: auto 1fr; }
+.serie__media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+.serie__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s var(--ease); }
+.serie:hover .serie__media img { transform: scale(1.04); }
+.serie__body { padding: clamp(24px, 2.6vw, 44px); display: flex; flex-direction: column; gap: 18px; }
+.serie__brand { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.serie__brand img { height: clamp(40px, 3.6vw, 60px); width: auto; }
+.serie__brand span { font-size: 14px; color: rgba(205,218,228,.7); white-space: nowrap; }
+.serie__lead { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(20px, 1.6vw, 26px); letter-spacing: -0.03em; line-height: 1.2; }
+.serie__spec { margin: 0 0 8px; border-top: 1px solid var(--line-dark); }
+.serie__spec div { display: grid; grid-template-columns: 170px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line-dark); font-size: 15px; line-height: 1.45; }
+.serie__spec dt { color: rgba(205,218,228,.6); font-size: 14px; }
+.serie__spec dd { margin: 0; }
+.serie .btn { align-self: flex-start; margin-top: auto; }
+
+.xlink { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; margin-top: 14px; padding: 22px clamp(22px, 2.6vw, 44px); border: 1px solid var(--line-dark); transition: background-color .4s; }
+.xlink:hover { background: rgba(255,255,255,.05); }
+.xlink__k { font-size: 13px; color: var(--red-soft); }
+.xlink__t { font-family: var(--f-display); font-weight: 500; font-size: clamp(18px, 1.5vw, 24px); letter-spacing: -0.03em; }
+.xlink i { width: 46px; height: 46px; display: grid; place-items: center; border: 1px solid var(--line-dark); }
+.xlink:hover i { background: var(--red); border-color: var(--red); }
+
+.tapps { margin-top: clamp(70px, 7vw, 120px); }
+.tapps__head { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
+.tapps__head .eyebrow { margin: 0; }
+.tapps__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.tapp__img { aspect-ratio: 4 / 3; overflow: hidden; margin-bottom: 18px; }
+.tapp__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s var(--ease); }
+.tapp:hover .tapp__img img { transform: scale(1.05); }
+.tapp h3 { margin: 0 0 6px; font-family: var(--f-display); font-weight: 500; font-size: clamp(20px, 1.6vw, 26px); letter-spacing: -0.035em; }
+.tapp p { margin: 0; font-size: 15px; color: rgba(225,234,240,.7); }
+
+.catband { margin-top: clamp(70px, 7vw, 120px); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: clamp(24px, 4vw, 70px); padding: clamp(26px, 3vw, 50px); background: var(--navy);
+  clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%); }
+.catband__logo { width: clamp(150px, 16vw, 260px); height: auto; }
+.catband h3 { margin: 0 0 8px; font-family: var(--f-display); font-weight: 500; font-size: clamp(26px, 2.4vw, 40px); letter-spacing: -0.045em; }
+.catband p { margin: 0; color: rgba(225,234,240,.75); max-width: 34em; }
+.catband__act { display: grid; justify-items: start; gap: 10px; }
+
+.sys__feat--2 { grid-template-columns: repeat(2, 1fr); }
+
+@media (max-width: 1100px) {
+  .dirs { grid-template-columns: 1fr 1fr; }
+  .dir--thermo { grid-column: 1 / -1; min-height: 380px; }
+  .pcards { grid-template-columns: 1fr 1fr; }
+  .series { grid-template-columns: 1fr; }
+  .catband { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .motto__in { justify-content: center; text-align: center; padding-top: 16px; padding-bottom: 16px; }
+  .motto__uz { gap: 14px; font-size: 22px; }
+  .motto__ru { width: 100%; font-size: 13px; }
+  .dirs, .pcards, .tapps__grid { grid-template-columns: 1fr; }
+  .dir, .dir--thermo { min-height: 0; }
+  .dir__name { margin-top: 18px; }
+  .dir__logo { margin-top: 6px; width: 240px; }
+  .dir__series img { height: 20px; }
+  .dir__series b { font-size: 18px; }
+  .pc { min-height: 0; }
+  .pc h3 { margin-top: 10px; }
+  .thermo__head { grid-template-columns: 1fr; }
+  .thermo__logo { width: 300px; }
+  .serie__spec div { grid-template-columns: 1fr; gap: 2px; }
+  .serie__brand img { height: 38px; }
+  .xlink { grid-template-columns: 1fr auto; }
+  .xlink__k { grid-column: 1 / -1; }
+  .tapps__grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 calc(-1 * var(--pad)); padding: 0 var(--pad); scroll-padding-left: var(--pad); gap: 12px; }
+  .tapps__grid::-webkit-scrollbar { display: none; }
+  .tapp { flex: none; width: 78vw; scroll-snap-align: start; }
+  .footer__brands img { height: 24px; }
+  .footer__brands img:first-child { height: 40px; }
+  .page-systems .page-hero .h-mega { font-size: 17vw; }
+  .is-simple .sys__feat li:nth-child(3) { display: list-item; }
+}
+.sys__feat--2 li { min-width: 0; }
+@media (max-width: 860px) {
+  .sys__feat--2 { grid-template-columns: minmax(0, 1fr); }
+  .sys__body { min-width: 0; }
+  .sys__index { gap: 14px; }
+  .sys__index span { text-align: right; }
+}
+.stack__anchor { height: 0; }
+@media (min-width: 861px) and (max-width: 1100px) { .series { grid-template-columns: 1fr 1fr; } .serie__spec div { grid-template-columns: 1fr; gap: 2px; } }

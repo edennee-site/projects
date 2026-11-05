@@ -27,13 +27,18 @@
   const absTop = el => { let y = 0; while (el) { y += el.offsetTop; el = el.offsetParent; } return y; };
 
   /* ---------------- якорные ссылки ---------------- */
+  // отступ под закреплённую шапку: заголовок блока не должен уходить под неё
+  const targetY = t => { const pt = parseFloat(getComputedStyle(t).paddingTop) || 0; return Math.max(0, absTop(t) - Math.max(0, 96 - pt)); };
   $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
     const id = a.getAttribute('href');
     if (id.length < 2) return;
     const t = $(id); if (!t) return;
     e.preventDefault();
     body.classList.remove('menu-open');
-    window.scrollTo({ top: absTop(t), behavior: reduce ? 'auto' : 'smooth' });
+    // кнопка аудитории заранее выбирает «Кто вы» в форме
+    const who = a.dataset.who, sel = who && $('#f-who');
+    if (sel) sel.value = who;
+    window.scrollTo({ top: targetY(t), behavior: reduce ? 'auto' : 'smooth' });
   }));
 
   /* ---------------- разбивка заголовков на слова ---------------- */
@@ -420,7 +425,7 @@
   window.addEventListener('load', () => {
     measure(); measureDraw(); fitBig();
     const t = location.hash && location.hash.length > 1 ? document.querySelector(location.hash) : null;
-    window.scrollTo(0, t ? absTop(t) : 0);
+    window.scrollTo(0, t ? targetY(t) : 0);
   });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); fitBig(); });
 
