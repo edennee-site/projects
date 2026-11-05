@@ -1226,3 +1226,5 @@ button, input, select, textarea { font: inherit; color: inherit; letter-spacing:
 .stack__anchor { height: 0; }
 @media (min-width: 861px) and (max-width: 1100px) { .series { grid-template-columns: 1fr 1fr; } .serie__spec div { grid-template-columns: 1fr; gap: 2px; } }
 .pstep__viz--photo > img { opacity: .72; }
+.pstep__viz--photo > img { opacity: .92; }
+.pstep__viz--photo::after { background: linear-gradient(0deg, rgba(0,26,40,.88) 0%, rgba(0,26,40,.35) 42%, rgba(0,26,40,.08) 75%); }
