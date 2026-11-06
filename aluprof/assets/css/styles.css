@@ -1460,3 +1460,22 @@ html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .pag
   .pdir__btn { white-space: nowrap; }
 }
 @media (max-width: 400px) { .pdir__btn { font-size: 14px; padding: 0 18px; } }
+/* ALDOX: текстовый знак в стиле сайта (оригинального логотипа нет) */
+.wm-aldox { display: inline-flex; align-items: center; font-family: var(--f-display); font-weight: 600; letter-spacing: -0.03em; line-height: 1; color: var(--navy); }
+.wm-aldox::before { content: ""; width: .42em; height: .17em; margin-right: .2em; background: var(--red); transform: skewX(-38deg); flex: none; }
+.pdir__wm { font-size: clamp(48px, 4.4vw, 76px); width: auto; }
+.aldox__wm { font-size: clamp(60px, 6vw, 110px); width: auto; }
+.choose__sys .choose__aldox { font-size: 22px; color: #fff; height: auto; filter: none; }
+/* THERMO: без пустоты внизу — карточка ALDOX подстраивается по высоте */
+.pdir__img { flex: 1 1 0; min-height: 200px; }
+.pdir__img img { position: absolute; inset: 0; }
+.pdir--thermo .pdir__body { justify-content: space-between; gap: 0; }
+.pdir--thermo .pdir__row { padding: 20px 0; }
+.pdir--thermo .pdir__btn { margin-top: 24px; }
+.pdir--thermo .pdir__thumb { width: 140px; height: 100px; }
+.pdir--thermo .pdir__row { grid-template-columns: 140px 1fr auto; }
+@media (max-width: 860px) {
+  .pdir--thermo .pdir__thumb { width: 84px; height: 66px; }
+  .pdir--thermo .pdir__row { grid-template-columns: 84px 1fr; padding: 14px 0; }
+  .pdir__img { min-height: 220px; }
+}
