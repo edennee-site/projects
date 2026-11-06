@@ -1479,3 +1479,7 @@ html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .pag
   .pdir--thermo .pdir__row { grid-template-columns: 84px 1fr; padding: 14px 0; }
   .pdir__img { min-height: 220px; }
 }
+/* логотип ALDOX в геометрии ALUPROF */
+.pdir__wm { width: clamp(170px, 14vw, 250px); height: auto; font-size: inherit; }
+.aldox__wm { width: clamp(220px, 22vw, 380px); height: auto; font-size: inherit; }
+.choose__sys .choose__aldox { width: auto; height: 20px; font-size: inherit; }
