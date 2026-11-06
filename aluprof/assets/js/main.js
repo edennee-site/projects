@@ -35,9 +35,11 @@
     const t = $(id); if (!t) return;
     e.preventDefault();
     body.classList.remove('menu-open');
-    // кнопка аудитории заранее выбирает «Кто вы» в форме
+    // кнопка аудитории заранее выбирает «Кто вы» в форме, кнопка системы — заполняет комментарий
     const who = a.dataset.who, sel = who && $('#f-who');
     if (sel) sel.value = who;
+    const msg = a.dataset.msg, ta = msg && $('#f-msg');
+    if (ta && !ta.value.trim()) ta.value = msg + '. ';
     window.scrollTo({ top: targetY(t), behavior: reduce ? 'auto' : 'smooth' });
   }));
 
@@ -467,6 +469,38 @@
   setTimeout(() => { measureDraw(); fitBig(); }, 60);
   requestAnimationFrame(loop);
 
+  /* ---------------- география: маршруты и подписи регионов ---------------- */
+  $$('.geo2').forEach(sec => {
+    const io3 = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { sec.classList.add('is-in'); io3.disconnect(); } }), { threshold: 0.2 });
+    io3.observe(sec);
+    const box = $('.geo2__map', sec), tip = $('.gmap__tip', sec);
+    if (!box || !tip) return;
+    let hideT = 0;
+    const mark = id => {
+      $$('[data-id]', box).forEach(el => el.classList.toggle('is-active', !!id && el.dataset.id === id));
+    };
+    const show = (el, x, y) => {
+      clearTimeout(hideT);
+      tip.textContent = el.getAttribute('aria-label');
+      const r = box.getBoundingClientRect();
+      tip.style.left = Math.max(70, Math.min(r.width - 70, x - r.left)) + 'px';
+      tip.style.top = (y - r.top) + 'px';
+      tip.classList.add('is-on'); mark(el.dataset.id);
+    };
+    const hide = () => { tip.classList.remove('is-on'); mark(null); };
+    $$('.gmap__r', box).forEach(el => {
+      el.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') show(el, e.clientX, e.clientY); });
+      el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hide(); });
+      el.addEventListener('click', e => {
+        // на телефоне подпись появляется над точкой региона
+        const pt = $('.gmap__pt[data-id="' + el.dataset.id + '"]', box);
+        const rr = (pt || el).getBoundingClientRect();
+        show(el, rr.left + rr.width / 2, pt ? rr.top : e.clientY);
+        hideT = setTimeout(hide, 2600);
+      });
+    });
+  });
+
   /* ---------------- форма ---------------- */
   $$('form[data-form]').forEach(form => {
     const phone = form.querySelector('input[name="phone"]');
@@ -493,7 +527,8 @@
       btn.disabled = true;
       const data = Object.fromEntries(new FormData(form).entries());
       // Адрес обработчика задаётся в data-endpoint (серверный скрипт, который пересылает заявку в Telegram и на почту).
-      const endpoint = form.dataset.endpoint;
+      // на демо-хостинге (GitHub Pages) обработчика нет — отправка заработает на хостинге компании
+      const endpoint = /github\.io$/.test(location.hostname) || location.protocol === 'file:' ? '' : form.dataset.endpoint;
       try { if (endpoint) await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); } catch (err) {}
       form.closest('.form').classList.add('is-sent');
       btn.disabled = false;

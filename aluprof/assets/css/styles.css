@@ -1234,3 +1234,229 @@ html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .pag
 /* на узбекском перевод девиза дублирует сам девиз */
 html[lang="uz"] .val__ru, html[lang="uz"] .motto__ru { display: none; }
 html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .page-hero .h-mega { font-size: clamp(44px, 6vw, 116px); }
+
+/* ==========================================================================
+   Раунд 06.11: география, направления THERMO / ALDOX, слоган, подбор по назначению
+   ========================================================================== */
+
+/* ---------- география поставок ---------- */
+.geo2 { position: relative; background: var(--navy-deep); color: #fff; padding: clamp(80px, 8vw, 130px) 0 clamp(60px, 6vw, 100px); overflow: hidden; }
+.geo2::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 70% at 62% 45%, rgba(40, 120, 190, .16), transparent 70%); pointer-events: none; }
+.geo2 .grid-bg { background-image: linear-gradient(to right, var(--line-dark) 1px, transparent 1px); border-right-color: var(--line-dark); }
+.geo2__in { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(280px, .9fr) 2.4fr; gap: 30px clamp(20px, 3vw, 56px); align-items: center; }
+.geo2__text .h2 { font-size: clamp(36px, 3.8vw, 72px); }
+.geo2__text .lead { margin-top: 22px; color: rgba(225,234,240,.75); }
+.geo2__feat { list-style: none; margin: 34px 0 0; padding: 0; display: grid; gap: 10px; }
+.geo2__feat li { display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--line-dark); background: rgba(255,255,255,.03); font-size: 15px; line-height: 1.35; }
+.geo2__ico { flex: none; width: 40px; height: 40px; display: grid; place-items: center; color: var(--red-soft); border: 1px solid rgba(253,2,1,.35); }
+.geo2__ico svg { width: 22px; height: 22px; }
+.geo2__map { position: relative; }
+.gmap { width: 100%; height: auto; overflow: hidden; display: block; }
+.gmap__nb path { fill: none; stroke: rgba(160,190,215,.12); stroke-width: 1; }
+.gmap__r { fill: #0b3550; stroke: #5fc3ff; stroke-width: 1.1; stroke-linejoin: round; cursor: pointer; transition: fill .3s; }
+.gmap__regions { filter: drop-shadow(0 0 6px rgba(80, 180, 255, .35)); }
+.is-safari .gmap__regions { filter: none; }
+.gmap__r:hover, .gmap__r.is-active { fill: #155a85; }
+.gmap__kg { fill: rgba(253, 2, 1, .14); stroke: rgba(255, 74, 66, .85); }
+.gmap__kg:hover, .gmap__kg.is-active { fill: rgba(253, 2, 1, .26); }
+.gmap__route { fill: none; stroke: #ff3b30; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: .9; pointer-events: none;
+  transition: stroke-dashoffset 1.1s cubic-bezier(.6,0,.2,1) calc(var(--i) * .07s); }
+.gmap__route--kg { stroke-width: 2.2; }
+.gmap__flow { fill: none; stroke: #fff; stroke-width: 2.2; stroke-dasharray: .02 .025; opacity: 0; pointer-events: none; transition: opacity .6s 1.6s; }
+.is-in .gmap__route { stroke-dashoffset: 0; }
+.is-in .gmap__flow { opacity: .9; animation: gflow 2.4s linear infinite; }
+@keyframes gflow { to { stroke-dashoffset: -.45; } }
+.gmap__pt { pointer-events: none; }
+.gmap__pt circle { fill: #ff3b30; stroke: #fff; stroke-width: 1.4; transform: scale(0); transition: transform .5s var(--ease) calc(.6s + var(--i) * .07s); }
+.gmap__pt circle.h { fill: rgba(255, 59, 48, .25); stroke: none; }
+.is-in .gmap__pt circle { transform: scale(1); }
+.gmap__pt.is-active circle.h { fill: rgba(255, 59, 48, .5); }
+.gmap__labels text { fill: #fff; font-family: var(--f-text); font-size: 11.5px; font-weight: 500; letter-spacing: -.01em; pointer-events: none; paint-order: stroke; stroke: rgba(0, 26, 40, .85); stroke-width: 3px; stroke-linejoin: round; transition: fill .3s; }
+.gmap__labels text.is-active { fill: #ffb3ad; }
+.gmap__labels .gmap__country { font-family: var(--f-display); font-size: 22px; letter-spacing: -.03em; fill: rgba(255,255,255,.9); }
+.gmap__labels .gmap__city { font-size: 15px; font-weight: 600; }
+.gmap__hub { pointer-events: none; }
+.gmap__hub .c { fill: #fd0201; stroke: #fff; stroke-width: 2; }
+.gmap__hub .p { fill: none; stroke: #ff3b30; stroke-width: 2; animation: gpulse 2.4s ease-out infinite; transform-origin: 0 0; }
+.gmap__hub .p2 { animation-delay: 1.2s; }
+@keyframes gpulse { from { transform: scale(.7); opacity: .9; } to { transform: scale(3.2); opacity: 0; } }
+.gmap__badge rect { fill: #c40000; stroke: #ff6b63; stroke-width: 1; }
+.gmap__badge text { fill: #fff; font-family: var(--f-display); font-weight: 600; font-size: 15px; }
+.gmap__tip { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; padding: 8px 12px; background: #fff; color: var(--navy); font-size: 13px; font-weight: 500; white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 12px)); opacity: 0; transition: opacity .2s; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.gmap__tip.is-on { opacity: 1; }
+.gmap__hint { display: none; margin: 10px 0 0; font-size: 12px; color: rgba(205,218,228,.55); }
+.geo2__stats { position: relative; z-index: 1; margin-top: clamp(30px, 4vw, 56px); display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line-dark); border-left: 3px solid var(--red); background: rgba(255,255,255,.03); }
+.geo2__stats > div { padding: 22px 26px; display: flex; align-items: center; gap: 14px; border-left: 1px solid var(--line-dark); min-width: 0; }
+.geo2__stats > div:first-child { border-left: 0; }
+.geo2__stats b { font-family: var(--f-display); font-weight: 500; font-size: clamp(40px, 3.6vw, 60px); letter-spacing: -.05em; line-height: .9; }
+.geo2__stats b.sm { font-size: clamp(22px, 1.8vw, 30px); letter-spacing: -.03em; white-space: nowrap; }
+.geo2__stats span { font-size: 14px; line-height: 1.35; color: rgba(225,234,240,.75); }
+.geo2__exp .geo2__ico { width: 46px; height: 46px; }
+.geo2__exp span:last-child { font-size: 16px; color: #fff; }
+@media (max-width: 1100px) {
+  .geo2__in { grid-template-columns: 1fr; }
+  .geo2__stats { grid-template-columns: 1fr 1fr; }
+  .geo2__stats > div:nth-child(3) { border-left: 0; }
+  .geo2__stats > div:nth-child(n+3) { border-top: 1px solid var(--line-dark); }
+}
+@media (max-width: 860px) {
+  .gmap__labels text:not(.gmap__country):not(.gmap__city) { display: none; }
+  .gmap__labels .gmap__country { font-size: 30px; }
+  .gmap__labels .gmap__city { font-size: 22px; }
+  .gmap__bi { transform: scale(1.6); }
+  .gmap__hint { display: block; }
+  .geo2__map { margin: 0 calc(-1 * var(--pad) + 6px); }
+  .geo2__stats > div { padding: 18px 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+@media (max-width: 520px) { .geo2__stats { grid-template-columns: 1fr 1fr; } .geo2__stats span { font-size: 13px; } }
+
+/* ---------- слоган: тёмно-синий, красный только акцентами ---------- */
+.motto { background: var(--navy-deep); color: #fff; position: relative; overflow: hidden; border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); }
+.motto::after { content: ""; position: absolute; right: -40px; bottom: -60px; width: 260px; height: 1px; background: linear-gradient(90deg, transparent, var(--red)); transform: rotate(-38deg); transform-origin: right; opacity: .8; }
+.motto__in { position: relative; z-index: 1; display: flex; align-items: center; justify-content: flex-start; gap: 20px clamp(24px, 3vw, 48px); flex-wrap: wrap; padding-top: clamp(30px, 3.4vw, 52px); padding-bottom: clamp(30px, 3.4vw, 52px); }
+.motto__uz { display: flex; align-items: center; gap: clamp(14px, 1.6vw, 26px); margin: 0; font-family: var(--f-display); font-weight: 600; font-size: clamp(30px, 4vw, 66px); letter-spacing: -0.035em; line-height: 1; }
+.motto__uz .para { width: clamp(26px, 2.4vw, 40px); height: clamp(10px, .9vw, 15px); background: var(--red); margin-right: clamp(4px, .8vw, 14px); }
+.motto__uz em { font-style: normal; font-weight: 400; color: var(--red); }
+.motto__ru { margin: 0; padding-left: clamp(24px, 3vw, 48px); border-left: 1px solid rgba(255,255,255,.22); font-size: clamp(15px, 1.2vw, 19px); color: rgba(225,234,240,.82); }
+@media (max-width: 860px) {
+  .motto__in { justify-content: flex-start; text-align: left; }
+  .motto__uz { font-size: clamp(26px, 7.4vw, 40px); gap: 10px; }
+  .motto__uz .para { display: none; }
+  .motto__ru { width: auto; padding-left: 0; border-left: 0; font-size: 15px; }
+}
+
+/* ---------- два направления: THERMO и ALDOX ---------- */
+.pdirs { display: grid; grid-template-columns: 1.65fr 1fr; gap: 16px; }
+.pdir { position: relative; overflow: hidden; clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%); }
+.pdir--thermo { display: grid; grid-template-columns: .8fr 1.2fr; background: var(--navy-deep); color: #fff; min-height: 520px; }
+.pdir__media { position: relative; overflow: hidden; }
+.pdir__media img, .pdir__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s var(--ease); }
+.pdir:hover .pdir__media img, .pdir:hover .pdir__img img { transform: scale(1.04); }
+.pdir__body { padding: clamp(24px, 2.6vw, 42px); display: flex; flex-direction: column; gap: 14px; }
+.pdir__head { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; padding-bottom: 18px; }
+.pdir__logo { width: clamp(150px, 13vw, 230px); height: auto; }
+.pdir__head p { margin: 0; padding-left: 22px; border-left: 1px solid rgba(255,255,255,.22); font-size: 15px; line-height: 1.5; color: rgba(225,234,240,.82); }
+.pdir__row { display: grid; grid-template-columns: 116px 1fr auto; gap: 18px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line-dark); transition: background-color .3s; }
+.pdir__row:hover { background: rgba(255,255,255,.04); }
+.pdir__thumb { width: 116px; height: 84px; overflow: hidden; background: #e9eef1; display: grid; place-items: center; border-radius: 4px; }
+.pdir__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.pdir__thumb--sec svg { width: 64px; height: auto; }
+.pdir__thumb--sec path { fill: #c9d2d8; stroke: #6f808c; stroke-width: .25; }
+.pdir__thumb--sec path.red { fill: #f2b233; stroke: none; }
+.pdir__rt { display: grid; gap: 6px; padding-left: 16px; border-left: 3px solid var(--red); }
+.pdir__rt b { font-family: var(--f-display); font-weight: 500; font-size: clamp(20px, 1.6vw, 26px); letter-spacing: -0.03em; line-height: 1.1; }
+.pdir__rt > span { font-size: 14px; color: rgba(225,234,240,.75); }
+.pdir__series { display: flex; align-items: center; gap: 8px; font-family: var(--f-display); font-size: 18px; color: #fff !important; }
+.pdir__series img { height: 20px; width: auto; }
+.pdir__series i { width: 1px; height: 20px; background: rgba(255,255,255,.3); margin: 0 6px; }
+.pdir__go { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line-dark); transition: background-color .3s, border-color .3s; }
+.pdir__row:hover .pdir__go { background: var(--red); border-color: var(--red); }
+.pdir__btn { align-self: flex-start; margin-top: auto; }
+.pdir--thermo .pdir__btn { margin-top: 18px; }
+.pdir--aldox { display: flex; flex-direction: column; background: #fff; color: var(--navy); border-bottom: 3px solid var(--red); }
+.pdir--aldox .pdir__body { padding-bottom: 8px; }
+.pdir__wm { width: clamp(170px, 14vw, 240px); height: auto; }
+.pdir--aldox p { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink-soft); max-width: 30em; }
+.pdir__img { position: relative; flex: 1; min-height: 220px; overflow: hidden; margin: 16px clamp(24px, 2.6vw, 42px) 0; }
+.pdir--aldox .pdir__btn { margin: 22px clamp(24px, 2.6vw, 42px) clamp(24px, 2.6vw, 42px); }
+.pben { list-style: none; margin: 34px 0 0; padding: 22px 0 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line-light); }
+.pben li { display: flex; align-items: center; gap: 14px; padding: 6px 18px; border-left: 1px solid var(--line-light); font-size: 15px; line-height: 1.35; color: var(--navy); }
+.pben li:first-child { border-left: 0; padding-left: 0; }
+.pben span { flex: none; color: var(--red); }
+.pben svg { width: 28px; height: 28px; }
+@media (max-width: 1100px) {
+  .pdirs { grid-template-columns: 1fr; }
+  .pben { grid-template-columns: 1fr 1fr; row-gap: 14px; }
+  .pben li:nth-child(3) { border-left: 0; padding-left: 0; }
+}
+@media (max-width: 860px) {
+  .pdir--thermo { grid-template-columns: 1fr; min-height: 0; }
+  .pdir__media { height: 220px; }
+  .pdir__head { grid-template-columns: 1fr; gap: 14px; }
+  .pdir__head p { padding-left: 0; border-left: 0; }
+  .pdir__row { grid-template-columns: 84px 1fr; gap: 14px; }
+  .pdir__thumb { width: 84px; height: 66px; }
+  .pdir__go { display: none; }
+  .pdir__rt b { font-size: 19px; }
+  .pdir__series { font-size: 15px; } .pdir__series img { height: 16px; }
+  .pdir__btn { white-space: normal; height: auto; min-height: 50px; padding-top: 12px; padding-bottom: 12px; }
+  .pben { grid-template-columns: 1fr; }
+  .pben li { border-left: 0; padding-left: 0; }
+}
+
+/* ---------- подбор по назначению ---------- */
+.choose { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.choose__item { display: flex; flex-direction: column; gap: 14px; padding: clamp(24px, 2.4vw, 36px); background: var(--mist); border-top: 3px solid var(--navy); transition: border-color .3s; }
+.choose__item:hover { border-top-color: var(--red); }
+.choose__n { font-size: 13px; color: var(--steel); }
+.choose__item h3 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(24px, 2vw, 32px); letter-spacing: -0.04em; line-height: 1.05; color: var(--navy); min-height: 2.1em; }
+.choose__sys { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--navy-deep); color: #fff; font-size: 14px; }
+.choose__sys img { height: 30px; width: auto; }
+.choose__sys img.choose__aldox { height: 18px; filter: brightness(0) invert(1); }
+.choose__item p { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.5; }
+.choose__act { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; padding-top: 8px; }
+@media (max-width: 1100px) { .choose { grid-template-columns: 1fr; } .choose__item h3 { min-height: 0; } }
+
+/* ---------- THERMO: подзаголовки, фасадные решения ---------- */
+.sub-anchor { position: relative; top: -110px; height: 0; }
+.subhead { display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: 18px; margin: clamp(50px, 5vw, 80px) 0 22px; padding-top: 22px; border-top: 1px solid var(--line-dark); }
+.subhead__n { font-size: 14px; color: var(--red-soft); }
+.subhead h3 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(28px, 2.6vw, 44px); letter-spacing: -0.045em; }
+.subhead p { margin: 0; color: rgba(225,234,240,.7); font-size: 15px; }
+.thermo__head + .sub-anchor + .subhead { margin-top: 0; }
+.facade { display: grid; grid-template-columns: 1.1fr 1fr; background: var(--navy); }
+.facade__media { position: relative; min-height: 420px; overflow: hidden; background: #e8ecef; }
+.facade__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.facade__body { padding: clamp(26px, 3vw, 50px); display: flex; flex-direction: column; gap: 16px; }
+.facade__logo { width: 150px; height: auto; }
+.facade__body h3 { margin: 0; font-family: var(--f-display); font-weight: 500; font-size: clamp(26px, 2.2vw, 38px); letter-spacing: -0.04em; }
+.facade__body > p { margin: 0; color: rgba(225,234,240,.78); font-size: 16px; line-height: 1.55; }
+.facade__body .btn { align-self: flex-start; }
+.thermo .catband { margin-top: clamp(50px, 5vw, 80px); }
+@media (max-width: 860px) {
+  .subhead { grid-template-columns: auto 1fr; } .subhead p { grid-column: 1 / -1; }
+  .facade { grid-template-columns: 1fr; } .facade__media { min-height: 240px; }
+}
+
+/* ---------- ALDOX ---------- */
+.aldox { display: grid; grid-template-columns: 1fr 1.05fr; background: #fff; border-bottom: 3px solid var(--red); }
+.aldox__body { padding: clamp(28px, 3.4vw, 60px); display: flex; flex-direction: column; gap: 18px; }
+.aldox__body .eyebrow { margin-bottom: 0; }
+.aldox__wm { width: clamp(220px, 22vw, 360px); height: auto; }
+.aldox__lead { margin: 0; font-size: clamp(17px, 1.3vw, 21px); line-height: 1.5; color: var(--navy); max-width: 30em; }
+.aldox__chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.aldox__chips li { padding: 8px 12px; background: var(--mist); font-size: 14px; color: var(--navy); }
+.aldox__spec { margin: 0; }
+.aldox__act { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.aldox__media { position: relative; min-height: 460px; overflow: hidden; }
+.aldox__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 860px) {
+  .aldox { grid-template-columns: 1fr; }
+  .aldox__media { min-height: 260px; order: -1; }
+  .aldox__act .btn { white-space: normal; }
+}
+.page-hero--sys { min-height: 70svh; }
+
+.page-systems .page-hero--sys { min-height: 66svh; }
+.pdir--thermo { grid-template-columns: .72fr 1.28fr; }
+.pdir__head { grid-template-columns: minmax(130px, 200px) 1fr; }
+.pdir__head p { font-size: 14px; }
+.pdir__thumb--sec { background: #f3f6f8; }
+.pdir__thumb--sec path { fill: #d5dde2; stroke: #00293d; stroke-width: .45; }
+@media (max-width: 860px) { .pdir__head { grid-template-columns: 1fr; } }
+@media (max-width: 860px) {
+  .motto__uz { font-size: clamp(22px, 6.4vw, 40px); gap: 8px; }
+  .pdir__rt { min-width: 0; padding-left: 12px; }
+  .pdir__series { flex-wrap: wrap; gap: 4px 6px; }
+  .pdir__series img { height: 14px; }
+  .pdir__series i { margin: 0 2px; height: 14px; }
+}
+@media (max-width: 1439px) { .header__phone { display: none; } }
+@media (min-width: 1241px) and (max-width: 1500px) { .header__nav { gap: 20px; } .header__in { gap: 20px; } }
+@media (max-width: 860px) {
+  .pdir--thermo { grid-template-columns: 1fr; }
+  .pdir__media { height: 220px; }
+  .pdir__btn { white-space: nowrap; }
+}
+@media (max-width: 400px) { .pdir__btn { font-size: 14px; padding: 0 18px; } }
