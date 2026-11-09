@@ -53,7 +53,7 @@ def page(p, B, T=lambda x: x):
     <div class="icase__box" role="dialog" aria-modal="true">
       <button class="icase__x" type="button" aria-label="{T("Закрыть")}"></button>
       <div class="icase__mc"></div>
-      <a class="icase__cta" href="{p.get("cta", "#contacts")}">{T("Обсудить похожий проект")}</a>
+      <a class="icase__cta" href="{p.get("cta", "#form")}">{T("Обсудить проект")}</a>
     </div>
   </div>
 </section>

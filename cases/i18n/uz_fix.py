@@ -4,6 +4,7 @@ D = os.path.dirname(__file__)
 M = json.load(open(os.path.join(D, 'uz_raw.json'), encoding='utf-8'))
 FIX = {
  'Закрыть': 'Yopish',
+ 'Обсудить проект': 'Loyihani muhokama qilish',
  'Кейсы внедрения Asterisk': 'Asterisk’ni joriy etish keyslari',
  'Кейсы внедрения amoCRM': 'amoCRM’ni joriy etish keyslari',
  'Кейсы внедрения Битрикс24': 'Bitrix24’ni joriy etish keyslari',
