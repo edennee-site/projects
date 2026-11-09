@@ -47,6 +47,12 @@ FIX = {
  'Интерактивный выбор дома во Flatris': 'Flatris’da uyni interaktiv tanlash',
  '6 статусов': '6 ta status', '3 уровня': '3 daraja', 'ОКК': 'SNB',
  'задачи и уведомления по заявкам': 'arizalar bo‘yicha vazifalar va bildirishnomalar',
+ 'Внедрили коробочный Битрикс24 и ИИ-бота для Instagram': 'Bitrix24 korobka versiyasini va Instagram uchun SI-botni joriy etdik',
+ 'Запустили шахматку Flatris с бронированием прямо из amoCRM': 'amoCRM’dan to‘g‘ridan-to‘g‘ri bron qilish imkoniga ega Flatris shaxmatkasini ishga tushirdik',
+ 'Перенесли все квартиры жилого комплекса в шахматку Flatris': 'Turar-joy majmuasining barcha xonadonlarini Flatris shaxmatkasiga ko‘chirdik',
+ 'Связали amoCRM с 1С и телефонией Asterisk': 'amoCRM’ni 1C va Asterisk telefoniyasi bilan bog‘ladik',
+ 'Техкарты': 'Texnologik kartalar', 'работают в одной системе': 'bitta tizimda ishlaydi',
+ 'Собрали обращения из Instagram и Facebook в CRM, а на типовые вопросы в Instagram теперь отвечает ИИ-ассистент.': 'Instagram va Facebook’dagi murojaatlarni CRM’ga yig‘dik, Instagram’dagi odatiy savollarga esa endi SI-yordamchi javob beradi.',
  'Производственный учёт в МойСклад с техкартами': 'MoySkladda texnologik kartalar bilan ishlab chiqarish hisobi',
 }
 M.update(FIX)
