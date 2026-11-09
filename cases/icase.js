@@ -7,7 +7,7 @@
     function close(){m.classList.remove('is-open');m.setAttribute('aria-hidden','true');document.documentElement.style.overflow='';}
     function open(c){
       mc.innerHTML='';
-      ['.icase__logo','.icase__meta','.icase__t','.icase__res'].forEach(function(q){var e=c.querySelector(q);if(e)mc.appendChild(e.cloneNode(true));});
+      ['.icase__logo','.icase__meta','.icase__t','.icase__res','.icase__note'].forEach(function(q){var e=c.querySelector(q);if(e)mc.appendChild(e.cloneNode(true));});
       var f=c.querySelector('.icase__full'); if(f) mc.insertAdjacentHTML('beforeend',f.innerHTML);
       m.classList.add('is-open');m.setAttribute('aria-hidden','false');document.documentElement.style.overflow='hidden';
     }

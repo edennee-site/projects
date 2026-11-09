@@ -19,6 +19,8 @@
 .icase__res li{display:flex;flex-direction:column;gap:4px}
 .icase__res b{white-space:nowrap;font-size:21px;line-height:1.1;font-weight:600;color:#0EB18A;letter-spacing:-.01em}
 .icase__res span{font-size:12px;line-height:1.35;color:#6B7471}
+.icase__note{margin:-14px 0 20px;font-size:11px;line-height:1.4;color:#9AA29F}
+.icase__mc .icase__note{display:none}
 .icase__more{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border:1px solid #D8DFDC;border-radius:12px;background:#fff;font:inherit;font-size:14px;font-weight:500;color:#252525;cursor:pointer;transition:border-color .3s,color .3s}
 .icase__more i{width:7px;height:7px;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor;transform:rotate(45deg)}
 .icase__more:hover,.icase__card:hover .icase__more{border-color:#0EB18A;color:#0C8F70}
