@@ -36,7 +36,7 @@
 .icase__cta{display:inline-flex;margin-top:6px;padding:14px 22px;border-radius:12px;background:#0EB18A;color:#fff!important;text-decoration:none!important;font-size:15px;font-weight:500}
 .icase__cta:hover{background:#0C9C79}
 .icase__logo{display:flex;align-items:center;height:40px;margin-bottom:18px}
-.icase__logo img{display:block;max-height:40px;max-width:150px;width:auto;height:auto;border-radius:6px}
+.icase__logo img{display:block;max-height:40px;max-width:150px;width:auto;height:auto;border-radius:6px;mix-blend-mode:multiply}
 .icase__mc .icase__logo{margin-bottom:14px}
 .icase__mc ul{margin:0 0 20px;padding:0;list-style:none}
 .icase__mc li{position:relative;padding-left:20px;margin-bottom:8px;font-size:15px;line-height:1.6;color:#3F4744}
