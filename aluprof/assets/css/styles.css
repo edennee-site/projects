@@ -1483,3 +1483,14 @@ html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .pag
 .pdir__wm { width: clamp(170px, 14vw, 250px); height: auto; font-size: inherit; }
 .aldox__wm { width: clamp(220px, 22vw, 380px); height: auto; font-size: inherit; }
 .choose__sys .choose__aldox { width: auto; height: 20px; font-size: inherit; }
+/* 5 этапов производства, факт без крупной цифры, шоу-рум */
+.pstep__fact:not(:has(b)) { justify-content: flex-start; }
+.pstep__fact:not(:has(b)) span { text-align: left; font-size: 16px; color: #fff; }
+.pstep__fact b { font-size: clamp(40px, 4.2vw, 76px); }
+.visit__img img { object-position: 50% 30%; }
+@media (max-width: 860px) {
+  .pstep__fact { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .pstep__fact span { text-align: left; }
+  .pstep__fact b { font-size: 40px; }
+  .visit .h2 { font-size: 34px; }
+}
