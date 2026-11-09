@@ -3,7 +3,7 @@
 <div class="ilk__g">
 <a class="ilk__c" href="/amo"><span class="ilk__l"><img style="--h:17px" src="https://static.tildacdn.net/tild6265-6439-4761-b837-623164623266/amoCRM-1.png" alt="amoCRM"></span><span class="ilk__n">Внедрение amoCRM</span><i></i></a>
 <a class="ilk__c" href="/bitriks24"><span class="ilk__l"><img style="--h:15px" src="https://static.tildacdn.net/tild6437-3262-4533-a631-386230616335/svgexport-1_37.svg" alt="Битрикс24"></span><span class="ilk__n">Внедрение Битрикс24</span><i></i></a>
-<a class="ilk__c" href="/sklad"><span class="ilk__l"><img style="--h:14px" src="https://static.tildacdn.net/tild3137-3239-4261-b831-313462363633/image.png" alt="МойСклад"></span><span class="ilk__n">Внедрение МойСклад</span><i></i></a>
+<a class="ilk__c" href="/sklad"><span class="ilk__l"><img style="--h:14px" class="ilk__w" src="https://static.tildacdn.net/tild3137-3239-4261-b831-313462363633/image.png" alt="МойСклад"></span><span class="ilk__n">Внедрение МойСклад</span><i></i></a>
 <a class="ilk__c" href="/odoo"><span class="ilk__l"><img style="--h:17px" src="https://static.tildacdn.net/tild3836-3161-4961-a139-643331633766/image.png" alt="Odoo"></span><span class="ilk__n">Внедрение Odoo ERP</span><i></i></a>
 <a class="ilk__c" href="/asterisk"><span class="ilk__l"><img style="--h:24px" src="https://static.tildacdn.net/tild6138-3663-4764-a131-366435616438/image.png" alt="Asterisk"></span><span class="ilk__n">Внедрение Asterisk</span><i></i></a>
 <a class="ilk__c" href="/web"><span class="ilk__l"><img style="--h:14px" src="https://static.tildacdn.net/tild3762-3063-4138-a562-313632393738/WEB.svg" alt="WEB"></span><span class="ilk__n">Разработка сайтов</span><i></i></a>
@@ -16,18 +16,23 @@
 </div>
 </div>
 <style>
-.ilk{box-sizing:border-box;width:100%;font-family:'Circle',Arial,sans-serif;--k:1}
+.ilk{box-sizing:border-box;width:100%;font-family:'Circle',Arial,sans-serif;--k:.85}
 .ilk *{box-sizing:border-box}
 .ilk__t{font-weight:600;letter-spacing:-.01em;color:#fff}
 .ilk__g{display:grid}
-.ilk__c{position:relative;display:flex;flex-direction:column;justify-content:space-between;background:#fff;text-decoration:none!important}
+.ilk__c{position:relative;display:flex;flex-direction:column;justify-content:space-between;background:#22272B;text-decoration:none!important;transition:background .4s ease}
+.ilk__c:hover{background:#fff}
 .ilk__l{display:flex;align-items:center;height:calc(var(--k)*24px)}
-.ilk__l img{display:block;height:calc(var(--k)*var(--h));width:auto;max-width:100%}
-.ilk__l b{display:flex;align-items:center;gap:calc(var(--k)*6px);font-weight:700;font-size:calc(var(--k)*14px);line-height:1;color:#1F2523;letter-spacing:.005em}
+.ilk__l img{display:block;height:calc(var(--k)*var(--h));width:auto;max-width:100%;filter:brightness(0) invert(1);opacity:.92;transition:filter .4s ease,opacity .4s ease}
+.ilk__l img.ilk__w{filter:grayscale(1) invert(1) brightness(1.6);mix-blend-mode:screen}
+.ilk__c:hover .ilk__l img{filter:none;opacity:1;mix-blend-mode:normal}
+.ilk__l b{display:flex;align-items:center;gap:calc(var(--k)*6px);font-weight:700;font-size:calc(var(--k)*14px);line-height:1;color:#fff;letter-spacing:.005em;transition:color .4s ease}
+.ilk__c:hover .ilk__l b{color:#1F2523}
 .ilk__l svg{width:calc(var(--k)*17px);height:calc(var(--k)*17px);flex:none;fill:none;stroke:#0EB18A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ilk__n{font-weight:400;line-height:1.25;color:#5E6663}
-.ilk__c i{position:absolute;top:50%;border-radius:50%;background:#F1F4F3;transform:translateY(-50%);transition:background .35s ease}
-.ilk__c i::after{content:"";position:absolute;left:50%;top:50%;border-top:1.5px solid #8E9894;border-right:1.5px solid #8E9894;transform:translate(-65%,-50%) rotate(45deg);transition:border-color .35s ease,transform .45s cubic-bezier(.22,1,.36,1)}
+.ilk__n{font-weight:400;line-height:1.25;color:#9AA3A0;transition:color .4s ease}
+.ilk__c:hover .ilk__n{color:#5E6663}
+.ilk__c i{position:absolute;top:50%;border-radius:50%;background:rgba(255,255,255,.08);transform:translateY(-50%);transition:background .35s ease}
+.ilk__c i::after{content:"";position:absolute;left:50%;top:50%;border-top:1.5px solid #C9D0CD;border-right:1.5px solid #C9D0CD;transform:translate(-65%,-50%) rotate(45deg);transition:border-color .35s ease,transform .45s cubic-bezier(.22,1,.36,1)}
 .ilk__c:hover i{background:#0EB18A}
 .ilk__c:hover i::after{border-color:#fff;transform:translate(-30%,-50%) rotate(45deg)}
 /* 1200 / 960 */
