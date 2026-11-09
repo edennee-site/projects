@@ -16,58 +16,51 @@
 </div>
 </div>
 <style>
-.ilk{box-sizing:border-box;width:100%;font-family:'Circle',Arial,sans-serif;color:#252525}
+.ilk{box-sizing:border-box;width:100%;font-family:'Circle',Arial,sans-serif;color:#fff}
 .ilk *{box-sizing:border-box}
-.ilk__t{font-weight:600;letter-spacing:-.01em}
+.ilk__t{font-weight:600;letter-spacing:-.01em;color:#fff}
 .ilk__g{display:grid}
-.ilk__c{position:relative;display:flex;flex-direction:column;justify-content:space-between;background:#F4F6F5;border-radius:16px;text-decoration:none!important;color:#252525!important;transition:background .3s ease}
-.ilk__c::after{content:"";position:absolute;width:8px;height:8px;border-top:1.5px solid #9AA3A0;border-right:1.5px solid #9AA3A0;transform:rotate(45deg);transition:border-color .3s ease,transform .3s ease}
-.ilk__c:hover{background:#E6F7F1}
-.ilk__c:hover::after{border-color:#0EB18A;transform:translateX(3px) rotate(45deg)}
-.ilk__l{display:flex;align-items:center;padding-right:22px}
+.ilk__c{position:relative;display:flex;flex-direction:column;justify-content:space-between;background:#fff;text-decoration:none!important;color:#252525!important}
+.ilk__c::after{content:"";position:absolute;border-top:1.5px solid #A3ABA8;border-right:1.5px solid #A3ABA8;transform:rotate(45deg);transition:border-color .3s ease,transform .35s cubic-bezier(.22,1,.36,1)}
+.ilk__c:hover::after{border-color:#0EB18A;transform:translateX(4px) rotate(45deg)}
+.ilk__l{display:flex;align-items:center;padding-right:20px}
 .ilk__l img{height:100%;width:auto;max-width:100%;object-fit:contain;object-position:left center;display:block}
 .ilk__l b{font-weight:700;color:#0EB18A;letter-spacing:.01em}
-.ilk__n{font-weight:500;line-height:1.25}
+.ilk__n{font-weight:400;line-height:1.25;color:#252525}
 /* 1200 */
-.ilk{height:520px;padding-top:72px}
-.ilk__t{font-size:30px;line-height:36px;margin-bottom:28px}
-.ilk__g{grid-template-columns:repeat(4,1fr);grid-auto-rows:92px;gap:16px}
-.ilk__c{padding:18px 20px}
-.ilk__c::after{right:22px;top:24px}
-.ilk__l{height:22px}.ilk__l b{font-size:16px}
-.ilk__n{font-size:16px}
-/* 960 */
-@media (max-width:1199px){
-.ilk__g{gap:14px}
-.ilk__c{padding:18px 18px}
-.ilk__n{font-size:15px}
-}
+.ilk{height:372px;padding-top:56px}
+.ilk__t{font-size:22px;line-height:28px;margin-bottom:20px}
+.ilk__g{grid-template-columns:repeat(4,1fr);grid-auto-rows:68px;gap:12px}
+.ilk__c{padding:13px 16px;border-radius:12px}
+.ilk__c::after{right:18px;top:19px;width:6px;height:6px}
+.ilk__l{height:15px}.ilk__l b{font-size:12px}
+.ilk__n{font-size:13px}
 /* 640 */
 @media (max-width:959px){
-.ilk{height:570px;padding-top:56px}
-.ilk__t{font-size:26px;line-height:32px;margin-bottom:24px}
-.ilk__g{grid-template-columns:repeat(3,1fr);gap:12px}
-.ilk__c{padding:16px 16px}
-.ilk__c::after{right:18px;top:22px}
+.ilk{height:414px;padding-top:48px}
+.ilk__t{font-size:20px;line-height:26px;margin-bottom:18px}
+.ilk__g{grid-template-columns:repeat(3,1fr);grid-auto-rows:64px;gap:10px}
+.ilk__c{padding:12px 14px}
+.ilk__c::after{right:15px;top:17px}
 }
 /* 480 */
 @media (max-width:639px){
-.ilk{height:700px;padding-top:48px}
-.ilk__t{font-size:24px;line-height:30px;margin-bottom:22px}
-.ilk__g{grid-template-columns:repeat(2,1fr);grid-auto-rows:84px;gap:10px}
-.ilk__c{padding:14px 14px;border-radius:14px}
-.ilk__l{height:20px}.ilk__l b{font-size:15px}
-.ilk__n{font-size:14px}
+.ilk{height:514px;padding-top:40px}
+.ilk__t{font-size:20px;line-height:26px;margin-bottom:16px}
+.ilk__g{grid-template-columns:repeat(2,1fr);grid-auto-rows:60px;gap:8px}
+.ilk__c{padding:11px 12px;border-radius:10px}
+.ilk__l{height:14px}.ilk__l b{font-size:12px}
+.ilk__n{font-size:12px}
 }
 /* 320 */
 @media (max-width:479px){
-.ilk{height:650px;padding-top:40px}
-.ilk__t{font-size:22px;line-height:28px;margin-bottom:20px}
-.ilk__g{grid-auto-rows:80px;gap:8px}
-.ilk__c{padding:12px 12px;border-radius:12px}
-.ilk__c::after{right:14px;top:18px;width:7px;height:7px}
-.ilk__l{height:18px}.ilk__l b{font-size:14px}
-.ilk__n{font-size:13px}
+.ilk{height:492px;padding-top:36px}
+.ilk__t{font-size:18px;line-height:24px;margin-bottom:14px}
+.ilk__g{grid-auto-rows:58px;gap:8px}
+.ilk__c{padding:10px 10px}
+.ilk__c::after{right:12px;top:15px;width:5px;height:5px}
+.ilk__l{height:13px;padding-right:14px}.ilk__l b{font-size:11px}
+.ilk__n{font-size:11px}
 }
 </style>
 <script>
