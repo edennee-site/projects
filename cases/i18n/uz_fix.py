@@ -44,6 +44,8 @@ FIX = {
  'Интегрировали Flatris с amoCRM: переход из карточки CRM прямо в шахматку.': 'Flatris’ni amoCRM bilan integratsiya qildik: CRM kartochkasidan to‘g‘ridan-to‘g‘ri shaxmatkaga o‘tish.',
  'Шахматка квартир во Flatris со статусами': 'Flatris’dagi statusli kvartiralar shaxmatkasi',
  'Интерактивный выбор дома во Flatris': 'Flatris’da uyni interaktiv tanlash',
+ '6 статусов': '6 ta status', '3 уровня': '3 daraja', 'ОКК': 'SNB',
+ 'задачи и уведомления по заявкам': 'arizalar bo‘yicha vazifalar va bildirishnomalar',
  'Производственный учёт в МойСклад с техкартами': 'MoySkladda texnologik kartalar bilan ishlab chiqarish hisobi',
 }
 M.update(FIX)
@@ -51,7 +53,7 @@ def post(s):
     s = s.replace('shaxmat o‘yini', 'shaxmatka').replace('shaxmat o‘yiniga', 'shaxmatkaga')
     s = re.sub(r'shaxmat(?!ka)', 'shaxmatka', s)
     for a, b in [('texnik xarita', 'texnologik karta'), ('texnologik xarita', 'texnologik karta'), ('texnik karta', 'texnologik karta'),
-                 ('AmoCRM', 'amoCRM'), ('1S ', '1C '), ('1S ', '1C '), ('Bitrix24 ni', 'Bitrix24’ni'), ('quti shaklidagi', 'korobka'), ('quti versiya', 'korobka versiya')]:
+                 ('AmoCRM', 'amoCRM'), ('TXK', 'PTO'), ('maqomlar', 'statuslar'), ('1S ', '1C '), ('1S ', '1C '), ('Bitrix24 ni', 'Bitrix24’ni'), ('quti shaklidagi', 'korobka'), ('quti versiya', 'korobka versiya')]:
         s = s.replace(a, b)
     s = re.sub(r'\b1S\b', '1C', s)
     s = re.sub(r'"([^"]+)"', r'«\1»', s)
