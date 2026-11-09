@@ -74,6 +74,7 @@ if __name__ == '__main__':
         return UZ[x]
     for slug, p in PAGES.items():
         open(f'{out}/{slug}.html', 'w', encoding='utf-8').write(page(p, B))
+        if slug not in UZURL: print(slug, len(p['cases'])); continue
         q = dict(p, url=UZURL[slug])
         open(f'{out}/uz-{slug}.html', 'w', encoding='utf-8').write(page(q, B, Tuz).replace('<section class="icase"', '<section lang="uz" class="icase"'))
         print(slug, len(p['cases']))
