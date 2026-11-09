@@ -1,15 +1,9 @@
 (function(){
-  function bpOf(w){return w>=1200?1200:w>=960?960:w>=640?640:w>=480?480:320;}
   var roots=document.querySelectorAll('.icase');
   roots.forEach(function(root){
     if(root.getAttribute('data-ok'))return; root.setAttribute('data-ok','1');
-    var m=root.querySelector('.icase__modal'), mc=root.querySelector('.icase__mc'), inn=root.querySelector('.icase__in'), box=m.querySelector('.icase__box');
+    var m=root.querySelector('.icase__modal'), mc=root.querySelector('.icase__mc');
     document.body.appendChild(m);
-    /* автоскейл как у зеро-блоков Тильды: вёрстка в ширине брейкпоинта, масштаб под окно */
-    function fit(){var w=document.documentElement.clientWidth||window.innerWidth,bp=bpOf(w),z=w/bp;
-      inn.style.width=bp+'px';inn.style.maxWidth='none';inn.style.zoom=z;
-      box.style.zoom=bp>=960?Math.min(z,1.5):'';}
-    fit(); window.addEventListener('resize',fit);
     function close(){m.classList.remove('is-open');m.setAttribute('aria-hidden','true');document.documentElement.style.overflow='';}
     function open(c){
       mc.innerHTML='';

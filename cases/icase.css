@@ -1,6 +1,6 @@
 .icase{font-family:'Circle',Arial,sans-serif;color:#252525;overflow:hidden}
 .icase *,.icase__modal *{box-sizing:border-box}
-.icase__in{max-width:1200px;margin:0 auto;padding:80px 80px}
+.icase__in{max-width:none;margin:0;padding:80px 6.667vw}
 .icase__head{margin-bottom:36px}
 .icase__kicker{display:inline-block;padding:7px 14px;border-radius:999px;background:#E8F8F2;color:#0C8F70;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
 .icase__h{margin:14px 0 10px;font-size:36px;line-height:1.15;font-weight:600;letter-spacing:-.02em}
@@ -50,13 +50,13 @@
 .icase__mc td{vertical-align:top;padding:10px 12px;border-top:1px solid #E6EBE9;color:#3F4744}
 .icase__mc td:first-child{color:#8A938F;width:42%}
 @media (max-width:639px){.icase__mc table{font-size:13px}.icase__mc th,.icase__mc td{padding:8px}}
-@media (max-width:1199px){.icase__in{padding:72px 20px}}
-@media (max-width:959px){.icase__in{padding:60px 20px}.icase__h{font-size:30px}}
+@media (max-width:1199px){.icase__in{padding:72px 2.083vw}}
+@media (max-width:959px){.icase__in{padding:60px 1.5625vw}.icase__h{font-size:30px}}
 @media (min-width:960px) and (max-width:1199px){.icase__grid{gap:14px}.icase__card{padding:24px}.icase__res b{font-size:18px}.icase__res span{font-size:11px}.icase__t{font-size:18px}}
 @media (max-width:639px){
-.icase__in{padding:48px 0}.icase__head{padding:0 16px;margin-bottom:24px}
+.icase__in{padding:48px 0}.icase__head{padding:0 max(16px,2.083vw);margin-bottom:24px}
 .icase__h{font-size:26px}.icase__sub{font-size:14px}
-.icase__grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:0 16px 6px;scrollbar-width:none}
+.icase__grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:0 max(16px,2.083vw) 6px;scroll-padding:0 max(16px,2.083vw);scrollbar-width:none}
 .icase__grid::-webkit-scrollbar{display:none}
 .icase__card{flex:0 0 88%;scroll-snap-align:center;padding:22px;border-radius:18px}
 .icase__img{width:calc(100% + 44px);margin:-22px -22px 18px;height:160px}
