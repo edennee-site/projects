@@ -7,10 +7,23 @@ def esc(s): return html.escape(s, quote=False)
 
 def li(items): return '<ul>' + ''.join(f'<li>{esc(i)}</li>' for i in items) + '</ul>'
 
+def logo_size(f):
+    import re, math
+    if f.endswith('.svg'):
+        vb = re.search(r'viewBox="([^"]+)"', open('img/' + f, encoding='utf-8').read()).group(1).split()
+        a = float(vb[2]) / float(vb[3])
+    else:
+        from PIL import Image
+        w, h = Image.open('img/' + f).size; a = w / h
+    w = math.sqrt(5200 * a); h = w / a
+    if h > 52: h = 52; w = h * a
+    if w > 180: w = 180; h = w / a
+    return round(w), round(h)
+
 def card(c, B, T):
     o = ['      <article class="icase__card">']
     if c.get('logo'):
-        o.append(f'        <div class="icase__logo"><img src="{B}/img/{c["logo"]}" alt="{esc(T(c["name"]))}" loading="lazy"></div>')
+        o.append(f'        <div class="icase__logo"><img style="--w:{logo_size(c["logo"])[0]}px;--h:{logo_size(c["logo"])[1]}px" src="{B}/img/{c["logo"]}" alt="{esc(T(c["name"]))}" loading="lazy"></div>')
     o.append(f'        <div class="icase__meta"><span class="icase__ind">{esc(T(c["ind"]))}</span><span class="icase__size">{esc(T(c["name"]))}{(" · " + esc(T(c["place"]))) if c.get("place") else ""}</span></div>')
     o.append(f'        <h3 class="icase__t">{esc(T(c["title"]))}</h3>')
     o.append(f'        <p class="icase__d">{esc(T(c["desc"]))}</p>')
@@ -35,7 +48,8 @@ def card(c, B, T):
 def page(p, B, T=lambda x: x):
     cards = '\n\n'.join(card(c, B, T) for c in p['cases'])
     if p.get('all'):
-        cards += f'\n\n      <a class="icase__allc" href="{p["all"]}"><div><b>{T("Смотреть все кейсы")}</b><span>{esc(T("Больше проектов на странице кейсов"))}</span></div><i></i></a>'
+        logos = ''.join(f'<li><img style="--w:{logo_size(c["logo"])[0]}px;--h:{logo_size(c["logo"])[1]}px" src="{B}/img/{c["logo"]}" alt="{esc(T(c["name"]))}" loading="lazy"></li>' for c in p['cases'][:6] if c.get('logo'))
+        cards += f'\n\n      <a class="icase__allc" href="{p["all"]}"><div><span class="icase__allk">{T("Все кейсы")}</span><b>{T("Смотреть все кейсы")}</b><span>{esc(T("Больше проектов на странице кейсов"))}</span></div><ul class="icase__alll">{logos}</ul><span class="icase__allb">{T("Перейти к кейсам")}<i></i></span></a>'
     return f'''<!-- iCORP · «Кейсы» для {p["url"]} -->
 <section class="icase" id="cases">
   <div class="icase__in">
