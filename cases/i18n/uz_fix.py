@@ -85,6 +85,7 @@ FIX = {
  'Связали amoCRM с МойСклад и 1С: менеджеры видят остатки и оплаты': 'amoCRM’ni MoySklad va 1C bilan bog‘ladik: menejerlar qoldiqlar va to‘lovlarni ko‘radi',
  'Смотреть все кейсы': 'Barcha keyslarni ko‘rish', 'Больше проектов на странице кейсов': 'Keyslar sahifasida boshqa loyihalar', 'Назад': 'Orqaga', 'Вперёд': 'Oldinga',
  'Все кейсы': 'Barcha keyslar', 'Перейти к кейсам': 'Keyslarga o‘tish',
+ 'Битрикс24': 'Bitrix24', 'МойСклад': 'MoySklad', 'Веб-разработка': 'Veb-sayt ishlab chiqish', 'внедрений в Узбекистане и за его пределами': 'ta joriy etish — O‘zbekistonda va xorijda', 'клиентов на постоянном сопровождении': 'mijoz doimiy qo‘llab-quvvatlashda',
 }
 M.update(FIX)
 def post(s):
