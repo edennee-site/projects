@@ -83,6 +83,7 @@ FIX = {
  'Опт и розница': 'Ulgurji va chakana',
  'Опт': 'Ulgurji', 'и розница в одной системе': 'va chakana savdo bir tizimda',
  'Связали amoCRM с МойСклад и 1С: менеджеры видят остатки и оплаты': 'amoCRM’ni MoySklad va 1C bilan bog‘ladik: menejerlar qoldiqlar va to‘lovlarni ko‘radi',
+ 'Смотреть все кейсы': 'Barcha keyslarni ko‘rish', 'Больше проектов на странице кейсов': 'Keyslar sahifasida boshqa loyihalar', 'Назад': 'Orqaga', 'Вперёд': 'Oldinga',
 }
 M.update(FIX)
 def post(s):

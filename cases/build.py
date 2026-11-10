@@ -7,8 +7,8 @@ def esc(s): return html.escape(s, quote=False)
 
 def li(items): return '<ul>' + ''.join(f'<li>{esc(i)}</li>' for i in items) + '</ul>'
 
-def card(c, B, T, extra=False):
-    o = ['      <article class="icase__card' + (' icase__card--extra' if extra else '') + '">']
+def card(c, B, T):
+    o = ['      <article class="icase__card">']
     if c.get('logo'):
         o.append(f'        <div class="icase__logo"><img src="{B}/img/{c["logo"]}" alt="{esc(T(c["name"]))}" loading="lazy"></div>')
     o.append(f'        <div class="icase__meta"><span class="icase__ind">{esc(T(c["ind"]))}</span><span class="icase__size">{esc(T(c["name"]))}{(" · " + esc(T(c["place"]))) if c.get("place") else ""}</span></div>')
@@ -33,21 +33,25 @@ def card(c, B, T, extra=False):
     return '\n'.join(o)
 
 def page(p, B, T=lambda x: x):
-    cards = '\n\n'.join(card(c, B, T, i >= 6) for i, c in enumerate(p['cases']))
-    allbtn = f'\n    <button class="icase__all" type="button">{T("Показать все кейсы")} ({len(p["cases"])})</button>' if len(p['cases']) > 6 else ''
+    cards = '\n\n'.join(card(c, B, T) for c in p['cases'])
+    if p.get('all'):
+        cards += f'\n\n      <a class="icase__allc" href="{p["all"]}"><div><b>{T("Смотреть все кейсы")}</b><span>{esc(T("Больше проектов на странице кейсов"))}</span></div><i></i></a>'
     return f'''<!-- iCORP · «Кейсы» для {p["url"]} -->
 <section class="icase" id="cases">
   <div class="icase__in">
     <div class="icase__head">
+      <div>
       <span class="icase__kicker">{esc(T(p.get("kicker", "Кейсы")))}</span>
       <h2 class="icase__h">{esc(T(p["h"]))}</h2>
       <p class="icase__sub">{esc(T(p["sub"]))}</p>
+      </div>
+      <div class="icase__nav"><button class="icase__arr icase__arr--prev" type="button" aria-label="{T("Назад")}"></button><button class="icase__arr icase__arr--next" type="button" aria-label="{T("Вперёд")}"></button></div>
     </div>
     <div class="icase__grid">
 
 {cards}
 
-    </div>{allbtn}
+    </div>
   </div>
   <div class="icase__modal" aria-hidden="true">
     <div class="icase__ov"></div>
