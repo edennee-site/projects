@@ -16,6 +16,7 @@
       c.addEventListener('click',function(){open(c);});
       c.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(c);}});
     });
+    var ab=root.querySelector('.icase__all'); if(ab) ab.addEventListener('click',function(){root.classList.add('is-all');});
     m.querySelector('.icase__ov').addEventListener('click',close);
     m.querySelector('.icase__x').addEventListener('click',close);
     m.querySelector('.icase__cta').addEventListener('click',close);

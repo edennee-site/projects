@@ -7,8 +7,8 @@ def esc(s): return html.escape(s, quote=False)
 
 def li(items): return '<ul>' + ''.join(f'<li>{esc(i)}</li>' for i in items) + '</ul>'
 
-def card(c, B, T):
-    o = ['      <article class="icase__card">']
+def card(c, B, T, extra=False):
+    o = ['      <article class="icase__card' + (' icase__card--extra' if extra else '') + '">']
     if c.get('logo'):
         o.append(f'        <div class="icase__logo"><img src="{B}/img/{c["logo"]}" alt="{esc(T(c["name"]))}" loading="lazy"></div>')
     o.append(f'        <div class="icase__meta"><span class="icase__ind">{esc(T(c["ind"]))}</span><span class="icase__size">{esc(T(c["name"]))}{(" · " + esc(T(c["place"]))) if c.get("place") else ""}</span></div>')
@@ -33,7 +33,8 @@ def card(c, B, T):
     return '\n'.join(o)
 
 def page(p, B, T=lambda x: x):
-    cards = '\n\n'.join(card(c, B, T) for c in p['cases'])
+    cards = '\n\n'.join(card(c, B, T, i >= 6) for i, c in enumerate(p['cases']))
+    allbtn = f'\n    <button class="icase__all" type="button">{T("Показать все кейсы")} ({len(p["cases"])})</button>' if len(p['cases']) > 6 else ''
     return f'''<!-- iCORP · «Кейсы» для {p["url"]} -->
 <section class="icase" id="cases">
   <div class="icase__in">
@@ -46,7 +47,7 @@ def page(p, B, T=lambda x: x):
 
 {cards}
 
-    </div>
+    </div>{allbtn}
   </div>
   <div class="icase__modal" aria-hidden="true">
     <div class="icase__ov"></div>
