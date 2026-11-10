@@ -369,10 +369,10 @@ AST = [
 ]
 
 PAGES = {
- 'asterisk': dict(url='/asterisk', all='/cases/vnedrenie-asterisk', h='Кейсы внедрения Asterisk', sub='Call-центры и IP-телефония на Asterisk, которые мы запустили для клиентов в Узбекистане.', cases=AST),
- 'amo': dict(url='/amo', all='/cases/vnedrenie-amocrm', h='Кейсы внедрения amoCRM', sub='Проекты по внедрению amoCRM, автоматизации продаж и интеграциям, которые мы реализовали для клиентов в Узбекистане.', cases=AMO + AMO_OLD),
- 'bitriks24': dict(url='/bitriks24', all='/cases/vnedrenie-bitrix24', h='Кейсы внедрения Битрикс24', sub='Внедрение Битрикс24, автоматизация процессов, аналитика и интеграции для наших клиентов в Узбекистане.', cases=BX),
- 'flatris': dict(url='/flatris', all='/cases/vnedrenie-flatris', h='Кейсы внедрения Flatris', sub='Шахматки недвижимости во Flatris и интеграции с amoCRM для застройщиков Узбекистана.', cases=FLATRIS),
- 'sklad': dict(url='/sklad', all='/cases/vnedrenie-sklad', h='Кейсы внедрения МойСклад', sub='Складской и производственный учёт в МойСклад для торговых и производственных компаний Узбекистана.', cases=SKLAD),
+ 'asterisk': dict(url='/asterisk', all='/cases', h='Кейсы внедрения Asterisk', sub='Call-центры и IP-телефония на Asterisk, которые мы запустили для клиентов в Узбекистане.', cases=AST),
+ 'amo': dict(url='/amo', all='/cases', h='Кейсы внедрения amoCRM', sub='Проекты по внедрению amoCRM, автоматизации продаж и интеграциям, которые мы реализовали для клиентов в Узбекистане.', cases=AMO + AMO_OLD),
+ 'bitriks24': dict(url='/bitriks24', all='/cases', h='Кейсы внедрения Битрикс24', sub='Внедрение Битрикс24, автоматизация процессов, аналитика и интеграции для наших клиентов в Узбекистане.', cases=BX),
+ 'flatris': dict(url='/flatris', all='/cases', h='Кейсы внедрения Flatris', sub='Шахматки недвижимости во Flatris и интеграции с amoCRM для застройщиков Узбекистана.', cases=FLATRIS),
+ 'sklad': dict(url='/sklad', all='/cases', h='Кейсы внедрения МойСклад', sub='Складской и производственный учёт в МойСклад для торговых и производственных компаний Узбекистана.', cases=SKLAD),
  'cases-sklad': dict(url='/cases/vnedrenie-sklad', h='Свежие кейсы внедрения МойСклад', sub='Новые проекты по складскому и производственному учёту в МойСклад.', cases=[GT, IM]),
 }
