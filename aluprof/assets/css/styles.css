@@ -1494,3 +1494,23 @@ html[lang="uz"] .page-about .page-hero .h-mega, html[lang="en"] .page-about .pag
   .pstep__fact b { font-size: 40px; }
   .visit .h2 { font-size: 34px; }
 }
+
+/* ---------- сертификат соответствия ---------- */
+.cert__in { display: grid; grid-template-columns: minmax(260px, .8fr) 1.2fr; gap: clamp(30px, 5vw, 90px); align-items: center; }
+.cert__doc { position: relative; display: block; background: #fff; padding: clamp(10px, 1.2vw, 18px); box-shadow: 0 30px 60px -20px rgba(0,26,40,.28), 0 0 0 1px var(--line-light); transform: rotate(-1.2deg); transition: transform .6s var(--ease), box-shadow .6s var(--ease); }
+.cert__doc:hover { transform: rotate(0) translateY(-6px); box-shadow: 0 40px 70px -20px rgba(0,26,40,.34), 0 0 0 1px var(--line-light); }
+.cert__doc img { display: block; width: 100%; height: auto; }
+.cert__zoom { position: absolute; right: 18px; bottom: 18px; padding: 9px 14px; background: var(--navy); color: #fff; font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(6px); transition: opacity .3s, transform .3s; }
+.cert__doc:hover .cert__zoom { opacity: 1; transform: none; }
+.cert__body .lead { margin-top: 22px; }
+.cert__spec { margin: 28px 0 0; border-top-color: var(--line-light); }
+.cert__spec div { border-bottom-color: var(--line-light); }
+.cert__spec dt { color: var(--steel); }
+.cert__spec dd { color: var(--navy); }
+.cert__act { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+.footer__docs { display: flex; gap: 24px; flex-wrap: wrap; }
+@media (max-width: 860px) {
+  .cert__in { grid-template-columns: 1fr; }
+  .cert__doc { max-width: 340px; margin: 0 auto; transform: none; }
+  .cert__zoom { opacity: 1; transform: none; }
+}
