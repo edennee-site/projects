@@ -3,17 +3,19 @@
  * ALUPROF — приём заявок с сайта.
  * Письмо уходит на info@alu-prof.uz, копия — в закрытую группу Telegram.
  *
- * Настройка на хостинге (Plesk):
- *   Файл ../aluprof-config.php (рядом с httpdocs, не в публичной папке):
- *   <?php return ['tg_token' => '…', 'tg_chat' => '…'];
- *   Без него заявки приходят только на почту.
+ * Токен бота: ../aluprof-config.php (вне публичной папки).
+ * Почта и группа для заявок меняются в панели /admin.
  */
-const MAIL_TO   = 'info@alu-prof.uz';
 const MAIL_FROM = 'noreply@alu-prof.uz';
-// токен и ID группы хранятся вне папки сайта: ../aluprof-config.php
+// токен хранится вне папки сайта: ../aluprof-config.php
 $cfg = @include __DIR__ . '/../aluprof-config.php';
-define('TG_TOKEN', is_array($cfg) ? ($cfg['tg_token'] ?? '') : '');
-define('TG_CHAT',  is_array($cfg) ? ($cfg['tg_chat'] ?? '') : '');
+$cfg = is_array($cfg) ? $cfg : [];
+// получатели меняются в панели /admin: ../aluprof-settings.json
+$set = @json_decode((string)@file_get_contents(__DIR__ . '/../aluprof-settings.json'), true);
+$set = is_array($set) ? $set : [];
+define('MAIL_TO',  !empty($set['lead_email']) ? $set['lead_email'] : 'info@alu-prof.uz');
+define('TG_TOKEN', (string)($cfg['tg_token'] ?? ''));
+define('TG_CHAT',  (string)(array_key_exists('lead_tg', $set) ? $set['lead_tg'] : ($cfg['tg_chat'] ?? '')));
 
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo '{"ok":false}'; exit; }
