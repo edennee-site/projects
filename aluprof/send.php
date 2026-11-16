@@ -4,14 +4,16 @@
  * Письмо уходит на info@alu-prof.uz, копия — в закрытую группу Telegram.
  *
  * Настройка на хостинге (Plesk):
- *   1. TG_TOKEN — токен бота от @BotFather.
- *   2. TG_CHAT  — ID группы отдела продаж (бота нужно добавить в группу).
- *   Если TG_TOKEN пустой, заявки приходят только на почту.
+ *   Файл ../aluprof-config.php (рядом с httpdocs, не в публичной папке):
+ *   <?php return ['tg_token' => '…', 'tg_chat' => '…'];
+ *   Без него заявки приходят только на почту.
  */
 const MAIL_TO   = 'info@alu-prof.uz';
 const MAIL_FROM = 'noreply@alu-prof.uz';
-const TG_TOKEN  = '';
-const TG_CHAT   = '';
+// токен и ID группы хранятся вне папки сайта: ../aluprof-config.php
+$cfg = @include __DIR__ . '/../aluprof-config.php';
+define('TG_TOKEN', is_array($cfg) ? ($cfg['tg_token'] ?? '') : '');
+define('TG_CHAT',  is_array($cfg) ? ($cfg['tg_chat'] ?? '') : '');
 
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo '{"ok":false}'; exit; }
