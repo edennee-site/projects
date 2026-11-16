@@ -7,7 +7,6 @@ declare(strict_types=1);
  * Файлы вне папки сайта (рядом с httpdocs):
  *   aluprof-config.php      — tg_token, admin_user, admin_hash (bcrypt)
  *   aluprof-settings.json   — текущие значения (создаётся при первом сохранении)
- *   aluprof-admin-lock.json — счётчик неудачных входов
  * Страницы сайта статические: при сохранении значения подставляются во все *.html.
  */
 
@@ -15,11 +14,8 @@ define('SITE_DIR', dirname(__DIR__));
 define('HOME_DIR', dirname(__DIR__, 2));
 define('CFG_FILE', HOME_DIR . '/aluprof-config.php');
 define('SET_FILE', HOME_DIR . '/aluprof-settings.json');
-define('LOCK_FILE', HOME_DIR . '/aluprof-admin-lock.json');
 const CAT_FILE = 'assets/docs/thermo-catalog.pdf';
 const MAX_PDF_MB = 40;
-const MAX_FAILS = 5;
-const LOCK_SEC = 900;
 const IDLE_SEC = 7200;
 
 // значения, с которыми собран сайт
@@ -187,19 +183,6 @@ function tg(string $method, array $params = []): ?array {
 }
 
 /* ---------- вход ---------- */
-function ip(): string { return substr((string)($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45); }
-function locks(): array { $l = is_file(LOCK_FILE) ? json_decode((string)file_get_contents(LOCK_FILE), true) : []; return is_array($l) ? $l : []; }
-function locked(): int {
-    $r = locks()[ip()] ?? null;
-    if ($r && $r['n'] >= MAX_FAILS && time() - $r['t'] < LOCK_SEC) return (int)ceil((LOCK_SEC - (time() - $r['t'])) / 60);
-    return 0;
-}
-function note_fail(bool $ok): void {
-    $l = array_filter(locks(), fn($r) => time() - $r['t'] < LOCK_SEC);
-    if ($ok) unset($l[ip()]);
-    else { $r = $l[ip()] ?? ['n' => 0, 't' => time()]; $l[ip()] = ['n' => $r['n'] + 1, 't' => time()]; }
-    write_atomic(LOCK_FILE, json_encode($l), 0600);
-}
 
 function flash(string $type, string $msg): void { $_SESSION['flash'][] = [$type, $msg]; }
 function back(string $anchor = ''): void { header('Location: ./' . $anchor, true, 303); exit; }
@@ -212,10 +195,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($a === 'login') {
         $user = (string)(cfg()['admin_user'] ?? ''); $hash = (string)(cfg()['admin_hash'] ?? '');
-        if ($m = locked()) { flash('err', "Слишком много попыток. Попробуйте через $m мин."); back(); }
         $ok = $hash !== '' && hash_equals($user, trim((string)($_POST['user'] ?? '')))
             && password_verify((string)($_POST['pass'] ?? ''), $hash);
-        note_fail($ok);
         if (!$ok) { usleep(400000); flash('err', 'Неверный логин или пароль.'); back(); }
         session_regenerate_id(true);
         $_SESSION['auth'] = true;
