@@ -34,8 +34,14 @@ const DEFAULTS = [
     'lead_email' => 'info@alu-prof.uz',
     'lead_tg' => '',
     'lead_tg_title' => '',
+    'addr_ru' => 'Ташкентская область, Зангиатинский район, ул. Магистральная, 40',
+    'addr_uz' => 'Toshkent viloyati, Zangiota tumani, Magistral koʻchasi, 40',
+    'addr_en' => '40 Magistralnaya St., Zangiata District, Tashkent Region',
+    'h1_ru' => 'Пн–Пт 9:00–17:00', 'h1_uz' => 'Du–Ju 9:00–17:00', 'h1_en' => 'Mon–Fri 9:00–17:00',
+    'h2_ru' => 'Сб 9:00–14:00', 'h2_uz' => 'Sha 9:00–14:00', 'h2_en' => 'Sat 9:00–14:00',
 ];
 const SITE_KEYS = ['phone1', 'phone2', 'email', 'telegram', 'instagram', 'cat_mb'];
+const LANGS = ['ru' => 'Русский', 'uz' => 'Oʻzbekcha', 'en' => 'English'];
 
 /* ---------- заголовки и сессия ---------- */
 $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
@@ -119,6 +125,17 @@ function apply_site(array $from_list, array $to): int {
         if ($to['cat_v'] !== '') {
             $out = preg_replace('~(assets/docs/thermo-catalog\.pdf)(\?v=\d+)?~', '$1?v=' . $to['cat_v'], $out);
         }
+        // адрес и график: размеченные места <span data-s="…"> на языке страницы
+        $dir = basename(dirname($file));
+        $lang = ($dir === 'uz' || $dir === 'en') ? $dir : 'ru';
+        $esc = fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+        $h1 = $esc($to['h1_' . $lang]); $h2 = $esc($to['h2_' . $lang]);
+        $out = preg_replace_callback('~<span data-s="(addr|hours)"( data-sep="br")?>.*?</span>~s', function ($m) use ($to, $lang, $esc, $h1, $h2) {
+            if ($m[1] === 'addr') $v = $esc($to['addr_' . $lang]);
+            else $v = $h2 === '' ? $h1 : $h1 . (($m[2] ?? '') !== '' ? '<br>' : ', ') . $h2;
+            return '<span data-s="' . $m[1] . '"' . ($m[2] ?? '') . '>' . $v . '</span>';
+        }, $out);
+        $out = preg_replace_callback('~("streetAddress": )"[^"]*"~', fn($m) => $m[1] . json_encode((string)$to['addr_ru'], JSON_UNESCAPED_UNICODE), $out);
         if ($out !== $html) {
             if (!write_atomic($file, $out, fileperms($file) & 0777)) return -1;
             $changed++;
@@ -128,10 +145,7 @@ function apply_site(array $from_list, array $to): int {
 }
 // после обновления сайта страницы снова содержат исходные значения — возвращаем сохранённые
 function sync_site(): void {
-    $s = settings();
-    $need = false;
-    foreach (SITE_KEYS as $k) if ($s[$k] !== DEFAULTS[$k]) $need = true;
-    if ($need || $s['cat_v'] !== '') apply_site([DEFAULTS], $s);
+    apply_site([DEFAULTS], settings());
 }
 
 /* ---------- проверка ввода ---------- */
@@ -223,6 +237,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $v = norm_handle((string)($_POST['telegram'] ?? '')); if ($v === null) $errs[] = 'Telegram: укажите ссылку или @имя.'; else $new['telegram'] = $v;
         $v = norm_handle((string)($_POST['instagram'] ?? '')); if ($v === null) $errs[] = 'Instagram: укажите ссылку или имя.'; else $new['instagram'] = $v;
         $v = norm_email((string)($_POST['lead_email'] ?? '')); if ($v === null) $errs[] = 'Почта для заявок: проверьте адрес.'; else $new['lead_email'] = $v;
+        foreach (LANGS as $l => $lname) {
+            foreach (['addr' => 'Адрес', 'h1' => 'График (первая строка)', 'h2' => 'График (вторая строка)'] as $f => $label) {
+                $v = trim(preg_replace('/\s+/u', ' ', strip_tags((string)($_POST[$f . '_' . $l] ?? ''))));
+                if ($v === '' && $f !== 'h2') { $errs[] = "$label ($lname): заполните поле."; continue; }
+                if (mb_strlen($v) > 150) { $errs[] = "$label ($lname): слишком длинно."; continue; }
+                $new[$f . '_' . $l] = $v;
+            }
+        }
         if ($errs) { foreach ($errs as $e) flash('err', $e); $_SESSION['form'] = $_POST; back(); }
         if ($new === $s) { flash('ok', 'Изменений нет.'); back(); }
         $r = apply_site([DEFAULTS, $s], $new);
@@ -391,6 +413,12 @@ input:focus { border-color: var(--navy); background: #fff; }
 .chats label:hover { border-color: var(--navy); }
 .chats small { color: var(--steel); margin-left: auto; }
 ol.steps { padding-left: 20px; color: var(--ink-soft); font-size: 14px; display: grid; gap: 4px; margin: 4px 0 16px; }
+.langs { display: grid; gap: 16px; }
+.langs fieldset { border: 1px solid var(--mist-2); padding: 14px 16px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; min-width: 0; }
+.langs fieldset > div:first-of-type { grid-column: 1 / -1; }
+.langs legend { font: 600 13px "Inter"; color: var(--navy); padding: 0 6px; letter-spacing: .06em; }
+.langs legend span { font-weight: 400; color: var(--steel); letter-spacing: 0; margin-left: 4px; }
+@media (max-width: 640px) { .langs fieldset { grid-template-columns: 1fr; } }
 .foot { text-align: center; font-size: 12px; color: var(--steel); }
 </style>
 </head>
@@ -439,6 +467,19 @@ ol.steps { padding-left: 20px; color: var(--ink-soft); font-size: 14px; display:
       <div><label for="phone1">Основной телефон</label><input id="phone1" type="tel" name="phone1" value="<?= $val('phone1') ?>" required><div class="hint">В шапке сайта и в кнопке «Позвонить»</div></div>
       <div><label for="phone2">Второй телефон</label><input id="phone2" type="tel" name="phone2" value="<?= $val('phone2') ?>" required><div class="hint">Формат: +998 77 420-49-94</div></div>
       <div><label for="email">Email на сайте</label><input id="email" type="email" name="email" value="<?= $val('email') ?>" required></div>
+    </div>
+    <div class="sep"></div>
+    <h2>Адрес и график работы</h2>
+    <p class="sub">Для каждой версии сайта свой язык. Вторую строку графика можно оставить пустой.</p>
+    <div class="langs">
+      <?php foreach (LANGS as $l => $lname): ?>
+      <fieldset>
+        <legend><?= h(strtoupper($l)) ?> <span><?= h($lname) ?></span></legend>
+        <div><label for="addr_<?= $l ?>">Адрес</label><input id="addr_<?= $l ?>" type="text" name="addr_<?= $l ?>" value="<?= $val('addr_' . $l) ?>" maxlength="150" required></div>
+        <div><label for="h1_<?= $l ?>">График, строка 1</label><input id="h1_<?= $l ?>" type="text" name="h1_<?= $l ?>" value="<?= $val('h1_' . $l) ?>" maxlength="150" required></div>
+        <div><label for="h2_<?= $l ?>">График, строка 2</label><input id="h2_<?= $l ?>" type="text" name="h2_<?= $l ?>" value="<?= $val('h2_' . $l) ?>" maxlength="150"></div>
+      </fieldset>
+      <?php endforeach; ?>
     </div>
     <div class="sep"></div>
     <h2>Соцсети</h2>
