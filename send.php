@@ -17,6 +17,7 @@ define('MAIL_TO',  !empty($set['lead_email']) ? $set['lead_email'] : 'info@alu-p
 define('TG_TOKEN', (string)($cfg['tg_token'] ?? ''));
 define('TG_CHAT',  (string)(array_key_exists('lead_tg', $set) ? $set['lead_tg'] : ($cfg['tg_chat'] ?? '')));
 
+date_default_timezone_set('Asia/Tashkent');
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo '{"ok":false}'; exit; }
 

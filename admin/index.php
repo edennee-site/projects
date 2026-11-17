@@ -10,6 +10,7 @@ declare(strict_types=1);
  * Страницы сайта статические: при сохранении значения подставляются во все *.html.
  */
 
+date_default_timezone_set('Asia/Tashkent');
 define('SITE_DIR', dirname(__DIR__));
 define('HOME_DIR', dirname(__DIR__, 2));
 define('CFG_FILE', HOME_DIR . '/aluprof-config.php');
