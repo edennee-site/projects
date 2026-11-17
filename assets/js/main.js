@@ -506,9 +506,13 @@
     const phone = form.querySelector('input[name="phone"]');
     if (phone) {
       phone.addEventListener('focus', () => { if (!phone.value) phone.value = '+998 '; });
+      // по умолчанию +998 с маской; другой код страны — стереть +998 и ввести, например, +996 или +7
       phone.addEventListener('input', () => {
-        let d = phone.value.replace(/\D/g, '');
-        if (!d.startsWith('998')) d = '998' + d;
+        const v = phone.value.trim();
+        let d = v.replace(/\D/g, '');
+        if (!d) { phone.value = v.startsWith('+') ? '+' : ''; return; }
+        if (!v.startsWith('+') && !d.startsWith('998')) d = '998' + d;
+        if (!d.startsWith('998')) { phone.value = '+' + d.slice(0, 15); return; }
         d = d.slice(0, 12);
         const p = [d.slice(0, 3), d.slice(3, 5), d.slice(5, 8), d.slice(8, 10), d.slice(10, 12)];
         phone.value = '+' + p[0] + (p[1] ? ' ' + p[1] : '') + (p[2] ? ' ' + p[2] : '') + (p[3] ? '-' + p[3] : '') + (p[4] ? '-' + p[4] : '');
@@ -519,7 +523,8 @@
       let ok = true;
       $$('[required]', form).forEach(inp => {
         const f = inp.closest('.field');
-        const bad = inp.name === 'phone' ? inp.value.replace(/\D/g, '').length < 12 : !inp.value.trim();
+        const pd = inp.value.replace(/\D/g, '');
+        const bad = inp.name === 'phone' ? (pd.startsWith('998') ? pd.length !== 12 : pd.length < 9) : !inp.value.trim();
         f.classList.toggle('is-error', bad); if (bad) ok = false;
       });
       if (!ok) { const first = form.querySelector('.is-error input'); if (first) first.focus(); return; }
