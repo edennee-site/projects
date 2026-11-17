@@ -30,6 +30,7 @@ const DEFAULTS = [
     'lead_email' => 'info@alu-prof.uz',
     'lead_tg' => '',
     'lead_tg_title' => '',
+    'tg_seen' => [],
     'addr_ru' => 'Ташкентская область, Зангиатинский район, ул. Магистральная, 40',
     'addr_uz' => 'Toshkent viloyati, Zangiota tumani, Magistral koʻchasi, 40',
     'addr_en' => '40 Magistralnaya St., Zangiata District, Tashkent Region',
@@ -256,20 +257,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($a === 'tgfind') {
-        $r = tg('getUpdates', ['allowed_updates' => json_encode(['message', 'my_chat_member', 'channel_post'])]);
-        if (!$r || empty($r['ok'])) { flash('err', 'Telegram не ответил. Попробуйте позже.'); back('#leads'); }
+        // группы, где бота отметили (их запоминает webhook /tg-hook.php)
         $chats = [];
-        foreach ($r['result'] as $u) {
-            foreach (['message', 'my_chat_member', 'channel_post'] as $t) {
-                $c = $u[$t]['chat'] ?? null;
-                if (!$c) continue;
-                $title = $c['title'] ?? trim(($c['first_name'] ?? '') . ' ' . ($c['last_name'] ?? ''));
-                if (isset($c['username']) && $c['type'] === 'private') $title .= ' (@' . $c['username'] . ')';
-                $chats[(string)$c['id']] = ['title' => $title ?: (string)$c['id'], 'type' => $c['type']];
-            }
-        }
+        foreach ((array)$s['tg_seen'] as $id => $c) $chats[(string)$id] = ['title' => (string)($c['title'] ?? $id), 'type' => (string)($c['type'] ?? 'group')];
         $_SESSION['tg_found'] = $chats;
-        if (!$chats) flash('err', 'Бот пока не видит ни одной группы. Добавьте его в группу, напишите там любое сообщение и нажмите ещё раз.');
+        if (!$chats) flash('err', 'Бот пока не видит ни одной группы. Напишите в группе «@AluprofLeadsBot тест» — с отметкой бота.');
         back('#leads');
     }
     if ($a === 'tgpick') {
@@ -517,8 +509,8 @@ ol.steps { padding-left: 20px; color: var(--ink-soft); font-size: 14px; display:
     <?php else: ?>
       <ol class="steps">
         <li>Добавьте бота <b>@AluprofLeadsBot</b> в нужную группу Telegram.</li>
-        <li>Напишите в группе любое сообщение.</li>
-        <li>Нажмите «Найти группу» и выберите её.</li>
+        <li>Напишите в группе <b>«@AluprofLeadsBot тест»</b> — обязательно с отметкой бота.</li>
+        <li>Бот ответит «Активация успешна», и группа подключится сама. Чтобы сменить группу, нажмите «Найти группу».</li>
       </ol>
     <?php endif; ?>
     <div class="row">
