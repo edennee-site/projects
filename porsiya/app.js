@@ -815,7 +815,7 @@
       b.innerHTML = `<div class="drop"><span class="lens"></span>
         <h4 class="display">Сфотографируй<br>тарелку</h4><p>Нейросеть узнает блюда, оценит порции и посчитает КБЖУ. Результат можно поправить.</p>
         <div class="acts"><button class="btn white sm" id="p-cam">${icon("cam")} Камера</button><button class="btn sm" id="p-gal" style="background:rgba(255,255,255,.22);color:#fff">${icon("img")} Галерея</button></div></div>
-        ${S.settings.key ? `<p class="note">Совет: снимай сверху и при хорошем свете. Если в блюде много масла или соуса, напиши это в подсказке, так оценка будет точнее.</p>` : `<div class="alert">Чтобы распознавать фото, добавь бесплатный ключ Gemini в профиле. Без него работают поиск и ручной ввод. <button class="btn sm ghost" id="p-key" style="margin-top:10px;background:var(--card)">Добавить ключ</button></div>`}`;
+        ${S.settings.key ? `<p class="note">Совет: снимай сверху и при хорошем свете. Если в блюде много масла или соуса, напиши это в подсказке, так оценка будет точнее.</p>` : `<div class="alert">Чтобы распознавать фото, добавь бесплатный ключ Gemini в профиле. Без него работают поиск и ручной ввод. <button class="btn sm" id="p-key" style="margin-top:10px">Добавить ключ</button></div>`}`;
       $$(".acts .btn svg", b).forEach((x) => (x.style.cssText = "width:17px;height:17px"));
       $("#p-cam").onclick = () => $("#f-cam").click();
       $("#p-gal").onclick = () => $("#f-gal").click();
@@ -1168,10 +1168,16 @@
       const vs = pts.map((p) => p[1]);
       const mn = Math.min(...vs) - 0.5, mx = Math.max(...vs) + 0.5;
       const xy = pts.map((p, i) => [(i / (pts.length - 1)) * W, H - ((p[1] - mn) / (mx - mn)) * H]);
-      const d = xy.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
-      const len = xy.reduce((a, p, i) => i ? a + Math.hypot(p[0] - xy[i - 1][0], p[1] - xy[i - 1][1]) : 0, 0);
+      // плавная кривая (catmull-rom → безье)
+      let d = "M" + xy[0][0].toFixed(1) + " " + xy[0][1].toFixed(1);
+      for (let i = 0; i < xy.length - 1; i++) {
+        const p0 = xy[i - 1] || xy[i], p1 = xy[i], p2 = xy[i + 1], p3 = xy[i + 2] || p2;
+        const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+        d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+      }
+      const len = Math.ceil(xy.reduce((a, p, i) => i ? a + Math.hypot(p[0] - xy[i - 1][0], p[1] - xy[i - 1][1]) : 0, 0) * 1.25);
       chart = `<div class="wchart" id="wch"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="wgrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--fat-b)" stop-opacity=".35"/><stop offset="1" stop-color="var(--fat-b)" stop-opacity="0"/></linearGradient></defs>
-        <path class="warea" d="${d} L${W} ${H} L0 ${H} Z"/><path class="wline" d="${d}" stroke-dasharray="${len}" stroke-dashoffset="${len}" vector-effect="non-scaling-stroke"/></svg>
+        <path class="warea" d="${d} L${W} ${H} L0 ${H} Z"/><path class="wline" d="${d}" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" vector-effect="non-scaling-stroke"/></svg>
         ${xy.map((p, i) => `<span style="position:absolute;left:${(p[0] / W) * 100}%;top:${(p[1] / H) * 100}%;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:var(--card);border:2px solid var(--fat-a);transform:scale(0);transition:transform .4s var(--spring) ${0.5 + i * 0.06}s" class="wdot"></span>`).join("")}</div>
         <div class="axis2"><span>${fromKey(pts[0][0]).getDate()} ${MONS[fromKey(pts[0][0]).getMonth()]}</span><span>${fromKey(pts[pts.length - 1][0]).getDate()} ${MONS[fromKey(pts[pts.length - 1][0]).getMonth()]}</span></div>`;
     } else {
