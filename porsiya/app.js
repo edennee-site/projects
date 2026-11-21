@@ -415,6 +415,24 @@
         b.addEventListener("pointerdown", start);
         ["pointerup", "pointerleave", "pointercancel"].forEach((ev) => b.addEventListener(ev, stop));
       });
+      // тап по числу — ввод с клавиатуры
+      const val = $(".val", st);
+      if (val) val.addEventListener("click", () => {
+        if ($("input", val)) return;
+        const inp = document.createElement("input");
+        inp.type = "text"; inp.inputMode = inc < 1 ? "decimal" : "numeric";
+        inp.value = String(obj[f]).replace(".", ",");
+        inp.className = "val-in";
+        out.style.display = "none"; val.prepend(inp); inp.focus(); inp.select();
+        const commit = () => {
+          const n = parseFloat(inp.value.replace(",", "."));
+          if (!isNaN(n)) { obj[f] = clamp(Math.round(n * 10) / 10, mn, mx); onChange && onChange(f, obj[f]); }
+          out.textContent = String(obj[f]).replace(".", ",");
+          inp.remove(); out.style.display = "";
+        };
+        inp.addEventListener("blur", commit);
+        inp.addEventListener("keydown", (e) => { if (e.key === "Enter") inp.blur(); });
+      });
     });
   }
   function showObResult() {
@@ -500,6 +518,7 @@
         </div>
         <div class="bar-dots" id="bd-fat">${barDots(t.f, nm.f)}</div>
       </div>
+      ${insightHTML(t, nm, isToday)}
       <div class="section-h fade-up d6"><h2 class="display">Приёмы пищи</h2><span class="muted">${dayEntries(selDay).length ? fmt(t.k) + " ккал" : ""}</span></div>
       <div id="meals"></div>`;
 
@@ -512,6 +531,41 @@
     countUp($("#v-c"), r0(t.c), { key: "c" });
     revealSoon($("#bd-pro")); revealSoon($("#bd-carb")); revealSoon($("#bd-fat"));
     $("#t-ava").onclick = () => show("profile");
+    const ib = $("#ins-btn");
+    if (ib) ib.onclick = () => { const f = window.FOODS.find((x) => x.n === ib.dataset.f); openAdd("search"); setTimeout(() => portion(Object.assign({}, f, { g: +ib.dataset.g })), 60); };
+  }
+  // ---------- подсказка дня ----------
+  const PRO_FOODS = ["Куриная грудка варёная", "Творог 5%", "Греческий йогурт", "Протеиновый коктейль (молочный)", "Яйцо варёное", "Тунец консервированный"];
+  function insightHTML(t, nm, isToday) {
+    const n = dayEntries(selDay).length;
+    if (!n) return "";
+    const h = new Date().getHours();
+    const kLeft = nm.k - t.k, pLeft = nm.p - t.p;
+    let ic = "spark", col = "cal", title = "", text = "", btn = "";
+    if (t.k > nm.k * 1.1) {
+      col = "pro"; ic = "flame"; title = "Сегодня сверх нормы на " + fmt(t.k - nm.k) + " ккал";
+      text = "Ничего страшного: на результат влияет средний показатель за неделю. Завтра просто держись нормы.";
+    } else if (isToday && pLeft > 20) {
+      // подбираем продукт, который закроет белок и влезет в остаток калорий
+      const opts = PRO_FOODS.map((nmF) => window.FOODS.find((x) => x.n === nmF)).filter(Boolean).map((f) => {
+        const g = Math.round(clamp((pLeft / f.p) * 100, 60, 250) / 10) * 10; const v = scaleFood(f, g); return { f, g, v };
+      }).filter((o) => o.v.k <= Math.max(kLeft, 200)).sort((a, b) => b.v.p / b.v.k - a.v.p / a.v.k);
+      const o = opts[(new Date().getDate()) % Math.max(1, Math.min(3, opts.length))] || opts[0];
+      col = "pro"; ic = "bolt"; title = "Добери " + r0(pLeft) + " г белка";
+      text = o ? `${o.f.e} ${o.f.n}, ${o.g} г даст ${r0(o.v.p)} г белка и ${fmt(o.v.k)} ккал.` : "Добавь к следующему приёму пищи курицу, творог или яйца.";
+      if (o) btn = `<button class="btn sm" id="ins-btn" data-f="${esc(o.f.n)}" data-g="${o.g}">${icon("plus")} Добавить</button>`;
+    } else if (isToday && kLeft > nm.k * 0.35 && h >= 19) {
+      col = "carb"; ic = "leaf"; title = "До нормы ещё " + fmt(kLeft) + " ккал";
+      text = S.profile.goal === "gain" ? "Для набора массы важно добирать калории. Проще всего: каша на молоке, орехи или банан с арахисовой пастой." : "Если не голоден, не нужно доедать через силу. Главное, чтобы был закрыт белок.";
+    } else if (Math.abs(kLeft) <= nm.k * 0.1 && pLeft <= 10) {
+      col = "carb"; ic = "check"; title = "Отличный день";
+      text = "Калории в норме, белок закрыт. Так держать.";
+    } else if (isToday && kLeft > 0) {
+      col = "cal"; ic = "spark"; title = "Осталось " + fmt(kLeft) + " ккал";
+      const next = h < 11 ? "обед и ужин" : h < 16 ? "ужин и перекус" : "ужин";
+      text = `Примерно столько можно съесть на ${next}. Белка осталось ${Math.max(0, r0(pLeft))} г.`;
+    } else return "";
+    return `<div class="card insight fade-up d6"><span class="ins-ic t-${col}">${icon(ic)}</span><div class="ins-t"><b>${title}</b><span>${esc(text)}</span>${btn}</div></div>`;
   }
   function fatChip(v, n) { return v > n * 1.1 ? "Больше нормы" : v >= n * 0.8 ? "В норме" : "ещё " + Math.max(0, r0(n - v)) + " г"; }
   function macroCard(kind, label, ic, v, n, d) {
@@ -591,7 +645,7 @@
       const on = Math.min(rows, Math.ceil(k / unit));
       let col = "";
       for (let r = 0; r < rows; r++) col += `<i class="${r < on ? "on" : ""}" style="transition-delay:${(i * 0.022 + r * 0.03).toFixed(3)}s"></i>`;
-      return `<div class="col" ${selDay === todayKey() && i === nowH - 6 ? 'title="сейчас"' : ""}>${col}</div>`;
+      return `<div class="col ${selDay === todayKey() && i === clamp(nowH - 6, 0, cols - 1) && nowH >= 6 ? "now" : ""}">${col}</div>`;
     }).join("");
     revealSoon(el);
   }
@@ -599,7 +653,19 @@
     const box = $("#meals");
     const list = dayEntries(selDay);
     if (!list.length) {
-      box.innerHTML = `<div class="meal-group fade-up d6"><div class="empty"><div class="em">🍽️</div><b>${selDay === todayKey() ? "Пока пусто" : "В этот день записей нет"}</b>Сфотографируй еду или найди её в базе. Калории посчитаются сами.</div></div>`;
+      // предложить повторить вчерашний приём пищи
+      let rep = "";
+      if (selDay === todayKey()) {
+        const yk = dkey(addDays(new Date(), -1)), m = mealByTime();
+        const ys = dayEntries(yk).filter((e) => e.meal === m);
+        if (ys.length) rep = `<button class="btn sm repeat" id="rep-btn">Повторить вчерашний ${mealName(m).toLowerCase()} · ${fmt(ys.reduce((a, e) => a + e.k, 0))} ккал</button>`;
+      }
+      box.innerHTML = `<div class="meal-group fade-up d6"><div class="empty"><div class="em">🍽️</div><b>${selDay === todayKey() ? "Пока пусто" : "В этот день записей нет"}</b>Сфотографируй еду или найди её в базе. Калории посчитаются сами.<br>${rep}</div></div>`;
+      if ($("#rep-btn")) $("#rep-btn").onclick = () => {
+        const m = mealByTime(); const ys = dayEntries(dkey(addDays(new Date(), -1))).filter((e) => e.meal === m);
+        addEntries(ys.map((e) => ({ n: e.n, e: e.e, g: e.g, k: e.k, p: e.p, f: e.f, c: e.c, img: e.img, src: e.src })), m);
+        afterAdd(ys.reduce((a, e) => a + e.k, 0));
+      };
       return;
     }
     box.innerHTML = MEALS.map((m) => {
@@ -609,15 +675,46 @@
       return `<div class="meal-group fade-up d6"><div class="mg-head"><b>${m.e} ${m.n}</b><span>${fmt(sum)} ккал</span></div>
         ${items.map((e) => itemHTML(e)).join("")}</div>`;
     }).join("");
-    $$(".item", box).forEach((el) => el.onclick = () => editEntry(el.dataset.id));
+    $$(".item", box).forEach((el) => { el.onclick = () => { if (!el.dataset.sw) editEntry(el.dataset.id); }; bindSwipe(el); });
+  }
+  function bindSwipe(el) {
+    const wrap = el.parentElement; let x0, y0, dx = 0, mode = null;
+    el.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; mode = null; delete el.dataset.sw; }, { passive: true });
+    el.addEventListener("touchmove", (e) => {
+      const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
+      if (!mode) { if (Math.abs(mx) > 8 && Math.abs(mx) > Math.abs(my)) mode = "x"; else if (Math.abs(my) > 8) mode = "y"; }
+      if (mode !== "x") return;
+      dx = Math.min(0, mx); el.dataset.sw = "1";
+      el.classList.add("dragging"); wrap.classList.add("swiping");
+      el.style.transform = `translateX(${dx < -140 ? -140 + (dx + 140) * 0.3 : dx}px)`;
+      const armed = dx < -90; if (armed !== wrap.classList.contains("armed")) { wrap.classList.toggle("armed", armed); if (armed) haptic("light"); }
+    }, { passive: true });
+    el.addEventListener("touchend", () => {
+      if (mode !== "x") return;
+      el.classList.remove("dragging");
+      if (dx < -90) {
+        el.style.transform = "translateX(-110%)";
+        wrap.style.transition = "height .3s var(--ease), opacity .3s"; wrap.style.height = wrap.offsetHeight + "px";
+        requestAnimationFrame(() => { wrap.style.height = "0px"; wrap.style.opacity = "0"; });
+        setTimeout(() => deleteEntry(el.dataset.id), 300);
+      } else { el.style.transform = ""; setTimeout(() => wrap.classList.remove("swiping", "armed"), 250); }
+      setTimeout(() => delete el.dataset.sw, 50);
+    });
+  }
+  function deleteEntry(id) {
+    const f = findEntry(id); if (!f) return;
+    const copy = JSON.parse(JSON.stringify(f.e));
+    S.days[f.k].splice(f.i, 1); if (!S.days[f.k].length) delete S.days[f.k];
+    save(); haptic("medium"); renderToday();
+    toast("Удалено", () => { (S.days[f.k] = S.days[f.k] || []).push(copy); save(); renderToday(); });
   }
   function tint(e) { const m = Math.max(e.p * 4, e.c * 4, e.f * 9); return m === e.p * 4 ? "t-pro" : m === e.f * 9 ? "t-fat" : "t-carb"; }
   function itemHTML(e, enter) {
     const time = new Date(e.t);
-    return `<div class="item ${enter ? "enter" : ""}" data-id="${e.id}">
+    return `<div class="item-wrap" data-w="${e.id}"><div class="item-del">${icon("trash")}</div><div class="item ${enter ? "enter" : ""}" data-id="${e.id}">
       <span class="ib ${tint(e)}">${e.img ? `<img src="${e.img}" alt="">` : esc(e.e || "🍽️")}</span>
       <span class="it"><b>${esc(e.n)}</b><span>${r0(e.g)} г · Б ${r0(e.p)} · Ж ${r0(e.f)} · У ${r0(e.c)}</span></span>
-      <span class="kc">${fmt(e.k)}<span>${pad(time.getHours())}:${pad(time.getMinutes())}</span></span></div>`;
+      <span class="kc">${fmt(e.k)}<span>${pad(time.getHours())}:${pad(time.getMinutes())}</span></span></div></div>`;
   }
 
   // ---------- entry ops ----------

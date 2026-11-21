@@ -472,3 +472,34 @@ input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 
 .nv .val { display: none; }
 .stepper.nv { gap: 14px; }
 .stepper.nv button { width: 48px; height: 48px; }
+
+/* подсказка дня */
+.insight { display: flex; gap: 14px; align-items: flex-start; margin-top: 10px; }
+.ins-ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.ins-ic svg { width: 18px; height: 18px; }
+.ins-ic.t-cal { background: color-mix(in srgb, var(--cal-b) 18%, transparent); color: var(--cal-a); }
+.ins-ic.t-pro { background: color-mix(in srgb, var(--pro-b) 20%, transparent); color: #E0566C; }
+.ins-ic.t-carb { background: color-mix(in srgb, var(--carb-b) 20%, transparent); color: #3D9460; }
+.ins-t { flex: 1; min-width: 0; }
+.ins-t b { display: block; font-weight: 500; font-size: 15px; margin-top: 2px; }
+.ins-t > span { display: block; font-size: 13px; color: var(--g60); margin-top: 3px; line-height: 1.45; }
+.ins-t .btn { margin-top: 12px; height: 36px; font-size: 13.5px; }
+.ins-t .btn svg { width: 14px; height: 14px; }
+/* маркер «сейчас» */
+.dots .col { position: relative; }
+.dots .col.now::after { content: ""; position: absolute; left: 50%; top: -6px; bottom: -6px; border-left: 1.5px dashed rgba(255,255,255,.7); opacity: 0; transition: opacity .6s .5s; }
+.dots.show .col.now::after { opacity: 1; }
+/* ввод числа в степпере */
+.val { cursor: text; }
+.val-in { width: 64px; text-align: center; font-size: 17px; font-weight: 500; background: var(--card-2); border-radius: 10px; padding: 4px 0; }
+.card .val-in, .portion .val-in, .res-item .val-in { background: var(--bg); }
+/* свайп для удаления */
+.item-wrap { position: relative; border-radius: 18px; overflow: hidden; }
+.item-wrap .item-del { position: absolute; inset: 0; background: var(--warn); color: #fff; display: flex; align-items: center; justify-content: flex-end; padding-right: 22px; border-radius: 18px; opacity: 0; transition: opacity .2s; }
+.item-wrap .item-del svg { width: 20px; height: 20px; transition: transform .25s var(--spring); }
+.item-wrap.swiping .item-del { opacity: 1; }
+.item-wrap.armed .item-del svg { transform: scale(1.25); }
+.item-wrap .item { background: var(--card); touch-action: pan-y; }
+.item-wrap .item.dragging { transition: none; }
+.repeat { margin-top: 14px; }
+:root[data-theme="dark"] .toast button { color: var(--cal-a); }
