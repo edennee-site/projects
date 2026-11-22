@@ -170,6 +170,14 @@
     const n = calcNorm(Object.assign({}, p, { manual: { on: false } }), pl), ach = (Math.abs(n.k - n.tdee) * 7) / 7700 / (pl.type === "lose" ? 1 : 1.2);
     return Math.max(0.05, Math.min(planKgWeek(pl), ach));
   }
+  function planNote(pi) {
+    if (pi.reached) return "Цель достигнута. Можно закрепить результат на поддержании или поставить новую цель.";
+    if (pi.wrong) return `Вес идёт в другую сторону. Проверь, что записываешь всё, включая напитки и перекусы, и держись нормы ${fmt(norm().k)} ккал. Если так уже несколько недель, пересчитай план от текущего веса.`;
+    if (pi.diff <= -1.5) return "Отставание заметное. Чаще попадай в норму калорий и пересчитай план от текущего веса, чтобы этапы снова стали реальными.";
+    if (pi.diff <= -0.6) return "Небольшое отставание нормально: вес колеблется день ото дня. Если отстаёшь уже несколько недель, пересчитай план от текущего веса.";
+    if (pi.diff >= 1.5) return "Идёшь заметно быстрее плана. Если держать норму тяжело или падают силы, выбери спокойный темп.";
+    return "Отмечай вес раз в несколько дней утром, чтобы прогресс считался точнее.";
+  }
   function planInfo(pl = S.plan) {
     if (!pl) return null;
     const sign = pl.type === "lose" ? -1 : 1, total = Math.abs(pl.target - pl.start), kw = planKgWeekEff(pl);
@@ -180,8 +188,8 @@
     const diff = sign * (cur - expected);
     const months = Math.max(1, Math.ceil(weeks / 4.345));
     const ms = Array.from({ length: months }, (_, i) => { const d = addMonths(sd, i + 1), exp = pl.start + sign * Math.min(total, kw * ((d - sd) / 6048e5)); const past = d <= now; const w = past ? weightAt(dkey(d)) : null; return { d, exp: r1(exp), past, cur: false, ok: (past && w != null && sign * (w - exp) >= -0.3) || sign * (cur - exp) >= 0, w }; });
-    const nx = ms.find((m) => !m.ok); if (nx) nx.cur = true;
-    return { sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1 };
+    const nx = ms.find((m) => !m.ok && !m.past) || ms.find((m) => !m.ok); if (nx) nx.cur = true;
+    return { sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wrong: wElapsed >= 2 && sign * (cur - pl.start) <= -0.5 };
   }
   function norm() { const m = S.profile.manual; return m.on ? { k: m.k, p: m.p, f: m.f, c: m.c } : calcNorm(); }
   const dayEntries = (k) => S.days[k] || [];
@@ -697,7 +705,7 @@
     $("#cal-chip").textContent = t.k ? pct + "% нормы" : "Норма " + fmt(kN);
     $("#v-kn").textContent = "из " + fmt(kN) + " ккал";
     countUp($("#v-k"), r0(t.k), { key: "k" });
-    const lb = $("#v-left"); countUp(lb, left >= 0 ? r0(left) : r0(-left), { key: "left" }); lb.previousElementSibling.textContent = left >= 0 ? "Осталось" : "Сверх нормы";
+    const lb = $("#v-left"); countUp(lb, left >= 0 ? r0(left) : r0(-left), { key: "left" }); lb.previousElementSibling.textContent = left > -0.5 ? "Осталось" : "Сверх нормы";
     const wb = weekBalance(selDay);
     const wl = $("#v-week").previousElementSibling;
     if (S.settings.carry && wb.days) { wl.textContent = "Перенос недели"; countUp($("#v-week"), kN - nm.k, { key: "wk", sign: true }); }
@@ -1033,7 +1041,7 @@
         <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>до ${fmtD(pi.end)}</span></span>
         <span class="gk-p num">${Math.round(pi.done * 100)}<small>%</small></span></div>
       <div class="gk-w"><span><em>Сейчас</em><b class="num">${dec(pi.cur)} кг</b></span>${dotRow(14, "ink gc-dots")}<span style="text-align:right"><em>Цель</em><b class="num">${dec(pl.target)} кг</b></span></div>
-      ${pi.reached ? `<div class="gc-m gc-done">${icon("trophy")}<span>Цель достигнута</span><span class="gc-btn" data-next>Что дальше</span></div>` : weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : cm ? `<div class="gc-m">${icon("flag")}<span>Следующий этап: ${dec(cm.exp)} кг к ${fmtD(cm.d)}</span></div>` : ""}
+      ${pi.reached ? `<div class="gc-m gc-done">${icon("trophy")}<span>Цель достигнута</span><span class="gc-btn" data-next>Что дальше</span></div>` : weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : pi.wrong ? `<div class="gc-m gc-due">${icon("info")}<span>Вес ${pi.sign < 0 ? "выше" : "ниже"} старта на ${dec(Math.abs(pi.cur - pl.start))} кг</span><span class="gc-btn" data-check>Что делать</span></div>` : cm ? `<div class="gc-m">${icon("flag")}<span>Следующий этап: ${dec(cm.exp)} кг к ${fmtD(cm.d)}</span></div>` : ""}
     </button>`;
   }
   function goalStatus(pi) {
@@ -1061,7 +1069,7 @@
         <div class="card-s" style="margin-top:6px">Темп ${PACE_N[pl.pace].toLowerCase()}: около ${dec(pi.km)} кг в месяц. Финиш примерно ${fmtD(pi.end)} ${pi.end.getFullYear()}. Норма под план: ${fmt(nm.k)} ккал в день.</div>
         <div class="msl">${pi.ms.map((m, i) => `<div class="${m.ok ? "ok" : m.past ? "miss" : m.cur ? "cur" : ""}"><span class="mk">${m.ok ? icon("check") : m.cur ? icon("target") : i + 1}</span><span class="ml"><b>${cap(MONN[m.d.getMonth()])}</b><em>до ${fmtD(m.d)}</em></span><span class="mv">${dec(m.exp)} кг${m.past && m.w != null ? `<em>было ${dec(m.w)}</em>` : ""}</span></div>`).join("")}</div>
       </div>
-      <p class="note">${pi.diff <= -0.6 && !pi.reached ? "Небольшое отставание нормально: вес колеблется день ото дня. Если отстаёшь уже несколько недель, пересчитай план от текущего веса, этапы сдвинутся." : "Отмечай вес раз в несколько дней утром, чтобы прогресс считался точнее."}</p>
+      <p class="note">${planNote(pi)}</p>
       <div class="list">
         <button class="prow" id="pd-edit"><span class="pi">${icon("edit")}</span><span class="pl"><b>Изменить цель</b></span><span class="pv">${icon("right")}</span></button>
         <button class="prow" id="pd-re"><span class="pi">${icon("refresh")}</span><span class="pl"><b>Пересчитать от текущего веса</b><span>Старт сегодня, цель та же</span></span></button>
@@ -1118,18 +1126,34 @@
       if (S.plan) planDetail(back);
     };
   }
+  // среднее съеденное за последние дни с записями (без сегодняшнего)
+  function recentEat(n) {
+    const ks = []; for (let d = addDays(new Date(), -1), i = 0; i < n; i++, d = addDays(d, -1)) { const k = dkey(d); if (isLogged(k)) ks.push(k); }
+    if (ks.length < 4) return null;
+    return { n: ks.length, avg: Math.round(ks.reduce((a, k) => a + totals(k).k, 0) / ks.length / 10) * 10 };
+  }
   function planCheck() {
     const pi = planInfo(), pl = S.plan, lose = pl.type === "lose";
     let ic = "check", tone = "ok", t = "", txt = "", acts = "";
-    if (pi.reached) { ic = "trophy"; t = "Цель достигнута"; txt = `Ты дошёл до ${dec(pl.target)} кг. Можно поставить новую цель или перейти на поддержание формы.`; acts = `<button class="btn ghost" data-pc="keep">Поддерживать вес</button><button class="btn" data-pc="new">Новая цель</button>`; }
-    else if (pi.diff <= -0.6) { ic = "info"; tone = "warn"; t = `Отстаёшь на ${dec(-pi.diff)} кг`; txt = `${pi.sign * (pi.cur - pl.start) < 0 ? `Вес ушёл в другую сторону: ${lose ? "+" : "−"}${dec(Math.abs(pi.cur - pl.start))} кг от старта. ` : ""}По плану сейчас должно быть ${dec(pi.expected)} кг. Небольшие колебания нормальны. Можно сдвинуть финиш, сохранив темп, или ${pl.pace < 2 ? "ускорить темп" : "оставить как есть"}.${lose ? " Проверь, что все приёмы пищи записаны, включая перекусы и напитки." : " Проверь, что добираешь калории каждый день."}`; acts = `<button class="btn ghost" data-pc="shift">Сдвинуть финиш</button>${pl.pace < 2 ? `<button class="btn" data-pc="faster">Ускорить темп</button>` : `<button class="btn" data-pc="ok">Оставить</button>`}`; }
+    if (pi.reached) { ic = "trophy"; t = "Цель достигнута"; txt = `Можно поставить новую цель или перейти на поддержание: норма пересчитается без ${lose ? "дефицита" : "профицита"}.`; acts = `<button class="btn ghost" data-pc="keep">Поддерживать вес</button><button class="btn" data-pc="new">Новая цель</button>`; }
+    else if (pi.diff <= -0.6) {
+      ic = "info"; tone = "warn";
+      const wrong = pi.wrong, eat = recentEat(14), nk = norm().k;
+      const over = eat && (lose ? eat.avg > nk * 1.05 : eat.avg < nk * 0.95);
+      t = wrong ? "Вес идёт в другую сторону" : `Отстаёшь на ${dec(-pi.diff)} кг`;
+      txt = (wrong ? `${lose ? "+" : "−"}${dec(Math.abs(pi.cur - pl.start))} кг от старта, по плану сейчас ${dec(pi.expected)} кг. ` : `По плану сейчас ${dec(pi.expected)} кг. `)
+        + (over ? `За последние ${eat.n} ${plural(eat.n, "день", "дня", "дней")} в среднем ${fmt(eat.avg)} ккал при норме ${fmt(nk)}. ${lose ? "Поэтому вес и не снижается. Держись нормы, и он пойдёт вниз." : "Добирай норму каждый день, иначе массе не из чего расти."}`
+          : eat ? `Калории в норме, значит часть еды не попадает в дневник${lose ? ": соусы, масло, напитки, перекусы" : ""}. Пересчитай план от текущего веса, чтобы этапы снова стали реальными.`
+          : "Записывай питание каждый день, тогда станет видно, в чём причина.");
+      acts = `<button class="btn ghost" data-pc="shift">Пересчитать план</button>${!over && pl.pace < 2 && !wrong ? `<button class="btn" data-pc="faster">Ускорить темп</button>` : `<button class="btn" data-pc="ok">Понятно</button>`}`;
+    }
     else if (pi.diff >= 0.6) { ic = "rocket"; t = `Впереди на ${dec(pi.diff)} кг`; txt = `Отличный темп. ${lose ? "Если чувствуешь сильный голод или упадок сил, лучше немного замедлиться." : "Если растёт живот, стоит немного замедлиться, чтобы набирать именно мышцы."}`; acts = `${pl.pace > 0 ? `<button class="btn ghost" data-pc="slower">Замедлить темп</button>` : ""}<button class="btn" data-pc="ok">Продолжать</button>`; }
     else { t = "Всё по плану"; txt = `Сейчас ${dec(pi.cur)} кг, по плану ${dec(pi.expected)} кг. Норма остаётся прежней, продолжай в том же духе.`; acts = `<button class="btn" data-pc="ok">Отлично</button>`; }
     setSheet("Сверка с целью", `<div class="pc-hero"><span class="pc-ic ${tone}">${icon(ic)}</span><b>${t}</b><p>${txt}</p></div>
       <div class="card"><div class="ps-row"><span>Сейчас</span><b>${dec(pi.cur)} кг</b></div><div class="ps-row"><span>По плану</span><b>${dec(pi.expected)} кг</b></div><div class="ps-row"><span>Цель</span><b>${dec(pl.target)} кг</b></div><div class="ps-row"><span>Пройдено</span><b>${Math.round(pi.done * 100)}%</b></div></div>`, `<div class="btn-row pc-acts" style="margin:0">${acts}</div>`, null, 1);
     $$("[data-pc]").forEach((b) => (b.onclick = () => {
       const a = b.dataset.pc; haptic("ok");
-      if (a === "shift") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); toast("Финиш сдвинут"); }
+      if (a === "shift") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); toast("План пересчитан от текущего веса"); }
       if (a === "faster") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); S.plan.pace++; toast("Темп ускорен, норма обновлена"); }
       if (a === "slower") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); S.plan.pace--; toast("Темп снижен, норма обновлена"); }
       if (a === "keep") { S.plan = null; S.profile.goal = "keep"; toast("Режим поддержания"); }
@@ -1141,7 +1165,7 @@
     const box = $("#t-goal"); if (!box) return;
     const html = `${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}<div class="gap"></div>`;
     if (box._h !== html) { box._h = html; box.innerHTML = html; if (S.plan) setDots($(".gc-dots", box), planInfo().done, 1); }
-    if (!box._bound) { box._bound = true; box.addEventListener("click", (e) => { const c = e.target.closest("#goal-open"); if (!c || sheetOpen) return; if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (S.plan && planInfo().reached) { openSheet("Цель по весу", ""); planCheck(); return; } openGoal(); }); }
+    if (!box._bound) { box._bound = true; box.addEventListener("click", (e) => { const c = e.target.closest("#goal-open"); if (!c || sheetOpen) return; if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (S.plan && (planInfo().reached || e.target.closest("[data-check]"))) { openSheet("Цель по весу", ""); planCheck(); return; } openGoal(); }); }
   }
   function streakSheet() {
     haptic("light"); if (S.game && S.game.unread) { S.game.unread = 0; save(); updBadge(); }
@@ -1246,7 +1270,7 @@
         <div class="c-head"><span class="c-title"><span class="ic">${icon(M.i)}</span>${dayLabel(selDay)}</span><span class="chip">${nm[k] ? Math.round((t[k] / nm[k]) * 100) : 0}% нормы</span></div>
         <div class="big"><span class="num">${r0(t[k])}</span><span class="of">из ${nm[k]} г</span></div>
         ${dotRow(24)}
-        <div class="stats3 two"><div><span>${rest > 0 ? "Осталось" : "Сверх нормы"}</span><b class="num">${r0(rest > 0 ? rest : t[k] - nm[k])} г</b></div><div><span>На кг веса</span><b class="num">${dec(t[k] / S.profile.weight)} г</b></div></div>
+        <div class="stats3 two"><div><span>${rest >= 0.5 ? "Осталось" : t[k] - nm[k] >= 0.5 ? "Сверх нормы" : "Норма"}</span><b class="num">${rest >= 0.5 ? r0(rest) + " г" : t[k] - nm[k] >= 0.5 ? r0(t[k] - nm[k]) + " г" : "закрыта"}</b></div><div><span>На кг веса</span><b class="num">${dec(t[k] / S.profile.weight)} г</b></div></div>
       </div>
       <div class="gap"></div>
       <div class="card"><div class="c-head"><span class="card-t">7 дней</span><span class="muted">${logged.length ? `в норме ${okDays} из ${logged.length}` : "нет записей"}</span></div>
@@ -1435,7 +1459,7 @@
   function renderResults() {
     const box = $("#p-res");
     if (!add.items.length) {
-      box.innerHTML = `<div class="alert"><span class="ins-ic t-n">${icon("info")}</span><div><b>${add.cleared ? "Список пуст" : "Еды на фото не видно"}</b>${add.cleared ? "Добавь блюдо сам или распознай фото ещё раз." : "Опиши блюдо в поле выше и распознай снова или сними ближе при хорошем свете."}</div></div><button class="res-addi" id="r-more">${icon("plus")}Добавить блюдо вручную</button>`;
+      box.innerHTML = `<div class="alert"><span class="ins-ic t-n">${icon("info")}</span><div><b>${add.cleared ? "Список пуст" : "Еды на фото не видно"}</b>${add.cleared ? "Добавь блюдо вручную или распознай фото ещё раз." : "Опиши блюдо в поле выше и распознай снова или сними ближе при хорошем свете."}</div></div><button class="res-addi" id="r-more">${icon("plus")}Добавить блюдо вручную</button>`;
       $("#r-more").onclick = addBlank; renderFoot(); return;
     }
     box.innerHTML = `<div class="subh">Распознано</div>` + add.items.map((x, i) => `<div class="res-item" style="animation-delay:${i * 0.06}s">
