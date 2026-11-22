@@ -345,7 +345,7 @@
     const cb = onSheetClose; onSheetClose = null; if (cb) cb();
     updateBack();
   }
-  function sheetFades() { const b = $("#sh-body"); b.style.setProperty("--fade-t", Math.min(24, b.scrollTop) + "px"); const rest = b.scrollHeight - b.clientHeight - b.scrollTop; b.style.setProperty("--fade-b", Math.min(24, Math.max(0, rest)) + "px"); }
+  function sheetFades() { const b = $("#sh-body"); $("#sheet").classList.toggle("scrolled", b.scrollTop > 2); const rest = b.scrollHeight - b.clientHeight - b.scrollTop; $("#sheet").classList.toggle("more", rest > 2 && !!$("#sh-foot").innerHTML); }
   $("#sh-body").addEventListener("scroll", sheetFades, { passive: true });
   new MutationObserver(() => requestAnimationFrame(sheetFades)).observe($("#sh-body"), { childList: true });
   $("#scrim").addEventListener("click", closeSheet);
@@ -541,11 +541,12 @@
         <div class="stats3"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Баланс недели</span><b class="num" id="v-week">0</b></div><div><span>Записей</span><b class="num" id="v-cnt">0</b></div></div>
       </div>
       <div class="gap"></div>
-      <div class="card m3">
-        ${macroCol("pro", "Белки", "protein", "p")}
-        ${macroCol("carb", "Углеводы", "carbs", "c")}
-        ${macroCol("fat", "Жиры", "fat", "f")}
+      <div class="row2">
+        ${macroCard("pro", "Белки", "protein", "p")}
+        ${macroCard("carb", "Углеводы", "carbs", "c")}
       </div>
+      <div class="gap"></div>
+      ${macroCard("fat", "Жиры", "fat", "f", true)}
       <div id="t-ins"></div>
       <div class="section-h"><h2 id="m-title">Приёмы пищи</h2><span class="muted" id="m-sum"></span></div>
       <div id="meals"></div>`;
@@ -560,12 +561,12 @@
     renderWeek();
     updateToday(true);
   }
-  function macroCol(kind, label, ic, key) {
-    return `<button class="m3c k-${kind}" id="c-${key}">
-      <span class="m3h"><span class="m3i">${icon(ic)}</span>${label}</span>
-      <span class="m3v"><span class="num" id="v-${key}">0</span><span class="u">г</span></span>
-      <span class="m3s" id="s-${key}"></span>
-      ${dotRow(10, "anim m3d")}
+  function macroCard(kind, label, ic, key, wide) {
+    return `<button class="mc k-${kind} ${wide ? "wide" : ""}" id="c-${key}">
+      <span class="mc-bg">${icon(ic)}</span>
+      <span class="mc-h"><span class="mc-i">${icon(ic)}</span>${label}${icon("right", "chev")}</span>
+      <span class="mc-row"><span class="mc-v"><span class="num" id="v-${key}">0</span><span class="u">г</span></span><span class="mc-s" id="s-${key}"></span></span>
+      ${dotRow(wide ? 24 : 12, "anim")}
     </button>`;
   }
   function updateToday(first) {
