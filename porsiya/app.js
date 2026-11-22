@@ -10,7 +10,7 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
   const r0 = (n) => Math.round(n || 0);
   const r1 = (n) => Math.round((n || 0) * 10) / 10;
-  const fmt = (n) => { const v = r0(n); return (v < 0 ? "−" : "") + Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f"); };
+  const fmt = (n) => { const v = r0(n); return (v < 0 ? "−" : "") + Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u2060\u2009\u2060"); };
   const fmtS = (n) => (n > 0 ? "+" : "") + fmt(n);
   const dec = (n) => String(r1(n)).replace(".", ",");
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -269,7 +269,6 @@
       track("meals", "breakfast", "fat", "Режим", g.fullDays, [1, 7, 21, 50, 100], (x) => `${x} ${plural(x, "день", "дня", "дней")} с завтраком, обедом и ужином`, "дн."),
       track("scale", "scale", "fat", "Весы", g.weights, [1, 4, 10, 25, 50], (x) => `${x} ${plural(x, "взвешивание", "взвешивания", "взвешиваний")}`, "раз"),
       track("bf", "breakfast", "pro", "Ранняя пташка", g.bfDays, [3, 7, 21, 50, 100], (x) => `${x} ${plural(x, "завтрак", "завтрака", "завтраков")}`, "дн."),
-      track("early", "dinner", "cal", "Ужин вовремя", g.earlyDin, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "ужин", "ужина", "ужинов")} до 20:00`, "дн."),
       track("week", "star", "carb", "Идеальная неделя", g.goodWeeks, [1, 2, 4, 8, 16], (x) => `${x} ${plural(x, "неделя", "недели", "недель")}, где 5 дней в норме`, "нед."),
       track("entries", "edit", "fat", "Летописец", g.entries, [10, 50, 150, 300, 600], (x) => `${x} ${plural(x, "запись", "записи", "записей")} еды`, "зап."),
       track("own", "dish", "pro", "Своя кухня", g.own, [1, 3, 7, 15, 30], (x) => `${x} ${plural(x, "своё блюдо", "своих блюда", "своих блюд")} или набор`, "шт."),
@@ -278,7 +277,6 @@
       track("minus", "down-trend", "carb", "Минус", r1(g.lost), [1, 2, 3, 5, 8, 12], (x) => `Сбрось ${n(x)} кг`, "кг"),
       track("calm", "check", "carb", "Без срывов", g.noOver, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} подряд без перебора`, "дн."),
       track("fat", "fat", "fat", "Жиры в норме", g.fatRun, [3, 7, 14, 30], (x) => `Держи жиры в норме ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
-      track("light", "moon", "cal", "Лёгкий ужин", g.lightDin, [3, 7, 14, 30], (x) => `${x} ${plural(x, "день", "дня", "дней")}, где ужин меньше трети нормы`, "дн."),
     ] : mode === "gain" ? [
       track("plus", "muscle", "carb", "Плюс", r1(g.gained), [0.5, 1, 2, 3, 5, 8], (x) => `Набери ${n(x)} кг`, "кг"),
       track("surplus", "flame", "pro", "Профицит", g.surplus, [3, 7, 14, 30, 60], (x) => `Добирай калории ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
@@ -1112,7 +1110,7 @@
       <div class="trs">${A.common.map(card).join("")}</div>
       <div class="subh">${modeT}</div>
       <div class="trs">${A.goal.map((t, i) => card(t, i + A.common.length)).join("")}</div>
-      <p class="note">У каждого достижения бесконечные этапы: после последнего цель растёт. Каждые 3 этапа поднимают общий уровень. Каждые 7 дней подряд дают заморозку серии.</p>`;
+      <p class="note">Каждый пройденный этап открывает следующий, чуть сложнее. За этапы растёт твой уровень. Неделя без пропусков даёт заморозку: она сохранит серию, если однажды забудешь отметиться.</p>`;
     openSheet("Прогресс и награды", body);
     countUp($("#st-n"), st.n, { from: 0, dur: 900, force: true });
     bindGoalCard(streakSheet);
