@@ -554,14 +554,10 @@
         ${macroCard("carb", "Углеводы", "carbs", "c")}
       </div>
       <div class="gap"></div>
-      <div class="row2">
-        ${macroCard("fat", "Жиры", "fat", "f")}
-        <div class="mc k-water" id="c-w" role="button">
-          <span class="mc-bg">${icon("drop")}</span>
-          <span class="mc-h"><span class="mc-i">${icon("drop")}</span>Вода<button class="w-plus" id="w-plus" aria-label="Добавить стакан">${icon("plus")}</button></span>
-          <span class="mc-row"><span class="mc-v"><span class="num" id="v-w">0</span><span class="u">л</span></span><span class="mc-s" id="s-w"></span></span>
-          ${dotRow(12, "anim")}
-        </div>
+      <div class="grad g-fat tap" id="c-f" role="button">
+        <div class="c-head"><span class="c-title"><span class="ic">${icon("fat")}</span>Жиры</span>${icon("right", "chev")}</div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><div class="mid"><span class="num" id="v-f">0</span><span class="u">г</span></div><div class="sub" id="s-f"></div></div>
+        ${dotRow(24, "anim")}
       </div>
       <div id="t-ins"></div>
       <div class="section-h"><h2 id="m-title">Приёмы пищи</h2><span class="muted" id="m-sum"></span></div>
@@ -574,18 +570,16 @@
     $("#c-p").onclick = () => openMacroDetail("p");
     $("#c-c").onclick = () => openMacroDetail("c");
     $("#c-f").onclick = () => openMacroDetail("f");
-    $("#c-w").onclick = (e) => { if (e.target.closest("#w-plus")) return; waterSheet(); };
-    $("#w-plus").onclick = (e) => { e.stopPropagation(); addWater(S.settings.glass || 250); };
     renderWeek();
     updateToday(true);
   }
-  function macroCard(kind, label, ic, key, wide) {
-    return `<button class="mc k-${kind} ${wide ? "wide" : ""}" id="c-${key}">
-      <span class="mc-bg">${icon(ic)}</span>
-      <span class="mc-h"><span class="mc-i">${icon(ic)}</span>${label}${icon("right", "chev")}</span>
-      <span class="mc-row"><span class="mc-v"><span class="num" id="v-${key}">0</span><span class="u">г</span></span><span class="mc-s" id="s-${key}"></span></span>
-      ${dotRow(wide ? 24 : 12, "anim")}
-    </button>`;
+  function macroCard(kind, label, ic, key) {
+    return `<div class="grad g-${kind} tap" id="c-${key}" role="button">
+      <div class="c-head"><span class="c-title"><span class="ic">${icon(ic)}</span>${label}</span>${icon("right", "chev")}</div>
+      <div class="mid"><span class="num" id="v-${key}">0</span><span class="u">г</span></div>
+      <div class="sub" id="s-${key}"></div>
+      ${dotRow(12, "anim sm")}
+    </div>`;
   }
   function updateToday(first) {
     if (cur !== "today" || !$("#v-k")) return;
@@ -609,7 +603,7 @@
     ["p", "c", "f"].forEach((k) => {
       countUp($("#v-" + k), r0(t[k]), { key: k });
       const rest = r0(nm[k] - t[k]);
-      $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "закрыто";
+      $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
     updWater();
