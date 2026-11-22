@@ -624,7 +624,8 @@
         const m = mealByTime(), ys = dayEntries(dkey(addDays(new Date(), -1))).filter((e) => e.meal === m);
         if (ys.length) rep = `<button class="btn sm ghost" id="rep-btn">${icon("refresh")}Повторить вчерашний ${meal(m).n.toLowerCase()}</button>`;
       }
-      box.innerHTML = `<div class="meal-group"><div class="empty"><div class="em">${icon("dish")}</div><b>${selDay === todayKey() ? "Пока пусто" : "В этот день записей нет"}</b><p>Сфотографируй еду или найди её в базе, калории посчитаются сами.</p>${rep}</div></div>`;
+      box.innerHTML = `<div class="meal-group"><div class="empty"><div class="em">${icon("dish")}</div><b>${selDay === todayKey() ? "Пока пусто" : "В этот день записей нет"}</b><p>Сфотографируй еду или найди её в базе, калории посчитаются сами.</p>${rep || `<button class="btn sm" id="empty-add">${icon("plus")}Добавить еду</button>`}</div></div>`;
+      if ($("#empty-add")) $("#empty-add").onclick = () => { haptic("medium"); openAdd(); };
       if ($("#rep-btn")) $("#rep-btn").onclick = () => {
         const m = mealByTime(), ys = dayEntries(dkey(addDays(new Date(), -1))).filter((e) => e.meal === m);
         addEntries(ys.map((e) => ({ n: e.n, cat: e.cat, g: e.g, k: e.k, p: e.p, f: e.f, c: e.c, img: e.img, src: e.src })), m);
@@ -1158,10 +1159,10 @@
     const filled = days.filter((k) => dayEntries(k).length);
     const avg = (f) => (filled.length ? filled.reduce((a, k) => a + totals(k)[f], 0) / filled.length : 0);
     const inNorm = filled.filter((k) => status(k) === "in").length;
-    $("#h-stats").innerHTML = `<div class="stat"><span class="sl">В среднем</span><b class="num"><span id="st-a">0</span></b><span class="ss">ккал в день</span></div>
+    $("#h-stats").innerHTML = `<div class="stat"><span class="sl">В среднем</span><b class="num"><span id="st-a">${filled.length ? 0 : "—"}</span></b><span class="ss">ккал в день</span></div>
       <div class="stat"><span class="sl">Белок</span><b class="num"><span id="st-p">0</span><span class="u">г</span></b><span class="ss">из ${nm.p} г</span></div>
-      <div class="stat"><span class="sl">В норме</span><b class="num">${inNorm}<span class="u">из ${filled.length}</span></b><span class="ss">${plural(filled.length, "дня", "дней", "дней")} с записями</span></div>`;
-    countUp($("#st-a"), r0(avg("k")), { from: 0 }); countUp($("#st-p"), r0(avg("p")), { from: 0 });
+      <div class="stat"><span class="sl">В норме</span>${filled.length ? `<b class="num">${inNorm}<span class="u">из ${filled.length}</span></b><span class="ss">${plural(filled.length, "дня", "дней", "дней")} с записями</span>` : `<b class="num">—</b><span class="ss">нет записей</span>`}</div>`;
+    if (filled.length) { countUp($("#st-a"), r0(avg("k")), { from: 0 }); countUp($("#st-p"), r0(avg("p")), { from: 0 }); }
     const list = days.slice().reverse().filter((k) => dayEntries(k).length);
     $("#h-days").innerHTML = list.length ? `<div class="list">${list.map((k) => {
       const v = totals(k), pc = Math.round((v.k / nm.k) * 100), st = status(k), dl = dayLabel(k);
