@@ -65,7 +65,7 @@
     v: 2, onboarded: false,
     profile: { name: "", avatar: "", sex: "m", age: 26, height: 175, weight: 72, goal: "gain", train: { n: 3, min: 60, type: "strength" }, steps: 0, manual: { on: false, k: 0, p: 0, f: 0, c: 0 } },
     days: {}, weights: {}, my: [], combos: [], recent: [],
-    settings: { theme: "auto", key: "", model: "gemini-flash-latest" },
+    settings: { theme: "auto", key: "", model: "gemini-flash-latest", carry: false },
   });
   let S = defaults();
   function migrate(d) {
@@ -165,6 +165,8 @@
     for (let x = new Date(mon); dkey(x) !== k; x = addDays(x, 1)) { const kk = dkey(x); if (dayEntries(kk).length) { bal += nm - totals(kk).k; days++; } }
     return { bal, days };
   }
+  // норма дня с переносом недобора/перебора прошлых дней недели (до 25%)
+  function dayNorm(k) { const nm = norm().k; if (!S.settings.carry) return nm; const wb = weekBalance(k); return Math.round(nm + clamp(wb.bal, -nm * 0.25, nm * 0.25)); }
   const status = (k) => { const n = dayEntries(k).length; if (!n) return ""; const v = totals(k).k, nm = norm().k; if (v > nm * 1.1) return "ov"; if (v >= nm * 0.9) return "in"; return "un"; };
 
   // ---------- numbers ----------
@@ -494,17 +496,18 @@
   }
   function updateToday(first) {
     if (cur !== "today" || !$("#v-k")) return;
-    const nm = norm(), t = totals(selDay), left = nm.k - t.k, pct = nm.k ? Math.round((t.k / nm.k) * 100) : 0;
+    const nm = norm(), t = totals(selDay), kN = dayNorm(selDay), left = kN - t.k, pct = kN ? Math.round((t.k / kN) * 100) : 0;
     const isToday = selDay === todayKey();
     setMonthLabel(weekAnchor || fromKey(selDay));
     $("#wk-today").classList.toggle("show", !isToday);
-    $("#cal-chip").textContent = t.k ? pct + "% нормы" : "Норма " + fmt(nm.k);
-    $("#v-kn").textContent = "из " + fmt(nm.k) + " ккал";
+    $("#cal-chip").textContent = t.k ? pct + "% нормы" : "Норма " + fmt(kN);
+    $("#v-kn").textContent = "из " + fmt(kN) + " ккал";
     countUp($("#v-k"), r0(t.k), { key: "k" });
     const lb = $("#v-left"); countUp(lb, left >= 0 ? r0(left) : r0(-left), { key: "left" }); lb.previousElementSibling.textContent = left >= 0 ? "Осталось" : "Сверх нормы";
     const wb = weekBalance(selDay);
     const wl = $("#v-week").previousElementSibling;
-    if (wb.days) { wl.textContent = wb.bal >= 0 ? "Запас недели" : "Перебор недели"; countUp($("#v-week"), r0(Math.abs(wb.bal)), { key: "wk" }); }
+    if (S.settings.carry && wb.days) { wl.textContent = "Перенос недели"; countUp($("#v-week"), kN - nm.k, { key: "wk", sign: true }); }
+    else if (wb.days) { wl.textContent = wb.bal >= 0 ? "Запас недели" : "Перебор недели"; countUp($("#v-week"), r0(Math.abs(wb.bal)), { key: "wk" }); }
     else { wl.textContent = "Запас недели"; $("#v-week").textContent = "—"; lastVals.delete("wk"); }
     countUp($("#v-cnt"), dayEntries(selDay).length, { key: "cnt" });
     ["p", "c", "f"].forEach((k) => {
@@ -512,10 +515,10 @@
       const rest = r0(nm[k] - t[k]);
       $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
     });
-    setDots($("#c-cal .drow"), t.k, nm.k, { over: true });
+    setDots($("#c-cal .drow"), t.k, kN, { over: true });
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
-    $("#t-ins").innerHTML = insightHTML(t, nm, isToday);
+    $("#t-ins").innerHTML = insightHTML(t, Object.assign({}, nm, { k: kN }), isToday);
     const ib = $("#ins-btn"); if (ib) ib.onclick = () => { const f = window.FOODS.find((x) => x.n === ib.dataset.f); openAdd("search"); portion(Object.assign({}, f), null, +ib.dataset.g); };
     $("#m-title").textContent = isToday ? "Приёмы пищи" : "Приёмы пищи · " + dayLabel(selDay).toLowerCase();
     $("#m-sum").textContent = dayEntries(selDay).length ? fmt(t.k) + " ккал" : "";
@@ -729,7 +732,7 @@
   // =====================================================================
   function openCalDetail() {
     haptic("light");
-    const nm = norm(), t = totals(selDay), list = dayEntries(selDay);
+    const nm = Object.assign({}, norm(), { k: dayNorm(selDay) }), t = totals(selDay), list = dayEntries(selDay);
     const byMeal = MEALS.map((m) => ({ m, k: list.filter((e) => e.meal === m.id).reduce((a, e) => a + e.k, 0) }));
     const maxM = Math.max(nm.k / 2.5, ...byMeal.map((x) => x.k));
     const hours = new Array(18).fill(0);
@@ -738,7 +741,7 @@
     const mon = monday(fromKey(selDay)), tk = todayKey();
     const wk = Array.from({ length: 7 }, (_, i) => { const d = addDays(mon, i), k = dkey(d); return { d, k, v: totals(k).k, has: dayEntries(k).length > 0 }; });
     const logged = wk.filter((x) => x.has && x.k <= tk);
-        const rows = 10, wUnit = (nm.k * 1.3) / rows;
+        const nb = norm().k, rows = 10, wUnit = (nb * 1.3) / rows;
     const wb = weekBalance(selDay);
     const body = `
       <div class="d-hero g-cal">
@@ -758,7 +761,7 @@
       <div class="gap"></div>
       <div class="card"><div class="card-t">Баланс недели</div>
         <div class="card-s">${wb.days ? (wb.bal >= 0 ? `В прошлые дни этой недели ты недобрал ${fmt(wb.bal)} ккал. Их можно добавить к сегодняшней норме, недельная сумма не изменится.` : `В прошлые дни этой недели ты съел на ${fmt(-wb.bal)} ккал больше нормы. Можно немного уменьшить порции в оставшиеся дни.`) : logged.length ? "Это первый день недели с записями, баланс появится со следующего дня." : "На этой неделе пока нет записей."}</div>
-        <div class="wbal" id="d-wbal">${wk.map((x, i) => { const on = Math.round(Math.min(x.v, nm.k * 1.3) / wUnit); const ovFrom = Math.round(nm.k / wUnit); let c = ""; for (let r = 0; r < rows; r++) c += `<i class="${r < on ? (r >= ovFrom ? "ov" : "on") : ""}" style="transition-delay:${(i * 0.05 + r * 0.025).toFixed(3)}s"></i>`; return `<div class="wb ${x.k === selDay ? "today" : ""}"><div class="dcol">${c}</div><span>${WD[x.d.getDay()]}</span></div>`; }).join("")}</div>
+        <div class="wbal" id="d-wbal">${wk.map((x, i) => { const on = Math.round(Math.min(x.v, nb * 1.3) / wUnit); const ovFrom = Math.round(nb / wUnit); let c = ""; for (let r = 0; r < rows; r++) c += `<i class="${r < on ? (r >= ovFrom ? "ov" : "on") : ""}" style="transition-delay:${(i * 0.05 + r * 0.025).toFixed(3)}s"></i>`; return `<div class="wb ${x.k === selDay ? "today" : ""}"><div class="dcol">${c}</div><span>${WD[x.d.getDay()]}</span></div>`; }).join("")}</div>
         <div class="legend"><span><i style="background:var(--cal-b)"></i>в пределах нормы</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span></div>
       </div>
       `;
@@ -1246,8 +1249,9 @@
         ${prow("pt", "dumbbell", "Тренировки", trainTxt)}
         ${prow("ps", "steps", "Шаги в день", p.steps ? fmt(p.steps) : "Не указано")}
       </div>
-      <div class="ptitle">Своя норма</div>
+      <div class="ptitle">Расчёт нормы</div>
       <div class="list">
+        <button class="prow" id="pc-t"><span class="pl"><b>Учитывать баланс недели</b><span>Недобор прошлых дней переносится на сегодня</span></span><span class="toggle ${S.settings.carry ? "on" : ""}"></span></button>
         <button class="prow" id="pm-t"><span class="pl"><b>Задать вручную</b><span>Если тренер или врач дал свои цифры</span></span><span class="toggle ${p.manual.on ? "on" : ""}"></span></button>
         <div id="pm-f" style="display:${p.manual.on ? "block" : "none"};padding:2px 0 16px">
           <div class="row2"><label class="field"><span>Калории</span><input data-m="k" inputmode="numeric" value="${p.manual.k}"></label><label class="field"><span>Белки, г</span><input data-m="p" inputmode="numeric" value="${p.manual.p}"></label></div>
@@ -1271,6 +1275,7 @@
     $("#pr-name").onclick = nameSheet;
     $("#pm-t").onclick = () => { p.manual.on = !p.manual.on; if (p.manual.on && !p.manual.k) { const a = calcNorm(); Object.assign(p.manual, { k: a.k, p: a.p, f: a.f, c: a.c }); } save(); haptic("sel"); renderProfile(); };
     $$("[data-m]", s).forEach((i) => (i.onchange = () => { p.manual[i.dataset.m] = Math.max(0, parseInt(i.value, 10) || 0); save(); renderProfile(); }));
+    $("#pc-t").onclick = () => { S.settings.carry = !S.settings.carry; save(); haptic("sel"); $("#pc-t .toggle").classList.toggle("on", S.settings.carry); lastVals.delete("wk"); };
     $("#pr-key").onclick = keySheet;
     $("#d-redo").onclick = () => startOnboarding();
     $("#d-reset").onclick = confirmReset;
