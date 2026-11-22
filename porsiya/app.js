@@ -357,11 +357,31 @@
   $("#scrim").addEventListener("click", closeSheet);
   $("#sh-close").addEventListener("click", closeSheet);
   $("#sh-back").addEventListener("click", () => { if (sheetBack) { haptic("light"); sheetBack(); } });
-  (function () { // свайп вниз
-    const sh = $("#sheet"); let y0 = null, dy = 0;
-    sh.addEventListener("touchstart", (e) => { const body = $("#sh-body"); if (body.contains(e.target) && body.scrollTop > 0) { y0 = null; return; } if (e.target.closest("input,.stepper,.week,.chips")) { y0 = null; return; } y0 = e.touches[0].clientY; dy = 0; }, { passive: true });
-    sh.addEventListener("touchmove", (e) => { if (y0 == null) return; dy = e.touches[0].clientY - y0; if (dy > 0) { sh.style.transition = "none"; sh.style.transform = `translateY(${dy}px)`; } }, { passive: true });
-    sh.addEventListener("touchend", () => { if (y0 == null) return; sh.style.transition = ""; if (dy > 110) closeSheet(); else sh.style.transform = ""; y0 = null; });
+  (function () { // перетаскивание окна вниз
+    const sh = $("#sheet"), scrim = $("#scrim"), body = $("#sh-body");
+    let y0 = null, t0 = 0, dy = 0, decided = false, drag = false, raf = 0, lastY = 0, lastT = 0, vel = 0;
+    const apply = () => { raf = 0; const d = Math.max(0, dy); sh.style.transform = `translate3d(0,${d}px,0)`; scrim.style.opacity = String(Math.max(0, 1 - d / (sh.offsetHeight * 0.9))); };
+    sh.addEventListener("touchstart", (e) => {
+      if (e.target.closest("input,textarea,.stepper,.chips.scroll,input[type=range],.week")) { y0 = null; return; }
+      y0 = lastY = e.touches[0].clientY; t0 = lastT = performance.now(); dy = 0; vel = 0; decided = false; drag = false;
+    }, { passive: true });
+    sh.addEventListener("touchmove", (e) => {
+      if (y0 == null) return;
+      const y = e.touches[0].clientY, now = performance.now(); dy = y - y0;
+      if (!decided) { if (Math.abs(dy) < 6) return; decided = true; drag = dy > 0 && (!body.contains(e.target) || body.scrollTop <= 0); if (drag) { sh.style.transition = "none"; scrim.style.transition = "none"; y0 = y; dy = 0; } }
+      if (!drag) return;
+      e.preventDefault();
+      vel = (y - lastY) / Math.max(1, now - lastT); lastY = y; lastT = now;
+      if (!raf) raf = requestAnimationFrame(apply);
+    }, { passive: false });
+    const end = () => {
+      if (y0 == null) return; y0 = null;
+      if (!drag) return; drag = false; if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      sh.style.transition = ""; scrim.style.transition = "";
+      if (dy > sh.offsetHeight * 0.28 || (vel > 0.45 && dy > 30)) { scrim.style.opacity = ""; closeSheet(); }
+      else { sh.style.transform = ""; scrim.style.opacity = ""; }
+    };
+    sh.addEventListener("touchend", end); sh.addEventListener("touchcancel", end);
   })();
 
   // segmented control
@@ -782,14 +802,13 @@
       <div class="macros" id="pe-m"></div>
       ${per ? `<div class="prow-ln"><span>Порция</span>${stepperHTML("g", st.g, "г", 10)}</div><input type="range" id="pe-r" min="10" max="${Math.max(800, st.g * 2)}" step="5" value="${st.g}">` : ""}
     </div>
-    <div class="subh">Приём пищи</div>
-    <div class="chips mgrid" id="pe-meal">${MEALS.map((m) => `<button class="fchip ${m.id === st.meal ? "on" : ""}" data-m="${m.id}">${icon(m.i)}${m.n}</button>`).join("")}</div>`;
+    ${mealLine("pe-meal", st.meal)}`;
     openSheet("Запись", body, `<div class="btn-row" style="margin:0"><button class="btn ghost icon-btn" id="pe-del" aria-label="Удалить">${icon("trash")}</button><button class="btn" id="pe-save">Сохранить</button></div>`);
     const upd = () => { const v = per ? scaleFood(per, st.g) : e; $("#pe-k").textContent = fmt(v.k); $("#pe-m").innerHTML = macroTags(v, true); const r = $("#pe-r"); if (r) { r.value = st.g; setRangeFill(r); } };
     upd();
     bindSteppers($("#sh-body"), st, { g: [5, 3000] }, upd);
     const r = $("#pe-r"); if (r) r.oninput = () => { st.g = +r.value; $('[data-step="g"] [data-v]').textContent = st.g; upd(); };
-    $$("#pe-meal .fchip").forEach((b) => (b.onclick = () => { st.meal = b.dataset.m; $$("#pe-meal .fchip").forEach((x) => x.classList.toggle("on", x === b)); haptic("sel"); }));
+    bindMealLine("pe-meal", (v) => (st.meal = v));
     $("#pe-save").onclick = () => { if (per) Object.assign(e, roundM(scaleFood(per, st.g)), { g: st.g }); e.meal = st.meal; save(); closeSheet(); refreshAll(); toast("Сохранено"); haptic("ok"); };
     $("#pe-del").onclick = () => { closeSheet(); setTimeout(() => deleteEntry(id), 200); };
   }
@@ -815,11 +834,35 @@
     const t = c.items.reduce((a, e) => { a.k += e.k; a.p += e.p; a.f += e.f; a.c += e.c; return a; }, { k: 0, p: 0, f: 0, c: 0 });
     setSheet(c.n, `<div class="portion"><div class="kbig" style="margin-top:0"><span class="num">${fmt(t.k)}</span><span class="u">ккал</span></div><div class="macros">${macroTags(t, true)}</div></div>
       <div class="meal-group" style="margin-top:12px">${c.items.map((e) => `<div class="item" style="pointer-events:none">${ficHTML(e)}<span class="it"><b>${esc(e.n)}</b><span>${r0(e.g)} г</span></span><span class="kc">${fmt(e.k)}</span></div>`).join("")}</div>
-      <div class="subh">Приём пищи</div><div class="chips mgrid" id="cb-meal">${MEALS.map((m) => `<button class="fchip ${m.id === add.meal ? "on" : ""}" data-m="${m.id}">${icon(m.i)}${m.n}</button>`).join("")}</div>`,
+      ${mealLine("cb-meal", add.meal)}`,
       `<div class="btn-row" style="margin:0"><button class="btn ghost icon-btn" id="cb-del" aria-label="Удалить набор">${icon("trash")}</button><button class="btn" id="cb-add">Добавить · ${fmt(t.k)} ккал</button></div>`, () => renderAdd(-1));
-    $$("#cb-meal .fchip").forEach((b) => (b.onclick = () => { add.meal = b.dataset.m; $$("#cb-meal .fchip").forEach((x) => x.classList.toggle("on", x === b)); haptic("sel"); }));
+    bindMealLine("cb-meal", (v) => (add.meal = v));
     $("#cb-add").onclick = () => { addEntries(c.items.map((e) => Object.assign({}, e, { src: "combo" })), add.meal); afterAdd(t.k); };
     $("#cb-del").onclick = () => { S.combos = S.combos.filter((x) => x.id !== id); save(); haptic("medium"); toast("Набор удалён"); renderAdd(-1); };
+  }
+
+  // ---------- выбор приёма пищи ----------
+  const MEAL_HINT = { breakfast: "утром", lunch: "днём", dinner: "вечером", snack: "между приёмами" };
+  const mealLine = (id, cur) => `<div class="mline"><span>Приём пищи</span><button class="mchip" id="${id}" data-v="${cur}">${icon(meal(cur).i)}<b>${meal(cur).n}</b>${icon("down", "mc-ch")}</button></div>`;
+  function bindMealLine(id, set) {
+    const btn = $("#" + id); if (!btn) return;
+    btn.onclick = (e) => { e.stopPropagation(); haptic("light"); mealMenu(btn, btn.dataset.v, (v) => { btn.dataset.v = v; btn.innerHTML = `${icon(meal(v).i)}<b>${meal(v).n}</b>${icon("down", "mc-ch")}`; set(v); }); };
+  }
+  function mealMenu(anchor, cur, cb) {
+    const old = $(".menu"); if (old) old.remove();
+    const r = anchor.getBoundingClientRect();
+    const m = document.createElement("div"); m.className = "menu";
+    m.innerHTML = MEALS.map((x) => `<button data-m="${x.id}" class="${x.id === cur ? "on" : ""}">${icon(x.i)}<span><b>${x.n}</b><em>${MEAL_HINT[x.id]}</em></span>${x.id === cur ? icon("check", "mk") : ""}</button>`).join("");
+    document.body.appendChild(m);
+    const w = 220, left = Math.min(window.innerWidth - w - 12, Math.max(12, r.right - w));
+    const below = r.bottom + 8 + 232 < window.innerHeight;
+    m.style.left = left + "px"; m.style.width = w + "px";
+    if (below) m.style.top = r.bottom + 8 + "px"; else { m.style.bottom = window.innerHeight - r.top + 8 + "px"; m.classList.add("up"); }
+    raf2(() => m.classList.add("on"));
+    const close = () => { m.classList.remove("on"); setTimeout(() => m.remove(), 250); document.removeEventListener("pointerdown", out, true); };
+    const out = (e) => { if (!m.contains(e.target)) { e.stopPropagation(); close(); } };
+    setTimeout(() => document.addEventListener("pointerdown", out, true), 0);
+    $$("button", m).forEach((b) => (b.onclick = () => { haptic("sel"); cb(b.dataset.m); close(); }));
   }
 
   // =====================================================================
@@ -937,8 +980,8 @@
       <div class="gap"></div>
       <div class="card"><div class="card-t">Баланс недели</div>
         <div class="card-s">${wb.days ? (wb.bal >= 0 ? `В прошлые дни этой недели ты недобрал ${fmt(wb.bal)} ккал. Их можно добавить к сегодняшней норме, недельная сумма не изменится.` : `В прошлые дни этой недели ты съел на ${fmt(-wb.bal)} ккал больше нормы. Можно немного уменьшить порции в оставшиеся дни.`) : logged.length ? "Это первый день недели с записями, баланс появится со следующего дня." : "На этой неделе пока нет записей."}</div>
-        <div class="wbal" id="d-wbal">${wk.map((x, i) => { const on = Math.round(Math.min(x.v, nb * 1.3) / wUnit); const ovFrom = Math.round(nb / wUnit); let c = ""; for (let r = 0; r < rows; r++) c += `<i class="${r < on ? (r >= ovFrom ? "ov" : "on") : ""}" style="transition-delay:${(i * 0.05 + r * 0.025).toFixed(3)}s"></i>`; return `<div class="wb ${x.k === selDay ? "today" : ""}"><div class="dcol">${c}</div><span>${WD[x.d.getDay()]}</span></div>`; }).join("")}</div>
-        <div class="legend"><span><i style="background:var(--cal-b)"></i>в пределах нормы</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span></div>
+        <div class="wbal" id="d-wbal">${wk.map((x, i) => { const on = Math.round(Math.min(x.v, nb * 1.3) / wUnit); const ovFrom = Math.round(nb / wUnit); let c = ""; for (let r = 0; r < rows; r++) c += `<i class="${r < on ? (r >= ovFrom ? "ov" : "on") : r < ovFrom ? "" : "x"}" style="transition-delay:${(i * 0.05 + r * 0.025).toFixed(3)}s"></i>`; return `<div class="wb ${x.k === selDay ? "today" : ""}"><div class="dcol">${c}</div><span>${WD[x.d.getDay()]}</span></div>`; }).join("")}</div>
+        <div class="legend"><span><i style="background:var(--cal-b)"></i>съедено</span><span><i style="background:var(--g20)"></i>до нормы</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span></div>
       </div>
       `;
     openSheet("Калории", body);
@@ -995,13 +1038,9 @@
     if (home) bindAddHome(); else renderAddBody(false);
   }
   function addHomeHTML() {
-    const m = meal(add.meal);
     const rec = S.recent.map((n) => allFoods().find((f) => f.n === n)).filter(Boolean).slice(0, 5);
     const combos = S.combos.slice(0, 3);
-    return `<div class="mpick">
-        <button class="mp-btn" id="mp-btn"><span class="mp-ic">${icon(m.i)}</span><span class="mp-t"><em>Приём пищи</em><b id="mp-n">${m.n}</b></span>${icon("down", "mp-ch")}</button>
-        <div class="collapse" id="mp-list"><div><div class="chips mgrid" style="padding:4px 4px 12px">${MEALS.map((x) => `<button class="fchip ${x.id === add.meal ? "on" : ""}" data-m="${x.id}">${icon(x.i)}${x.n}</button>`).join("")}</div></div></div>
-      </div>
+    return `${mealLine("mp-btn", add.meal)}
       <div class="hshot g-cal">
         <span class="hs-ic">${icon("cam")}</span>
         <b>Сфотографируй тарелку</b>
@@ -1017,12 +1056,7 @@
   }
   function bindAddHome() {
     const go = (t) => { haptic("light"); add.tab = t; renderAdd(1); };
-    $("#mp-btn").onclick = () => { haptic("sel"); $(".mpick").classList.toggle("open"); $("#mp-list").classList.toggle("open"); };
-    $$("#mp-list .fchip").forEach((b) => (b.onclick = () => {
-      add.meal = b.dataset.m; $$("#mp-list .fchip").forEach((x) => x.classList.toggle("on", x === b)); haptic("sel");
-      const m = meal(add.meal); $("#mp-n").textContent = m.n; $(".mp-ic").innerHTML = icon(m.i);
-      setTimeout(() => { $(".mpick").classList.remove("open"); $("#mp-list").classList.remove("open"); }, 180);
-    }));
+    bindMealLine("mp-btn", (v) => (add.meal = v));
     $("#h-cam").onclick = () => $("#f-cam").click();
     $("#h-gal").onclick = () => $("#f-gal").click();
     if ($("#h-key")) $("#h-key").onclick = () => keySheet();
@@ -1235,8 +1269,7 @@
       <input type="range" id="po-r" min="5" max="${Math.max(600, f.g * 3)}" step="5" value="${st.g}">
       <div class="presets">${[["½ порции", 0.5], ["Порция", 1], ["×1,5", 1.5], ["×2", 2]].map(([l, m]) => `<button class="fchip" data-pm="${m}">${l}</button>`).join("")}</div>
     </div>
-    <div class="subh">Приём пищи</div>
-    <div class="chips mgrid" id="po-meal">${MEALS.map((m) => `<button class="fchip ${m.id === add.meal ? "on" : ""}" data-m="${m.id}">${icon(m.i)}${m.n}</button>`).join("")}</div>`;
+    ${mealLine("po-meal", add.meal)}`;
     const back = backFn || (() => renderAdd(-1));
     if (sheetOpen) setSheet(f.n, body, `<button class="btn" id="po-add">Добавить</button>`, back, 1); else openSheet(f.n, body, `<button class="btn" id="po-add">Добавить</button>`, { back });
     let first = true;
@@ -1251,7 +1284,7 @@
     bindSteppers($("#sh-body"), st, { g: [5, 3000] }, upd);
     $("#po-r").oninput = (e) => { st.g = +e.target.value; $('[data-step="g"] [data-v]').textContent = st.g; upd(); };
     $$("[data-pm]").forEach((b) => (b.onclick = () => { st.g = Math.round(f.g * +b.dataset.pm); $('[data-step="g"] [data-v]').textContent = st.g; haptic("sel"); upd(); }));
-    $$("#po-meal .fchip").forEach((b) => (b.onclick = () => { add.meal = b.dataset.m; $$("#po-meal .fchip").forEach((x) => x.classList.toggle("on", x === b)); haptic("sel"); }));
+    bindMealLine("po-meal", (v) => (add.meal = v));
     $("#po-add").onclick = () => { const v = scaleFood(f, st.g); addEntries([{ n: f.n, cat: f.cat, g: st.g, ...v }], add.meal); afterAdd(v.k); };
     upd();
   }
@@ -1308,23 +1341,22 @@
   function drawHist(swap) {
     const days = histDays(), nm = norm(), vals = days.map((k) => totals(k));
     const month = hist.range === "month";
-    const maxV = Math.max(nm.k * 1.3, ...vals.map((v) => v.k)), rows = month ? 16 : 14, unit = maxV / rows;
+    const maxV = Math.max(nm.k * 1.25, ...vals.map((v) => v.k)), rows = month ? 16 : 14, unit = maxV / rows;
     const sel = hist.sel || days[days.length - 1], sv = totals(sel);
     const nrmRow = Math.round(nm.k / unit), step = month ? 7 : 10, gapPx = month ? 3 : 4;
-    const nLine = 2 + nrmRow * step - gapPx / 2;
     const card = $("#h-card");
     if (swap) { card.classList.remove("fade-sw"); void card.offsetWidth; card.classList.add("fade-sw"); }
     card.innerHTML = `<div class="c-head"><span class="card-t" id="h-day">${dayLabel(sel)}</span></div>
       <div class="mid" style="margin-top:10px"><span class="num" id="h-val">${fmt(sv.k)}</span><span class="u muted">ккал</span></div>
       <div class="macros" id="h-mac">${macroTags(sv, true)}</div>
-      <div class="hbars-wrap"><div class="norm-ln" style="bottom:${nLine}px"></div><span class="norm-tag" style="bottom:${nLine}px">${fmt(nm.k)}</span>
+      <div class="hbars-wrap">
       <div class="hbars ${month ? "month" : ""}" id="hbars">${days.map((k, i) => {
         const v = vals[i].k, on = Math.round(v / unit); let dots = "";
-        for (let r = 0; r < rows; r++) dots += `<i class="${r < on ? (r >= nrmRow ? "ov" : "on") : ""}"></i>`;
+        for (let r = 0; r < rows; r++) dots += `<i class="${r < on ? (r >= nrmRow ? "ov" : "on") : r < nrmRow ? "" : "x"}"></i>`;
         return `<button class="hb ${k === sel ? "sel" : ""}" data-k="${k}" aria-label="${dayLabel(k)}" style="transition-delay:${(i * (month ? 0.014 : 0.04)).toFixed(3)}s">${dots}</button>`;
       }).join("")}</div></div>
       <div class="hlabels ${month ? "month" : ""}">${days.map((k, i) => { const d = fromKey(k); const lab = month ? (i % 5 === 4 || i === 0 ? d.getDate() : "") : WD[d.getDay()]; return `<span class="${k === sel ? "sel" : ""}">${lab}</span>`; }).join("")}</div>
-      <div class="legend"><span><i style="background:var(--cal-b)"></i>в пределах нормы</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span><span><i class="ln"></i>норма</span></div>`;
+      <div class="legend"><span><i style="background:var(--cal-b)"></i>съедено</span><span><i style="background:var(--g20)"></i>до нормы ${fmt(nm.k)}</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span></div>`;
     raf2(() => $("#hbars").classList.add("go"));
     lastVals.set("hv", r0(sv.k));
     $$("#hbars .hb").forEach((b, i) => (b.onclick = () => {

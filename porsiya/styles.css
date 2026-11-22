@@ -129,7 +129,7 @@ svg.i { width: 20px; height: 20px; flex: none; }
 
 /* ---------- Cards ---------- */
 .card { background: var(--card); border-radius: var(--r-xl); padding: var(--pad); box-shadow: var(--shadow); }
-.grad { color: #fff; position: relative; overflow: hidden; border-radius: var(--r-xl); padding: var(--pad); isolation: isolate; }
+.grad { color: #fff; position: relative; overflow: hidden; border-radius: var(--r-xl); padding: 17px var(--pad) calc(var(--pad) + 2px); isolation: isolate; }
 .g-cal { background: var(--g-cal); }
 .g-pro { background: var(--g-pro); }
 .g-carb { background: var(--g-carb); }
@@ -333,15 +333,15 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .toggle.on::after { transform: translateX(20px); }
 
 /* ---------- Sheet ---------- */
-.scrim { position: fixed; inset: 0; background: var(--overlay); opacity: 0; pointer-events: none; transition: opacity .4s var(--ease); z-index: 40; }
-.scrim.open { opacity: 1; pointer-events: auto; }
+.scrim { position: fixed; inset: 0; background: transparent; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .4s var(--ease), background-color 0s .4s, visibility 0s .4s; z-index: 40; }
+.scrim.open { background: var(--overlay); opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .4s var(--ease); }
 .sheet {
   position: fixed; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 480px; z-index: 41;
   background: var(--bg); border-radius: 30px 30px 0 0; max-height: 92vh; display: flex; flex-direction: column;
-  transform: translateY(104%); visibility: hidden; transition: transform .5s var(--ease-out), visibility 0s .5s; will-change: transform;
+  transform: translateY(104%); visibility: hidden; transition: transform .42s cubic-bezier(.32,.72,0,1), visibility 0s .42s; will-change: transform;
   padding-bottom: var(--safe-b);
 }
-.sheet.open { transform: none; visibility: visible; transition: transform .55s var(--ease-out), visibility 0s; }
+.sheet.open { transform: none; visibility: visible; transition: transform .55s cubic-bezier(.32,.72,0,1), visibility 0s; }
 .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--g40); opacity: .5; margin: 10px auto 2px; flex: none; }
 .sheet .sh-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px 12px; flex: none; }
 .sheet .sh-head h3 { margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.025em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -566,8 +566,6 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .hbars .hb.sel i.on { background: var(--cal-a); }
 .hbars .hb.sel i.ov { background: var(--pro-a); }
 .norm-ln { position: absolute; left: 0; right: 0; height: 0; border-top: 1.5px solid var(--g20); z-index: 0; }
-.hbars-wrap { padding-right: 46px; }
-.hlabels { padding-right: 46px; }
 .norm-tag { position: absolute; right: 0; transform: translateY(50%); font-size: 11px; font-weight: 500; color: var(--g60); background: var(--card); padding: 2px 8px; border-radius: 99px; border: 1px solid var(--g20); z-index: 2; font-feature-settings: "tnum" 1; }
 .hlabels { display: flex; margin-top: 10px; }
 .hlabels span { flex: 1; text-align: center; font-size: 11.5px; color: var(--g60); }
@@ -883,3 +881,25 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .w-dots i.on { background: #3FA7F5 !important; }
 .w-acts { display: flex; gap: 10px; margin-top: 26px; }
 .w-acts .btn:not(.icon-btn) { flex: 1; }
+.hbars .hb i.x { background: transparent; }
+.wbal i.x { background: transparent !important; }
+/* приём пищи: строка и меню */
+.mline { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 4px 0; font-size: 14px; color: var(--g60); }
+.mline:first-child { margin-top: 2px; margin-bottom: 12px; }
+.mchip { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 12px 0 14px; border-radius: 99px; background: var(--card); color: var(--ink); font-size: 14.5px; transition: transform .3s var(--spring), background-color .3s; }
+.portion ~ .mline .mchip, .sheet .card ~ .mline .mchip { background: var(--card); }
+.mchip b { font-weight: 500; }
+.mchip svg { width: 17px; height: 17px; }
+.mchip .mc-ch { width: 15px; height: 15px; color: var(--g60); }
+.mchip:active { transform: scale(.95); }
+.menu { position: fixed; z-index: 95; background: var(--card); border-radius: 20px; padding: 6px; border: 1px solid var(--hair); opacity: 0; transform: scale(.92) translateY(-6px); transform-origin: top right; transition: opacity .2s var(--ease), transform .35s cubic-bezier(.32,.72,0,1); }
+.menu.up { transform-origin: bottom right; transform: scale(.92) translateY(6px); }
+.menu.on { opacity: 1; transform: none; }
+.menu button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; text-align: left; color: var(--ink); transition: background-color .2s; }
+.menu button:active { background: var(--card-2); }
+.menu button.on { background: var(--card-2); }
+.menu button > svg { width: 19px; height: 19px; flex: none; }
+.menu button span { flex: 1; min-width: 0; }
+.menu b { display: block; font-size: 15px; font-weight: 500; }
+.menu em { display: block; font-style: normal; font-size: 12px; color: var(--g60); margin-top: 1px; }
+.menu .mk { width: 16px; height: 16px; color: var(--ink); }
