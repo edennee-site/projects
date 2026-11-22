@@ -1131,3 +1131,10 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .streak .num, .streak.risk .num { color: var(--ink); }
 .streak.on svg { color: #F28A5B; fill: #F28A5B; }
 .streak.risk svg { color: #F28A5B; fill: none; }
+
+.home-card { padding: 14px 16px 14px 14px; }
+.home-card img { width: 52px; height: 52px; border-radius: 14px; }
+.hc-t b { white-space: nowrap; }
+.hc-t span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hc-btn { width: 40px; height: 40px; padding: 0; border-radius: 50%; justify-content: center; }
+.hc-btn svg { width: 18px; height: 18px; }
