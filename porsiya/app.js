@@ -1718,7 +1718,7 @@
       <div class="ptitle">Оформление</div>
       ${segHTML("theme", [["auto", "Авто"], ["light", "Светлая"], ["dark", "Тёмная"]], S.settings.theme)}
       <div class="ptitle">Приложение</div>
-      <button class="home-card" id="pr-home"><img src="logo.png?v=2" alt="Nomi"><span class="hc-t"><b>Иконка на телефон</b><span>Nomi в одно касание</span></span><span class="hc-btn">${icon("plus")}</span></button>
+      <button class="home-card" id="pr-home"><img src="logo.png?v=3" alt="Nomi"><span class="hc-t"><b>На рабочий стол</b><span>Открывай Nomi в одно касание</span></span><span class="hc-btn">${icon("plus")}</span></button>
       <div class="list">
         <button class="prow" id="pr-key"><span class="pi">${icon("key")}</span><span class="pl"><b>Распознавание фото</b><span>${S.settings.key ? "Ключ Gemini добавлен" : "Нужен бесплатный ключ Gemini"}</span></span><span class="pv">${S.settings.key ? `<span class="mtag c">Вкл</span>` : ""}${icon("right")}</span></button>
         <button class="prow" id="d-redo"><span class="pi">${icon("refresh")}</span><span class="pl"><b>Пройти анкету заново</b><span>Пересчитать норму с нуля</span></span><span class="pv">${icon("right")}</span></button>
@@ -1759,10 +1759,10 @@
   function addHome() {
     haptic("light");
     if (inTg && tg.addToHomeScreen && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0")) {
-      try { tg.addToHomeScreen(); tg.onEvent("homeScreenAdded", () => toast("Nomi добавлен на экран «Домой»")); return; } catch (e) {}
+      try { tg.addToHomeScreen(); tg.onEvent("homeScreenAdded", () => toast("Nomi добавлен на рабочий стол")); return; } catch (e) {}
     }
     const ios = /iPhone|iPad/.test(navigator.userAgent);
-    openSheet("На экран «Домой»", `<div class="hs-big"><img src="logo.png?v=2" alt=""><b>Nomi</b></div>
+    openSheet("На рабочий стол", `<div class="hs-big"><img src="logo.png?v=3" alt=""><b>Nomi</b></div>
       <div class="card"><div class="card-t">Как добавить</div><div class="card-s" style="margin-top:8px;line-height:1.6">${inTg ? "Обнови Telegram до последней версии: тогда кнопка добавит иконку сама.<br><br>Или открой меню бота (три точки сверху) и выбери «Добавить на экран „Домой“»." : ios ? "1. Нажми «Поделиться» внизу Safari.<br>2. Выбери «На экран „Домой“».<br>3. Нажми «Добавить»." : "1. Открой меню браузера (три точки).<br>2. Выбери «Добавить на главный экран».<br>3. Подтверди."}</div></div>`, `<button class="btn" id="hs-ok">Понятно</button>`);
     $("#hs-ok").onclick = closeSheet;
   }
