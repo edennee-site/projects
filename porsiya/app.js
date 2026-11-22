@@ -541,15 +541,10 @@
         <div class="stats3"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Баланс недели</span><b class="num" id="v-week">0</b></div><div><span>Записей</span><b class="num" id="v-cnt">0</b></div></div>
       </div>
       <div class="gap"></div>
-      <div class="row2">
-        ${macroCard("pro", "Белки", "protein", "p")}
-        ${macroCard("carb", "Углеводы", "carbs", "c")}
-      </div>
-      <div class="gap"></div>
-      <div class="grad g-fat tap" id="c-f" role="button">
-        <div class="c-head"><span class="c-title"><span class="ic">${icon("fat")}</span>Жиры</span>${icon("right", "chev")}</div>
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><div class="mid"><span class="num" id="v-f">0</span><span class="u">г</span></div><div class="sub" id="s-f"></div></div>
-        ${dotRow(24, "anim")}
+      <div class="card m3">
+        ${macroCol("pro", "Белки", "protein", "p")}
+        ${macroCol("carb", "Углеводы", "carbs", "c")}
+        ${macroCol("fat", "Жиры", "fat", "f")}
       </div>
       <div id="t-ins"></div>
       <div class="section-h"><h2 id="m-title">Приёмы пищи</h2><span class="muted" id="m-sum"></span></div>
@@ -565,13 +560,13 @@
     renderWeek();
     updateToday(true);
   }
-  function macroCard(kind, label, ic, key) {
-    return `<div class="grad g-${kind} tap" id="c-${key}" role="button">
-      <div class="c-head"><span class="c-title"><span class="ic">${icon(ic)}</span>${label}</span>${icon("right", "chev")}</div>
-      <div class="mid"><span class="num" id="v-${key}">0</span><span class="u">г</span></div>
-      <div class="sub" id="s-${key}"></div>
-      ${dotRow(12, "anim sm")}
-    </div>`;
+  function macroCol(kind, label, ic, key) {
+    return `<button class="m3c k-${kind}" id="c-${key}">
+      <span class="m3h"><span class="m3i">${icon(ic)}</span>${label}</span>
+      <span class="m3v"><span class="num" id="v-${key}">0</span><span class="u">г</span></span>
+      <span class="m3s" id="s-${key}"></span>
+      ${dotRow(10, "anim m3d")}
+    </button>`;
   }
   function updateToday(first) {
     if (cur !== "today" || !$("#v-k")) return;
@@ -595,7 +590,7 @@
     ["p", "c", "f"].forEach((k) => {
       countUp($("#v-" + k), r0(t[k]), { key: k });
       const rest = r0(nm[k] - t[k]);
-      $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
+      $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "закрыто";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
