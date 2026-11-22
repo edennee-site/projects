@@ -921,19 +921,23 @@
     const per = e.g ? { k: (e.k / e.g) * 100, p: (e.p / e.g) * 100, f: (e.f / e.g) * 100, c: (e.c / e.g) * 100 } : { k: e.k / q0, p: e.p / q0, f: e.f / q0, c: e.c / q0 };
     const st = { g: e.g || 100, q: q0, meal: e.meal };
     const body = `<div class="portion">
-      <div class="pn">${ficHTML(e)}<div style="min-width:0"><b>${esc(e.n)}</b><span>${dayLabel(f.k)}, ${meal(e.meal).n.toLowerCase()}</span></div></div>
+      <div class="pn">${ficHTML(e)}<div style="min-width:0;flex:1"><input class="pe-name" id="pe-n" value="${esc(e.n)}" maxlength="60" aria-label="Название"><span>${dayLabel(f.k)}, ${meal(e.meal).n.toLowerCase()}</span></div></div>
       <div class="kbig"><span class="num" id="pe-k">${fmt(e.k)}</span><span class="u">ккал</span></div>
-      <div class="macros" id="pe-m"></div>
+      <button class="res-mac" id="pe-mb" aria-label="Изменить КБЖУ"><span class="macros" id="pe-m"></span>${icon("edit")}</button>
+      <div class="collapse" id="pe-ed"><div><div class="re-grid">${[["k", "Ккал"], ["p", "Белки"], ["f", "Жиры"], ["c", "Углев."]].map(([k, l]) => `<label class="field"><span>${l}</span><input inputmode="decimal" data-pv="${k}"></label>`).join("")}</div><p class="note" style="padding:8px 2px 0">Значения для всей порции. Если поменять вес, они пересчитаются пропорционально.</p></div></div>
       ${byQ ? `<div class="prow-ln"><span>Количество</span>${stepperHTML("q", st.q, "порц.", 0.5)}</div>` : `<div class="prow-ln"><span>Порция</span>${stepperHTML("g", st.g, "г", 10)}</div><input type="range" id="pe-r" min="10" max="${Math.max(800, st.g * 2)}" step="5" value="${st.g}">`}
     </div>
     ${mealLine("pe-meal", st.meal)}`;
     openSheet("Запись", body, `<div class="btn-row" style="margin:0"><button class="btn ghost icon-btn" id="pe-del" aria-label="Удалить">${icon("trash")}</button><button class="btn" id="pe-save">Сохранить</button></div>`);
-    const upd = () => { const v = scaleFood(per, byQ ? st.q * 100 : st.g); $("#pe-k").textContent = fmt(v.k); $("#pe-m").innerHTML = macroTags(v, true); const r = $("#pe-r"); if (r) { r.value = st.g; setRangeFill(r); } };
+    const mult = () => (byQ ? st.q : st.g / 100);
+    const upd = () => { const v = scaleFood(per, byQ ? st.q * 100 : st.g); $("#pe-k").textContent = fmt(v.k); $("#pe-m").innerHTML = macroTags(v, true); $$("[data-pv]").forEach((inp) => { if (document.activeElement !== inp) inp.value = r0(v[inp.dataset.pv]); }); const r = $("#pe-r"); if (r) { r.value = st.g; setRangeFill(r); } };
     upd();
+    $("#pe-mb").onclick = () => { haptic("sel"); $("#pe-ed").classList.toggle("open"); $("#pe-mb").classList.toggle("on"); };
+    $$("[data-pv]").forEach((inp) => (inp.oninput = () => { const v = Math.max(0, parseFloat(inp.value.replace(",", ".")) || 0); per[inp.dataset.pv] = v / (mult() || 1); upd(); }));
     bindSteppers($("#sh-body"), st, { g: [5, 3000], q: [0.5, 20] }, upd);
     const r = $("#pe-r"); if (r) r.oninput = () => { st.g = +r.value; $('[data-step="g"] [data-v]').textContent = st.g; upd(); };
     bindMealLine("pe-meal", (v) => (st.meal = v));
-    $("#pe-save").onclick = () => { if (byQ) Object.assign(e, roundM(scaleFood(per, st.q * 100)), { q: st.q }); else Object.assign(e, roundM(scaleFood(per, st.g)), { g: st.g }); e.meal = st.meal; save(); closeSheet(); refreshAll(); toast("Сохранено"); haptic("ok"); };
+    $("#pe-save").onclick = () => { if (byQ) Object.assign(e, roundM(scaleFood(per, st.q * 100)), { q: st.q }); else Object.assign(e, roundM(scaleFood(per, st.g)), { g: st.g }); e.meal = st.meal; const nn = $("#pe-n").value.trim(); if (nn && nn !== e.n) { e.n = nn; e.cat = catOf(nn); } save(); closeSheet(); refreshAll(); toast("Сохранено"); haptic("ok"); };
     $("#pe-del").onclick = () => { closeSheet(); setTimeout(() => deleteEntry(id), 200); };
   }
   const roundM = (v) => ({ k: r0(v.k), p: r1(v.p), f: r1(v.f), c: r1(v.c) });
