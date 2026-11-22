@@ -1228,16 +1228,30 @@
     const s = $("#s-profile"), p = S.profile, nm = norm(), auto = calcNorm(), t = p.train;
     const u = inTg && tg.initDataUnsafe && tg.initDataUnsafe.user;
     const trainTxt = t.n ? `${t.n} × ${t.min} мин` : "Нет";
-    s.innerHTML = `<div class="p-hero">
-        <div class="p-ava-w"><button class="p-ava" id="pr-ava" aria-label="Сменить фото">${avatarInner()}</button><span class="p-ava-edit">${icon("cam")}</span></div>
-        <button class="p-name" id="pr-name">${esc(p.name || "Без имени")}${icon("edit")}</button>
-        ${u && u.username ? `<div class="muted" style="margin-top:2px">@${esc(u.username)}</div>` : ""}
+    const allDays = Object.keys(S.days).filter((k) => S.days[k].length);
+    const nEntries = allDays.reduce((a, k) => a + S.days[k].length, 0);
+    let streak = 0; { let d = new Date(); if (!dayEntries(dkey(d)).length) d = addDays(d, -1); while (dayEntries(dkey(d)).length) { streak++; d = addDays(d, -1); } }
+    const goalAdj = GOALS[p.goal].adj;
+    s.innerHTML = `<div class="top"><div><div class="date">Настройки и норма</div><h1>Профиль</h1></div></div>
+      <div class="gap" style="height:24px"></div>
+      <div class="card p-card">
+        <div class="p-row">
+          <button class="p-ava" id="pr-ava" aria-label="Сменить фото">${avatarInner()}<span class="p-ava-edit">${icon("cam")}</span></button>
+          <div class="p-id"><b>${esc(p.name || "Без имени")}</b><span>${u && u.username ? "@" + esc(u.username) + " · " : ""}${p.sex === "f" ? "Жен." : "Муж."}, ${p.age} · ${p.height} см · ${dec(p.weight)} кг</span></div>
+          <button class="p-edit" id="pr-name" aria-label="Изменить имя">${icon("edit")}</button>
+        </div>
+        <div class="p-stats">
+          <div><span>Серия</span><b class="num">${streak}<span class="u">${plural(streak, "день", "дня", "дней")}</span></b></div>
+          <div><span>Дней с едой</span><b class="num">${allDays.length}</b></div>
+          <div><span>Записей</span><b class="num">${fmt(nEntries)}</b></div>
+        </div>
       </div>
-      <div class="gap" style="height:22px"></div>
+      <div class="gap"></div>
       <div class="grad g-cal">
-        <div class="c-head"><span class="c-title">Норма в день</span><span class="chip">${p.manual.on ? "Задана вручную" : GOALS[p.goal].n}</span></div>
+        <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span>Норма</span><span class="chip">${p.manual.on ? "Задана вручную" : GOALS[p.goal].n}</span></div>
         <div class="big"><span class="num" id="pr-k">0</span><span class="of">ккал</span></div>
-        <div class="norm-grid"><div><b>${nm.p}</b><span>белки, г</span></div><div><b>${nm.f}</b><span>жиры, г</span></div><div><b>${nm.c}</b><span>углев., г</span></div><div><b>${fmt(auto.tdee)}</b><span>расход</span></div></div>
+        <div class="stats3"><div><span>Белки</span><b class="num">${nm.p} г</b></div><div><span>Жиры</span><b class="num">${nm.f} г</b></div><div><span>Углеводы</span><b class="num">${nm.c} г</b></div></div>
+        <div class="p-tdee">${p.manual.on ? "Расчётная норма " + fmt(auto.k) + " ккал" : "Расход около " + fmt(auto.tdee) + " ккал" + (goalAdj ? (goalAdj > 0 ? ". Профицит " : ". Дефицит ") + fmt(Math.abs(auto.k - auto.tdee)) + " ккал" : "")}</div>
       </div>
       <div class="ptitle">Цель</div>
       ${segHTML("goal", [["lose", "Похудеть"], ["keep", "Форма"], ["gain", "Масса"]], p.goal)}
