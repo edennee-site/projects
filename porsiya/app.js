@@ -229,6 +229,7 @@
     next.classList.remove("active"); void next.offsetWidth; next.classList.add("active");
     $("#tabbar").classList.toggle("hide", id === "onboard");
     $$(".tab").forEach((b) => b.classList.toggle("on", b.dataset.tab === id));
+    const ti = TABS.indexOf(id); if (ti > -1) $("#navp").style.setProperty("--i", ti);
     if (id === "today") buildToday();
     if (id === "history") renderHistory();
     if (id === "calendar") renderCalendar();
