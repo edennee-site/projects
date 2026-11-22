@@ -135,7 +135,7 @@
   const GOALS = {
     lose: { n: "Похудеть", s: "Мягкий дефицит, мышцы сохраняются", i: "down-trend", adj: -0.15, pk: 2.0 },
     keep: { n: "Держать форму", s: "Поддерживать вес и рельеф", i: "equal", adj: 0, pk: 1.8 },
-    gain: { n: "Набрать массу", s: "Небольшой профицит для роста мышц", i: "up-trend", adj: 0.1, pk: 1.8 },
+    gain: { n: "Набрать массу", s: "Небольшой профицит для роста мышц", i: "muscle", adj: 0.1, pk: 1.8 },
   };
   const TTYPES = { strength: { n: "Силовые", met: 5 }, cardio: { n: "Кардио", met: 7.5 }, mixed: { n: "Смешанные", met: 6 } };
   function calcNorm(p = S.profile, plan = p === S.profile ? S.plan : null) {
@@ -280,7 +280,7 @@
       track("fat", "fat", "fat", "Жиры в норме", g.fatRun, [3, 7, 14, 30], (x) => `Держи жиры в норме ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
       track("light", "moon", "cal", "Лёгкий ужин", g.lightDin, [3, 7, 14, 30], (x) => `${x} ${plural(x, "день", "дня", "дней")}, где ужин меньше трети нормы`, "дн."),
     ] : mode === "gain" ? [
-      track("plus", "up-trend", "carb", "Плюс", r1(g.gained), [0.5, 1, 2, 3, 5, 8], (x) => `Набери ${n(x)} кг`, "кг"),
+      track("plus", "muscle", "carb", "Плюс", r1(g.gained), [0.5, 1, 2, 3, 5, 8], (x) => `Набери ${n(x)} кг`, "кг"),
       track("surplus", "flame", "pro", "Профицит", g.surplus, [3, 7, 14, 30, 60], (x) => `Добирай калории ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
       track("carbs", "carbs", "carb", "Углеводы", g.carbRun, [3, 7, 14, 30], (x) => `Закрывай углеводы ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
       track("pro2", "dumbbell", "pro", "Строитель", g.pro2, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} с белком 2 г на кг веса`, "дн."),
@@ -974,7 +974,7 @@
     if (!pi) return `<button class="card goal-cta" id="goal-open"><span class="gc-ic">${icon("flag")}</span><span class="gc-t"><b>Поставь цель по весу</b><span>Посчитаю норму под цель и разобью путь на месячные этапы</span></span>${icon("right", "chev")}</button>`;
     const pl = S.plan, cm = pi.ms.find((m) => m.cur);
     return `<button class="card goal-card" id="goal-open">
-      <div class="gk-row"><span class="gk-ic">${icon(pl.type === "lose" ? "down-trend" : "up-trend")}</span>
+      <div class="gk-row"><span class="gk-ic">${icon(pl.type === "lose" ? "down-trend" : "muscle")}</span>
         <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>до ${fmtD(pi.end)}</span></span>
         <span class="gk-p num">${Math.round(pi.done * 100)}<small>%</small></span></div>
       <div class="gk-w"><span><em>Сейчас</em><b class="num">${dec(pi.cur)} кг</b></span>${dotRow(14, "ink gc-dots")}<span style="text-align:right"><em>Цель</em><b class="num">${dec(pl.target)} кг</b></span></div>
@@ -996,7 +996,7 @@
     const pi = planInfo(), pl = S.plan, st = goalStatus(pi), nm = norm();
     const body = `
       <div class="d-hero g-carb">
-        <div class="c-head"><span class="c-title"><span class="ic">${icon(pi.reached ? "trophy" : "flag")}</span>${pl.type === "lose" ? "Похудение" : "Набор массы"}</span><span class="chip">${st.t}</span></div>
+        <div class="c-head"><span class="c-title"><span class="ic">${icon(pi.reached ? "trophy" : pl.type === "lose" ? "down-trend" : "muscle")}</span>${pl.type === "lose" ? "Похудение" : "Набор массы"}</span><span class="chip">${st.t}</span></div>
         <div class="big"><span class="num" id="pd-p">0</span><span class="of">% пути</span></div>
         ${dotRow(24)}
         <div class="stats3"><div><span>Старт</span><b class="num">${dec(pl.start)} кг</b></div><div><span>Сейчас</span><b class="num">${dec(pi.cur)} кг</b></div><div><span>Цель</span><b class="num">${dec(pl.target)} кг</b></div></div>
