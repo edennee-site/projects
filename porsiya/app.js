@@ -1028,8 +1028,8 @@
     return out.slice(0, 6);
   }
   function addHomeHTML() {
-    const rec = recentFoods();
-    const combos = S.combos.slice(0, 3);
+    const mine = S.my.slice(0, 12);
+    const combos = S.combos.slice(0, 5);
     return `${mealLine("mp-btn", add.meal)}
       <div class="hshot g-cal">
         <span class="hs-ic">${icon("cam")}</span>
@@ -1038,8 +1038,8 @@
         <div class="hs-acts"><button class="btn white" id="h-cam">${icon("cam")}Камера</button><button class="btn glass icon-btn" id="h-gal" aria-label="Из галереи">${icon("img")}</button></div>
         ${S.settings.key ? "" : `<button class="hs-key" id="h-key">${icon("key")}Для фото нужен ключ Gemini${icon("right")}</button>`}
       </div>
-      <button class="mrow" id="h-man"><span class="at-ic">${icon("edit")}</span><span class="mr-t"><b>Ввести вручную</b><span>Название и калории, например с упаковки</span></span>${icon("right", "chev")}</button>
-      ${combos.length || rec.length ? `<div class="subh">Быстро добавить</div><div class="flist stagger">${combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="ft"><b>${esc(c.n)}</b><span>Набор · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("")}${rec.map((f, i) => { const v = scaleFood(f, f.g); return `<button class="fitem" data-ri="${i}">${f.img ? `<span class="fic"><img src="${f.img}" alt=""></span>` : ""}<span class="ft"><b>${esc(f.n)}</b><span>${r0(f.g)} г · ${fmt(v.k)} ккал</span></span><span class="plus">${icon("plus")}</span></button>`; }).join("")}</div>` : ""}`;
+      <button class="mrow" id="h-man"><span class="at-ic">${icon("edit")}</span><span class="mr-t"><b>Ввести вручную</b><span>Можно сохранить блюдо, чтобы добавлять в одно касание</span></span>${icon("right", "chev")}</button>
+      ${combos.length || mine.length ? `<div class="subh">Мои блюда</div><div class="flist stagger">${combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="ft"><b>${esc(c.n)}</b><span>Набор · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("")}${mine.map((f, i) => { const v = scaleFood(f, f.g); return `<button class="fitem" data-mi="${i}"><span class="ft"><b>${esc(f.n)}</b><span>${r0(f.g)} г · ${fmt(v.k)} ккал</span></span><span class="plus">${icon("plus")}</span></button>`; }).join("")}</div>` : ""}`;
   }
   function bindAddHome() {
     const go = (t) => { haptic("light"); add.tab = t; renderAdd(1); };
@@ -1049,8 +1049,7 @@
     if ($("#h-key")) $("#h-key").onclick = () => keySheet();
     $("#h-man").onclick = () => go("manual");
     $$(".stagger > *", $("#sh-body")).forEach((el, i) => (el.style.animationDelay = i * 0.03 + "s"));
-    const rec = recentFoods();
-    $$("#sh-body .fitem").forEach((el) => (el.onclick = () => (el.dataset.combo ? (haptic("light"), comboSheet(el.dataset.combo)) : portion(rec[+el.dataset.ri]))));
+    $$("#sh-body .fitem").forEach((el) => (el.onclick = () => (el.dataset.combo ? (haptic("light"), comboSheet(el.dataset.combo)) : portion(S.my[+el.dataset.mi]))));
     footBtn("");
   }
   function renderAddBody() {
@@ -1359,8 +1358,8 @@
     const avg = (f) => (filled.length ? filled.reduce((a, k) => a + totals(k)[f], 0) / filled.length : 0);
     const inNorm = filled.filter((k) => status(k) === "in").length;
     $("#h-stats").innerHTML = `<div class="stat"><span class="sl">В среднем</span><b class="num"><span id="st-a">${filled.length ? 0 : "—"}</span></b><span class="ss">ккал в день</span></div>
-      <div class="stat"><span class="sl">Белок</span><b class="num"><span id="st-p">0</span><span class="u">г</span></b><span class="ss">из ${nm.p} г</span></div>
-      <div class="stat"><span class="sl">В норме</span>${filled.length ? `<b class="num">${inNorm}<span class="u">из ${filled.length}</span></b><span class="ss">${plural(filled.length, "дня", "дней", "дней")} с записями</span>` : `<b class="num">—</b><span class="ss">нет записей</span>`}</div>`;
+      <div class="stat"><span class="sl">Белок</span><b class="num"><span id="st-p">0</span><span class="u">г</span></b><span class="ss">норма ${nm.p} г</span></div>
+      <div class="stat"><span class="sl">В норме</span>${filled.length ? `<b class="num">${inNorm}<span class="u">из ${filled.length}</span></b><span class="ss">${plural(filled.length, "дня", "дней", "дней")}</span>` : `<b class="num">—</b><span class="ss">нет записей</span>`}</div>`;
     if (filled.length) { countUp($("#st-a"), r0(avg("k")), { from: 0 }); countUp($("#st-p"), r0(avg("p")), { from: 0 }); }
     const list = days.slice().reverse().filter((k) => dayEntries(k).length);
     $("#h-days").innerHTML = list.length ? `<div class="list">${list.map((k) => {
@@ -1671,6 +1670,7 @@
   if (/[?&]demo/.test(location.search)) {
     try {
       const d = defaults(); d.onboarded = true; d.profile.name = "Эдем"; d.profile.steps = 7000;
+      d.my = [{ n: "Домашний суп мамы", g: 350, k: 52, p: 3.1, f: 2.2, c: 5, t: [] }, { n: "Сырники", g: 150, k: 220, p: 14, f: 9, c: 20, t: [] }];
       const now = new Date(), pick = (n) => window.FOODS.find((f) => f.n === n);
       const mk = (n, g, h, m, off) => { const f = pick(n); if (!f) return null; const v = scaleFood(f, g), t = addDays(now, -off); t.setHours(h, 10, 0, 0); return { id: uid(), n: f.n, cat: catOf(f.n, f.cat), g, k: r0(v.k), p: r1(v.p), f: r1(v.f), c: r1(v.c), meal: m, t: +t }; };
       for (let o = 0; o < 40; o++) {

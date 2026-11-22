@@ -484,7 +484,8 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .d-hero { border-radius: var(--r-xl); padding: var(--pad); color: #fff; }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 12px; color: var(--g60); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
-.legend i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.legend span { line-height: 16px; }
+.legend i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; transform: translateY(1px); }
 .legend i.ln { width: 14px; height: 0; border-radius: 0; border-top: 1.5px solid var(--g40); }
 .mbar { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
 .mbar + .mbar { border-top: 1px solid var(--line); }
@@ -546,11 +547,11 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 @keyframes calIn { from { opacity: 0; transform: translateX(14px); } }
 @keyframes calInB { from { opacity: 0; transform: translateX(-14px); } }
 .msum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-.stat { background: var(--card); border-radius: var(--r-lg); padding: 16px; box-shadow: var(--shadow); }
+.stat { background: var(--card); border-radius: var(--r-lg); padding: 16px 14px 15px 16px; min-width: 0; display: flex; flex-direction: column; }
 .stat .sl { font-size: 12px; color: var(--g60); display: block; }
-.stat b { font-size: 24px; font-weight: 400; display: block; margin-top: 10px; line-height: 1; }
-.stat b .u { font-size: 13px; color: var(--g60); letter-spacing: 0; margin-left: 2px; }
-.stat .ss { font-size: 11.5px; color: var(--g60); display: block; margin-top: 6px; }
+.stat b { font-size: 24px; font-weight: 400; display: flex; align-items: baseline; gap: 3px; margin-top: 12px; line-height: 1; white-space: nowrap; }
+.stat b .u { font-size: 13px; color: var(--g60); letter-spacing: 0; margin: 0; }
+.stat .ss { font-size: 12px; color: var(--g60); display: block; margin-top: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- History chart ---------- */
 .hbars-wrap { position: relative; margin-top: 22px; }
@@ -960,3 +961,4 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
   background: color-mix(in srgb, var(--bg) 72%, transparent); -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8); }
 .sheet .sh-body { padding-top: calc(var(--hh, 78px) + 2px); }
 .sheet.scrolled .sh-head::after { opacity: .7; }
+.sheet { overflow: hidden; }
