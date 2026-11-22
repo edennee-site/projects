@@ -766,7 +766,7 @@
       const next = h < 11 ? "обед и ужин" : h < 16 ? "ужин и перекус" : "ужин";
       text = `Примерно столько можно съесть на ${next}. Белка осталось ${Math.max(0, r0(pLeft))} г.`;
     } else return "";
-    return `<div class="gap"></div><div class="card insight"><span class="ins-ic t-${col}">${icon(ic)}</span><div class="ins-t"><b>${title}</b><p>${esc(text)}</p>${btn}</div></div>`;
+    return `<div class="gap"></div><div class="card tip c-${col}"><div class="tip-h"><span class="tip-ic">${icon(ic)}</span><b>${title}</b></div><p>${esc(text)}</p>${btn}</div>`;
   }
 
   // ---------- meals ----------

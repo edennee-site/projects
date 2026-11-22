@@ -1094,3 +1094,15 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .ach-ban .chev { width: 16px; height: 16px; opacity: .5; }
 .streak { position: relative; }
 .sbadge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: #F2545B; color: #fff; font-size: 11px; font-weight: 600; font-style: normal; display: grid; place-items: center; border: 2px solid var(--bg); animation: bump .5s var(--spring); }
+
+/* подсказка дня */
+.tip { padding: 18px 20px 19px; }
+.tip.c-cal { background: color-mix(in srgb, var(--cal-b) 9%, var(--card)); }
+.tip.c-pro { background: color-mix(in srgb, var(--pro-b) 10%, var(--card)); }
+.tip.c-carb { background: color-mix(in srgb, var(--carb-b) 11%, var(--card)); }
+.tip-h { display: flex; align-items: center; gap: 10px; }
+.tip-ic { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--card); }
+.tip-ic svg { width: 15px; height: 15px; }
+.c-cal .tip-ic { color: var(--cal-t); } .c-pro .tip-ic { color: var(--pro-t); } .c-carb .tip-ic { color: var(--carb-t); }
+.tip-h b { font-size: 15.5px; font-weight: 500; letter-spacing: -0.01em; }
+.tip p { margin: 8px 0 0; font-size: 13.5px; color: var(--g70); line-height: 1.5; }
