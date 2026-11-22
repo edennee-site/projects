@@ -1128,3 +1128,6 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .hs-big img { width: 104px; height: 104px; border-radius: 26px; }
 .hs-big b { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
 .ld-name { font-weight: 600; letter-spacing: 0.06em; font-size: 28px; }
+.streak .num, .streak.risk .num { color: var(--ink); }
+.streak.on svg { color: #F28A5B; fill: #F28A5B; }
+.streak.risk svg { color: #F28A5B; fill: none; }
