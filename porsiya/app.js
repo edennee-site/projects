@@ -172,6 +172,7 @@
   }
   function planNote(pi) {
     if (pi.reached) return "Цель достигнута. Можно закрепить результат на поддержании или поставить новую цель.";
+    if (pi.wk < 2) return "В первые две недели вес колеблется из-за воды и соли. Темп станет понятен после второй недели.";
     if (pi.wrong) return `Вес идёт в другую сторону. Проверь, что записываешь всё, включая напитки и перекусы, и держись нормы ${fmt(norm().k)} ккал. Если так уже несколько недель, пересчитай план от текущего веса.`;
     if (pi.diff <= -1.5) return "Отставание заметное. Чаще попадай в норму калорий и пересчитай план от текущего веса, чтобы этапы снова стали реальными.";
     if (pi.diff <= -0.6) return "Небольшое отставание нормально: вес колеблется день ото дня. Если отстаёшь уже несколько недель, пересчитай план от текущего веса.";
@@ -189,7 +190,7 @@
     const months = Math.max(1, Math.ceil(weeks / 4.345));
     const ms = Array.from({ length: months }, (_, i) => { const d = addMonths(sd, i + 1), exp = pl.start + sign * Math.min(total, kw * ((d - sd) / 6048e5)); const past = d <= now; const w = past ? weightAt(dkey(d)) : null; return { d, exp: r1(exp), past, cur: false, ok: (past && w != null && sign * (w - exp) >= -0.3) || sign * (cur - exp) >= 0, w }; });
     const nx = ms.find((m) => !m.ok && !m.past) || ms.find((m) => !m.ok); if (nx) nx.cur = true;
-    return { sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wrong: wElapsed >= 2 && sign * (cur - pl.start) <= -0.5 };
+    return { sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wk: wElapsed, wrong: wElapsed >= 2 && sign * (cur - pl.start) <= -0.5 };
   }
   function norm() { const m = S.profile.manual; return m.on ? { k: m.k, p: m.p, f: m.f, c: m.c } : calcNorm(); }
   const dayEntries = (k) => S.days[k] || [];
@@ -808,7 +809,7 @@
     if (!dayEntries(selDay).length) { if (!pat()) return ""; }
     else if (t.k > nm.k * 1.1) {
       col = "pro"; ic = "flame"; title = "Сверх нормы на " + fmt(t.k - nm.k) + " ккал";
-      text = wb.days && wb.bal > 0 ? `С учётом недели всё в порядке: до этого дня ты недобрал ${fmt(wb.bal)} ккал.` : "На результат влияет средний показатель за неделю. Завтра просто держись нормы.";
+      text = wb.days && wb.bal > 0 ? `С учётом недели всё в порядке: за прошлые дни недели недобор ${fmt(wb.bal)} ккал.` : "На результат влияет средний показатель за неделю. Завтра просто держись нормы.";
     } else if (isToday && pLeft > 20) {
       col = "pro"; ic = "protein"; title = "Добери " + r0(pLeft) + " г белка";
       const mine = myProteinFoods().filter((x) => x.k <= Math.max(kLeft, 250));
@@ -816,7 +817,7 @@
       else text = kLeft > 0 ? `На оставшиеся ${fmt(kLeft)} ккал выбери что-то белковое: мясо, рыбу, яйца, творог или йогурт.` : "Калории уже закрыты, поэтому лучше что-то лёгкое и белковое: творог, йогурт или яйца.";
     } else if (isToday && kLeft > nm.k * 0.35 && h >= 19) {
       col = "carb"; ic = "carbs"; title = "До нормы ещё " + fmt(kLeft) + " ккал";
-      text = S.profile.goal === "gain" ? "Для набора массы важно добирать калории каждый день, иначе вес стоит на месте." : "Если не голоден, доедать через силу не нужно. Главное, чтобы был закрыт белок.";
+      text = S.profile.goal === "gain" ? "Для набора массы важно добирать калории каждый день, иначе вес стоит на месте." : "Если голода нет, доедать через силу не нужно. Главное, чтобы был закрыт белок.";
     } else if (Math.abs(kLeft) <= nm.k * 0.1 && pLeft <= 10) {
       col = "carb"; ic = "check"; title = "Отличный день"; text = "Калории в норме, белок закрыт.";
     } else if (isToday && kLeft > 0) {
@@ -1136,6 +1137,7 @@
     const pi = planInfo(), pl = S.plan, lose = pl.type === "lose";
     let ic = "check", tone = "ok", t = "", txt = "", acts = "";
     if (pi.reached) { ic = "trophy"; t = "Цель достигнута"; txt = `Можно поставить новую цель или перейти на поддержание: норма пересчитается без ${lose ? "дефицита" : "профицита"}.`; acts = `<button class="btn ghost" data-pc="keep">Поддерживать вес</button><button class="btn" data-pc="new">Новая цель</button>`; }
+    else if (pi.wk < 2 && Math.abs(pi.diff) >= 0.6) { t = "Вес записан"; txt = `Сейчас ${dec(pi.cur)} кг. В первые две недели вес заметно колеблется из-за воды и соли, поэтому темп оцениваем позже. Держись нормы и взвешивайся утром натощак.`; acts = `<button class="btn" data-pc="ok">Понятно</button>`; }
     else if (pi.diff <= -0.6) {
       ic = "info"; tone = "warn";
       const wrong = pi.wrong, eat = recentEat(14), nk = norm().k;
@@ -1147,7 +1149,7 @@
           : "Записывай питание каждый день, тогда станет видно, в чём причина.");
       acts = `<button class="btn ghost" data-pc="shift">Пересчитать план</button>${!over && pl.pace < 2 && !wrong ? `<button class="btn" data-pc="faster">Ускорить темп</button>` : `<button class="btn" data-pc="ok">Понятно</button>`}`;
     }
-    else if (pi.diff >= 0.6) { ic = "rocket"; t = `Впереди на ${dec(pi.diff)} кг`; txt = `Отличный темп. ${lose ? "Если чувствуешь сильный голод или упадок сил, лучше немного замедлиться." : "Если растёт живот, стоит немного замедлиться, чтобы набирать именно мышцы."}`; acts = `${pl.pace > 0 ? `<button class="btn ghost" data-pc="slower">Замедлить темп</button>` : ""}<button class="btn" data-pc="ok">Продолжать</button>`; }
+    else if (pi.diff >= 0.6) { ic = "rocket"; t = `Впереди на ${dec(pi.diff)} кг`; txt = `Темп выше плана. ${lose ? "Если чувствуешь сильный голод или упадок сил, лучше немного замедлиться." : "Если вместе с весом заметно растёт талия, лучше немного замедлиться, чтобы набирать в основном мышцы."}`; acts = `${pl.pace > 0 ? `<button class="btn ghost" data-pc="slower">Замедлить темп</button>` : ""}<button class="btn" data-pc="ok">Продолжать</button>`; }
     else { t = "Всё по плану"; txt = `Сейчас ${dec(pi.cur)} кг, по плану ${dec(pi.expected)} кг. Норма остаётся прежней, продолжай в том же духе.`; acts = `<button class="btn" data-pc="ok">Отлично</button>`; }
     setSheet("Сверка с целью", `<div class="pc-hero"><span class="pc-ic ${tone}">${icon(ic)}</span><b>${t}</b><p>${txt}</p></div>
       <div class="card"><div class="ps-row"><span>Сейчас</span><b>${dec(pi.cur)} кг</b></div><div class="ps-row"><span>По плану</span><b>${dec(pi.expected)} кг</b></div><div class="ps-row"><span>Цель</span><b>${dec(pl.target)} кг</b></div><div class="ps-row"><span>Пройдено</span><b>${Math.round(pi.done * 100)}%</b></div></div>`, `<div class="btn-row pc-acts" style="margin:0">${acts}</div>`, null, 1);
