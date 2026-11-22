@@ -1140,7 +1140,7 @@
         ${byMeal.map((x) => `<div class="mbar"><span class="ml">${icon(x.m.i)}${x.m.n}</span>${dotRow(14, "ink")}<span class="mv">${x.k ? fmt(x.k) : "—"}</span></div>`).join("")}
       </div>
       <div class="gap"></div>
-      <div class="card"><div class="card-t">Когда ты ел</div><div class="card-s">Одна точка ≈ ${fmt(unit)} ккал</div>
+      <div class="card"><div class="card-t">По времени суток</div><div class="card-s">Одна точка ≈ ${fmt(unit)} ккал</div>
         <div class="hours" id="d-hours">${hours.map((k, i) => { const on = Math.min(6, Math.ceil(k / unit)); let c = ""; for (let r = 0; r < 6; r++) c += `<i class="${r < on ? "on" : ""}" style="transition-delay:${(i * 0.02 + r * 0.03).toFixed(3)}s"></i>`; return `<div class="hc">${c}</div>`; }).join("")}</div>
         <div class="axis"><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
       </div>
