@@ -1,4 +1,4 @@
-/* Порция v2 — трекер калорий по фото. Telegram Mini App, без сборки. */
+/* Nomi — трекер калорий по фото. Telegram Mini App, без сборки. */
 (function () {
   "use strict";
 
@@ -1718,12 +1718,13 @@
       <div class="ptitle">Оформление</div>
       ${segHTML("theme", [["auto", "Авто"], ["light", "Светлая"], ["dark", "Тёмная"]], S.settings.theme)}
       <div class="ptitle">Приложение</div>
+      <button class="home-card" id="pr-home"><img src="logo.png" alt="Nomi"><span class="hc-t"><b>Иконка на телефон</b><span>Открывай Nomi в одно касание</span></span><span class="hc-btn">Добавить</span></button>
       <div class="list">
         <button class="prow" id="pr-key"><span class="pi">${icon("key")}</span><span class="pl"><b>Распознавание фото</b><span>${S.settings.key ? "Ключ Gemini добавлен" : "Нужен бесплатный ключ Gemini"}</span></span><span class="pv">${S.settings.key ? `<span class="mtag c">Вкл</span>` : ""}${icon("right")}</span></button>
         <button class="prow" id="d-redo"><span class="pi">${icon("refresh")}</span><span class="pl"><b>Пройти анкету заново</b><span>Пересчитать норму с нуля</span></span><span class="pv">${icon("right")}</span></button>
         <button class="prow danger" id="d-reset"><span class="pi t-pro">${icon("trash")}</span><span class="pl"><b>Удалить все данные</b><span>Записи еды, вес и настройки</span></span></button>
       </div>
-      <p class="note" style="text-align:center;margin-top:20px">Порция · калории и КБЖУ ориентировочные</p>`;
+      <p class="note" style="text-align:center;margin-top:20px">Nomi · калории и КБЖУ ориентировочные</p>`;
     updNormCard();
     bindSeg(s, "goal", (v) => { if (S.plan && S.plan.type !== v) { S.plan = null; toast("Цель по весу сброшена"); } p.goal = v; if (p.manual.on) { p.manual.on = false; $("#pm-t .toggle").classList.remove("on"); $("#pm-f").classList.remove("open"); } save(); updNormCard(); });
     bindSeg(s, "theme", (v) => { S.settings.theme = v; save(); applyTheme(true); });
@@ -1738,6 +1739,7 @@
     $$("[data-m]", s).forEach((i) => (i.oninput = () => { p.manual[i.dataset.m] = Math.max(0, parseInt(i.value, 10) || 0); save(); updNormCard(); }));
     $("#pc-t").onclick = () => { S.settings.carry = !S.settings.carry; save(); haptic("sel"); $("#pc-t .toggle").classList.toggle("on", S.settings.carry); lastVals.delete("wk"); };
     $("#pr-key").onclick = keySheet;
+    $("#pr-home").onclick = addHome;
     $("#pr-plan").onclick = () => openGoal(renderProfile);
     $("#d-redo").onclick = () => startOnboarding();
     $("#d-reset").onclick = confirmReset;
@@ -1754,6 +1756,16 @@
     const f = e.target.files[0]; e.target.value = ""; if (!f) return;
     try { const { full } = await compress(f, 320, 0, true); S.profile.avatar = full; save(); haptic("ok"); renderProfile(); toast("Фото обновлено"); } catch (err) { toast("Не удалось открыть фото"); }
   });
+  function addHome() {
+    haptic("light");
+    if (inTg && tg.addToHomeScreen && tg.isVersionAtLeast && tg.isVersionAtLeast("8.0")) {
+      try { tg.addToHomeScreen(); tg.onEvent("homeScreenAdded", () => toast("Nomi добавлен на экран «Домой»")); return; } catch (e) {}
+    }
+    const ios = /iPhone|iPad/.test(navigator.userAgent);
+    openSheet("На экран «Домой»", `<div class="hs-big"><img src="logo.png" alt=""><b>Nomi</b></div>
+      <div class="card"><div class="card-t">Как добавить</div><div class="card-s" style="margin-top:8px;line-height:1.6">${inTg ? "Обнови Telegram до последней версии: тогда кнопка добавит иконку сама.<br><br>Или открой меню бота (три точки сверху) и выбери «Добавить на экран „Домой“»." : ios ? "1. Нажми «Поделиться» внизу Safari.<br>2. Выбери «На экран „Домой“».<br>3. Нажми «Добавить»." : "1. Открой меню браузера (три точки).<br>2. Выбери «Добавить на главный экран».<br>3. Подтверди."}</div></div>`, `<button class="btn" id="hs-ok">Понятно</button>`);
+    $("#hs-ok").onclick = closeSheet;
+  }
   function nameSheet() {
     openSheet("Имя", `<label class="field"><span>Как к тебе обращаться</span><input id="nm-in" maxlength="20" value="${esc(S.profile.name)}" placeholder="Имя"></label>${S.profile.avatar ? `<div class="list" style="margin-top:12px"><button class="prow danger" id="nm-ava"><span class="pi t-pro">${icon("trash")}</span><span class="pl"><b>Удалить фото профиля</b></span></button></div>` : ""}`, `<button class="btn" id="nm-save">Сохранить</button>`);
     setTimeout(() => $("#nm-in") && $("#nm-in").focus(), 350);
