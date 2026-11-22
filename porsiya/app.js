@@ -797,10 +797,12 @@
     $$("[data-save]", box).forEach((b) => (b.onclick = (ev) => { ev.stopPropagation(); saveCombo(b.dataset.save); }));
     $$(".item", box).forEach((el) => { el.onclick = () => { if (!el.dataset.sw) editEntry(el.dataset.id); }; bindSwipe(el); });
   }
+  const qTxt = (q) => `${dec(q)} ${plural(Math.ceil(q), "порция", "порции", "порций")}`;
+  const amtTxt = (e) => (e.g ? `${r0(e.g)} г` : qTxt(e.q || 1));
   function itemHTML(e, isFresh) {
     const tm = new Date(e.t);
     return `<div class="item-wrap"><div class="item-del">${icon("trash")}</div><div class="item ${isFresh ? "fresh" : ""}" data-id="${e.id}">
-      ${ficHTML(e)}<span class="it"><b>${esc(e.n)}</b><span>${r0(e.g)} г · Б ${r0(e.p)} · Ж ${r0(e.f)} · У ${r0(e.c)}</span></span>
+      ${ficHTML(e)}<span class="it"><b>${esc(e.n)}</b><span>${amtTxt(e)} · Б ${r0(e.p)} · Ж ${r0(e.f)} · У ${r0(e.c)}</span></span>
       <span class="kc">${fmt(e.k)}<span>${pad(tm.getHours())}:${pad(tm.getMinutes())}</span></span></div></div>`;
   }
   function bindSwipe(el) {
@@ -835,7 +837,7 @@
     const base = dayK === todayKey() ? Date.now() : fromKey(dayK).setHours(mealHour(m), 0, 0, 0);
     arr.forEach((x, i) => {
       const id = uid(); fresh.add(id);
-      S.days[dayK].push({ id, n: x.n, cat: catOf(x.n, x.cat), g: r0(x.g), k: r0(x.k), p: r1(x.p), f: r1(x.f), c: r1(x.c), meal: m, t: base + i, img: x.img || undefined, src: x.src || "db" });
+      S.days[dayK].push({ id, n: x.n, cat: catOf(x.n, x.cat), q: x.g ? undefined : (x.q || 1), g: r0(x.g), k: r0(x.k), p: r1(x.p), f: r1(x.f), c: r1(x.c), meal: m, t: base + i, img: x.img || undefined, src: x.src || "db" });
       if (x.src !== "photo" && x.src !== "combo") S.recent = [x.n].concat(S.recent.filter((r) => r !== x.n)).slice(0, 12);
     });
     save();
@@ -852,22 +854,23 @@
   function editEntry(id) {
     const f = findEntry(id); if (!f) return;
     const e = f.e;
-    const per = e.g ? { k: (e.k / e.g) * 100, p: (e.p / e.g) * 100, f: (e.f / e.g) * 100, c: (e.c / e.g) * 100 } : null;
-    const st = { g: e.g || 100, meal: e.meal };
+    const byQ = !e.g, q0 = e.q || 1;
+    const per = e.g ? { k: (e.k / e.g) * 100, p: (e.p / e.g) * 100, f: (e.f / e.g) * 100, c: (e.c / e.g) * 100 } : { k: e.k / q0, p: e.p / q0, f: e.f / q0, c: e.c / q0 };
+    const st = { g: e.g || 100, q: q0, meal: e.meal };
     const body = `<div class="portion">
       <div class="pn">${ficHTML(e)}<div style="min-width:0"><b>${esc(e.n)}</b><span>${dayLabel(f.k)}, ${meal(e.meal).n.toLowerCase()}</span></div></div>
       <div class="kbig"><span class="num" id="pe-k">${fmt(e.k)}</span><span class="u">ккал</span></div>
       <div class="macros" id="pe-m"></div>
-      ${per ? `<div class="prow-ln"><span>Порция</span>${stepperHTML("g", st.g, "г", 10)}</div><input type="range" id="pe-r" min="10" max="${Math.max(800, st.g * 2)}" step="5" value="${st.g}">` : ""}
+      ${byQ ? `<div class="prow-ln"><span>Количество</span>${stepperHTML("q", st.q, "порц.", 0.5)}</div>` : `<div class="prow-ln"><span>Порция</span>${stepperHTML("g", st.g, "г", 10)}</div><input type="range" id="pe-r" min="10" max="${Math.max(800, st.g * 2)}" step="5" value="${st.g}">`}
     </div>
     ${mealLine("pe-meal", st.meal)}`;
     openSheet("Запись", body, `<div class="btn-row" style="margin:0"><button class="btn ghost icon-btn" id="pe-del" aria-label="Удалить">${icon("trash")}</button><button class="btn" id="pe-save">Сохранить</button></div>`);
-    const upd = () => { const v = per ? scaleFood(per, st.g) : e; $("#pe-k").textContent = fmt(v.k); $("#pe-m").innerHTML = macroTags(v, true); const r = $("#pe-r"); if (r) { r.value = st.g; setRangeFill(r); } };
+    const upd = () => { const v = scaleFood(per, byQ ? st.q * 100 : st.g); $("#pe-k").textContent = fmt(v.k); $("#pe-m").innerHTML = macroTags(v, true); const r = $("#pe-r"); if (r) { r.value = st.g; setRangeFill(r); } };
     upd();
-    bindSteppers($("#sh-body"), st, { g: [5, 3000] }, upd);
+    bindSteppers($("#sh-body"), st, { g: [5, 3000], q: [0.5, 20] }, upd);
     const r = $("#pe-r"); if (r) r.oninput = () => { st.g = +r.value; $('[data-step="g"] [data-v]').textContent = st.g; upd(); };
     bindMealLine("pe-meal", (v) => (st.meal = v));
-    $("#pe-save").onclick = () => { if (per) Object.assign(e, roundM(scaleFood(per, st.g)), { g: st.g }); e.meal = st.meal; save(); closeSheet(); refreshAll(); toast("Сохранено"); haptic("ok"); };
+    $("#pe-save").onclick = () => { if (byQ) Object.assign(e, roundM(scaleFood(per, st.q * 100)), { q: st.q }); else Object.assign(e, roundM(scaleFood(per, st.g)), { g: st.g }); e.meal = st.meal; save(); closeSheet(); refreshAll(); toast("Сохранено"); haptic("ok"); };
     $("#pe-del").onclick = () => { closeSheet(); setTimeout(() => deleteEntry(id), 200); };
   }
   const roundM = (v) => ({ k: r0(v.k), p: r1(v.p), f: r1(v.f), c: r1(v.c) });
@@ -1221,7 +1224,7 @@
         ${S.settings.key ? "" : `<button class="hs-key" id="h-key">${icon("key")}Для фото нужен ключ Gemini${icon("right")}</button>`}
       </div>
       <button class="mrow" id="h-man"><span class="at-ic">${icon("edit")}</span><span class="mr-t"><b>Ввести вручную</b><span>Можно сохранить блюдо, чтобы добавлять в одно касание</span></span>${icon("right", "chev")}</button>
-      ${combos.length || mine.length ? `<div class="subh">Мои блюда</div><div class="flist stagger">${combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="ft"><b>${esc(c.n)}</b><span>Набор · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("")}${mine.map((f, i) => { const v = scaleFood(f, f.g); return `<button class="fitem" data-mi="${i}"><span class="ft"><b>${esc(f.n)}</b><span>${r0(f.g)} г · ${fmt(v.k)} ккал</span></span><span class="plus">${icon("plus")}</span></button>`; }).join("")}</div>` : ""}`;
+      ${combos.length || mine.length ? `<div class="subh">Мои блюда</div><div class="flist stagger">${combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="ft"><b>${esc(c.n)}</b><span>Набор · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("")}${mine.map((f, i) => { const v = f.g ? scaleFood(f, f.g) : f; return `<button class="fitem" data-mi="${i}"><span class="ft"><b>${esc(f.n)}</b><span>${f.g ? r0(f.g) + " г" : "1 порция"} · ${fmt(v.k)} ккал</span></span><span class="plus">${icon("plus")}</span></button>`; }).join("")}</div>` : ""}`;
   }
   function bindAddHome() {
     const go = (t) => { haptic("light"); add.tab = t; renderAdd(1); };
@@ -1433,6 +1436,7 @@
   }
   function portion(f, backFn, g0) {
     if (!f) return; haptic("light");
+    if (!f.g) return portionQ(f, backFn);
     const st = { g: g0 || f.g };
     const body = `<div class="portion">
       <div class="pn">${ficHTML(f)}<div style="min-width:0"><b>${esc(f.n)}</b><span>${fmt(f.k)} ккал на 100 г</span></div></div>
@@ -1462,6 +1466,23 @@
     upd();
   }
 
+  function portionQ(f, backFn) {
+    const st = { q: 1 }, per = { k: f.k, p: f.p, f: f.f, c: f.c };
+    const body = `<div class="portion">
+      <div class="pn"><div style="min-width:0"><b>${esc(f.n)}</b><span>${fmt(f.k)} ккал за порцию</span></div></div>
+      <div class="kbig"><span class="num" id="po-k">0</span><span class="u">ккал</span></div>
+      <div class="macros" id="po-m"></div>
+      <div class="prow-ln"><span>Количество</span>${stepperHTML("q", st.q, "порц.", 0.5)}</div>
+    </div>
+    ${mealLine("po-meal", add.meal)}`;
+    const back = backFn || (() => renderAdd(-1));
+    if (sheetOpen) setSheet(f.n, body, `<button class="btn" id="po-add">Добавить</button>`, back, 1); else openSheet(f.n, body, `<button class="btn" id="po-add">Добавить</button>`, { back });
+    const upd = () => { const v = scaleFood(per, st.q * 100); $("#po-k").textContent = fmt(v.k); $("#po-m").innerHTML = macroTags(v, true); $("#po-add").textContent = `Добавить · ${fmt(v.k)} ккал`; };
+    bindSteppers($("#sh-body"), st, { q: [0.5, 20] }, upd);
+    bindMealLine("po-meal", (v) => (add.meal = v));
+    $("#po-add").onclick = () => { const v = scaleFood(per, st.q * 100); addEntries([{ n: f.n, g: 0, q: st.q, ...v, src: "manual" }], add.meal); afterAdd(v.k); };
+    upd();
+  }
   // ----- manual -----
   function renderManual() {
     const b = $("#a-body");
@@ -1481,9 +1502,9 @@
       let k = num(m.k); if (!k && (num(m.p) || num(m.f) || num(m.c))) k = num(m.p) * 4 + num(m.f) * 9 + num(m.c) * 4;
       footBtn(k ? `Добавить · ${fmt(k)} ккал` : "Добавить", "m-add", !(m.n.trim() && k));
       if ($("#m-add")) $("#m-add").onclick = () => {
-        const g = num(m.g) || 100, it = { n: m.n.trim(), g, k, p: num(m.p), f: num(m.f), c: num(m.c) };
+        const g = num(m.g), it = { n: m.n.trim(), g, q: g ? undefined : 1, k, p: num(m.p), f: num(m.f), c: num(m.c) };
         it.cat = catOf(it.n);
-        if (m.save && !S.my.find((x) => x.n === it.n)) S.my.unshift({ n: it.n, cat: it.cat, g, k: (k / g) * 100, p: (it.p / g) * 100, f: (it.f / g) * 100, c: (it.c / g) * 100, t: [] });
+        if (m.save && !S.my.find((x) => x.n === it.n)) S.my.unshift(g ? { n: it.n, cat: it.cat, g, k: (k / g) * 100, p: (it.p / g) * 100, f: (it.f / g) * 100, c: (it.c / g) * 100, t: [] } : { n: it.n, cat: it.cat, g: 0, k, p: it.p, f: it.f, c: it.c, t: [] });
         it.src = "manual"; addEntries([it], add.meal); add.man = null; afterAdd(k);
       };
     };
