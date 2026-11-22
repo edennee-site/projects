@@ -85,7 +85,7 @@
   let saveT = 0;
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { try { pruneThumbs(); localStorage.setItem(KEY, JSON.stringify(S)); } catch (e2) {} }
-    clearTimeout(saveT); saveT = setTimeout(cloudPush, 1200);
+    clearTimeout(saveT); saveT = setTimeout(() => { cloudPush(); serverSync(); }, 1200);
   }
   function pruneThumbs() { const keys = Object.keys(S.days).sort(); for (const k of keys.slice(0, Math.max(0, keys.length - 7))) S.days[k].forEach((e) => delete e.img); }
 
@@ -1343,6 +1343,17 @@
   // ----- photo -----
   // распознавание: через сервер Nomi (ключ хранится на сервере); для разработки можно указать свой ключ (?dev)
   const API = window.NOMI_API || "";
+  // сводка дня для сервера: по ней бот шлёт напоминания (серия, белок, взвешивание, итоги недели)
+  let lastSync = "";
+  function serverSync() {
+    if (!API || !inTg || !tg.initData || !S.onboarded) return;
+    const tk = todayKey(), t = totals(tk), nm = norm(), st = streakInfo(), wk = Object.keys(S.weights).sort();
+    const body = JSON.stringify({ tz: -new Date().getTimezoneOffset(), day: tk, logged: isLogged(tk), k: r0(t.k), p: r0(t.p), nk: nm.k, np: nm.p, streak: st.n, best: st.best,
+      goal: S.profile.goal, plan: S.plan ? { type: S.plan.type, start: S.plan.start, target: S.plan.target } : null, weight: curWeight(), lastWeigh: wk[wk.length - 1] || null });
+    if (body === lastSync) return;
+    lastSync = body;
+    fetch(API.replace(/\/$/, "") + "/sync", { method: "POST", headers: { "Content-Type": "application/json", "X-Init-Data": tg.initData }, body, keepalive: true }).catch(() => { lastSync = ""; });
+  }
   const canRecognize = () => !!(API || S.settings.key);
   function renderPhoto() {
     const b = $("#a-body");
