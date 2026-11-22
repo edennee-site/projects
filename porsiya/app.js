@@ -57,7 +57,7 @@
   const CATS = ["dish", "soup", "dough", "meat", "fish", "egg", "milk", "bread", "grain", "fruit", "veg", "nut", "sweet", "drink", "fast", "shaker"];
   const catOf = (n, c) => (c && CATS.includes(c) ? c : (CAT_RULES.find(([, re]) => re.test(n)) || ["dish"])[0]);
   function tint(e) { const p = (e.p || 0) * 4, c = (e.c || 0) * 4, f = (e.f || 0) * 9; if (!p && !c && !f) return "t-n"; const m = Math.max(p, c, f); return m === p ? "t-pro" : m === f ? "t-fat" : "t-carb"; }
-  const ficHTML = (e, cls = "") => `<span class="fic ${e.img ? "" : tint(e)} ${cls}">${e.img ? `<img src="${e.img}" alt="">` : icon(catOf(e.n, e.cat))}</span>`;
+  const ficHTML = (e, cls = "") => (e.img ? `<span class="fic ${cls}"><img src="${e.img}" alt=""></span>` : "");
 
   // ---------- state ----------
   const KEY = "porsiya.v1";
@@ -191,7 +191,7 @@
       while (!isLogged(dkey(back)) && !isFrozen(dkey(back)) && miss.length < 3) { miss.push(dkey(back)); back = addDays(back, -1); }
       if ((isLogged(dkey(back)) || isFrozen(dkey(back))) && miss.length <= S.game.fz) { S.game.frozen.push(...miss); S.game.fz -= miss.length; used = miss.length; }
     }
-    if (S.game.seen == null) S.game.seen = achList().filter((a) => a.done).map((a) => a.id);
+    if (S.game.seen == null || S.game.v !== 2) { S.game.seen = achList().filter((a) => a.done).map((a) => a.id); S.game.v = 2; }
     save();
     return used;
   }
@@ -202,31 +202,46 @@
   }
   function gameStats() {
     const keys = Object.keys(S.days).filter(isLogged), nm = norm();
-    let photos = 0, entries = 0, inNorm = 0, proDays = 0, xp = 0, todayXp = 0;
+    let photos = 0, entries = 0, inNorm = 0, proDays = 0, xp = 0, todayXp = 0, bfDays = 0, fullDays = 0, manual = 0;
     keys.forEach((k) => {
       const t = totals(k), arr = S.days[k];
       entries += arr.length; const ph = arr.filter((e) => e.src === "photo").length; photos += ph;
+      manual += arr.filter((e) => e.src === "manual").length;
       const okN = Math.abs(t.k - nm.k) <= nm.k * 0.1, okP = t.p >= nm.p * 0.95;
       if (okN) inNorm++; if (okP) proDays++;
+      if (arr.some((e) => e.meal === "breakfast")) bfDays++;
+      if (["breakfast", "lunch", "dinner"].every((m) => arr.some((e) => e.meal === m))) fullDays++;
       const dx = 10 + (okN ? 5 : 0) + (okP ? 5 : 0) + Math.min(ph, 5) * 2;
       xp += dx; if (k === todayKey()) todayXp = dx;
     });
     const wN = Object.keys(S.weights).length; xp += wN * 3;
-    return { days: keys.length, photos, entries, inNorm, proDays, xp, todayXp, weights: wN, combos: S.combos.length };
+    return { days: keys.length, photos, entries, inNorm, proDays, xp, todayXp, weights: wN, combos: S.combos.length, bfDays, fullDays, manual };
   }
   const LVL = [0, 60, 150, 300, 500, 750, 1050, 1400, 1800, 2300, 2900, 3600, 4400, 5300, 6300];
   function levelOf(xp) { let i = 0; while (i < LVL.length - 1 && xp >= LVL[i + 1]) i++; const from = LVL[i], to = LVL[i + 1] || from + 1000; return { lv: i + 1, from, to, cur: xp - from, need: to - from }; }
   function achList() {
     const g = gameStats(), best = streakInfo().best;
     const A = [
-      ...MILES.map((m) => ({ id: "s" + m, ic: "bolt", t: m + " " + plural(m, "день", "дня", "дней") + " подряд", d: "Серия без пропусков", cur: best, goal: m, streak: true })),
-      { id: "ph1", ic: "cam", t: "Первый снимок", d: "Добавь еду по фото", cur: g.photos, goal: 1 },
-      { id: "ph30", ic: "cam", t: "Фотограф", d: "30 блюд по фото", cur: g.photos, goal: 30 },
-      { id: "n7", ic: "check", t: "В точку", d: "7 дней в норме калорий", cur: g.inNorm, goal: 7 },
-      { id: "p7", ic: "protein", t: "Белковая неделя", d: "7 дней с закрытым белком", cur: g.proDays, goal: 7 },
-      { id: "w5", ic: "scale", t: "На весах", d: "5 записей веса", cur: g.weights, goal: 5 },
+      { id: "e1", ic: "plus", t: "Начало", d: "Первая запись еды", cur: g.entries, goal: 1 },
+      { id: "s3", ic: "bolt", t: "Разгон", d: "3 дня подряд", cur: best, goal: 3 },
+      { id: "s7", ic: "bolt", t: "Неделя", d: "7 дней подряд", cur: best, goal: 7 },
+      { id: "s14", ic: "bolt", t: "Две недели", d: "14 дней подряд", cur: best, goal: 14 },
+      { id: "s30", ic: "bolt", t: "Месяц", d: "30 дней подряд", cur: best, goal: 30 },
+      { id: "s60", ic: "bolt", t: "Привычка", d: "60 дней подряд", cur: best, goal: 60 },
+      { id: "s100", ic: "bolt", t: "Легенда", d: "100 дней подряд", cur: best, goal: 100 },
+      { id: "ph1", ic: "cam", t: "Первый кадр", d: "Блюдо по фото", cur: g.photos, goal: 1 },
+      { id: "ph10", ic: "cam", t: "Фотограф", d: "10 блюд по фото", cur: g.photos, goal: 10 },
+      { id: "ph50", ic: "cam", t: "Фуд-блогер", d: "50 блюд по фото", cur: g.photos, goal: 50 },
+      { id: "n1", ic: "check", t: "В точку", d: "День в норме калорий", cur: g.inNorm, goal: 1 },
+      { id: "n7", ic: "check", t: "Снайпер", d: "7 дней в норме", cur: g.inNorm, goal: 7 },
+      { id: "p1", ic: "protein", t: "Белковый день", d: "Белок закрыт", cur: g.proDays, goal: 1 },
+      { id: "p7", ic: "protein", t: "Строитель", d: "7 дней с белком", cur: g.proDays, goal: 7 },
+      { id: "bf7", ic: "breakfast", t: "Ранняя пташка", d: "7 завтраков", cur: g.bfDays, goal: 7 },
+      { id: "fd1", ic: "dinner", t: "Полный день", d: "Завтрак, обед и ужин", cur: g.fullDays, goal: 1 },
+      { id: "w1", ic: "scale", t: "На старте", d: "Первая запись веса", cur: g.weights, goal: 1 },
+      { id: "w10", ic: "scale", t: "Наблюдатель", d: "10 записей веса", cur: g.weights, goal: 10 },
       { id: "e100", ic: "star", t: "Сотня", d: "100 записей еды", cur: g.entries, goal: 100 },
-      { id: "c1", ic: "dish", t: "Свой набор", d: "Сохрани набор блюд", cur: g.combos, goal: 1 },
+      { id: "c1", ic: "star", t: "Свой набор", d: "Сохрани набор блюд", cur: g.combos, goal: 1 },
       { id: "d30", ic: "cal", t: "Месяц с нами", d: "30 дней с записями", cur: g.days, goal: 30 },
     ];
     A.forEach((a) => (a.done = a.cur >= a.goal));
@@ -319,6 +334,8 @@
 
   // ---------- sheet ----------
   let sheetOpen = false, sheetBack = null, onSheetClose = null;
+  function measureHead() { const h = $("#sheet .sh-head"); if (h) $("#sheet").style.setProperty("--hh", h.offsetHeight + "px"); }
+  window.addEventListener("resize", measureHead);
   function sheetFoot(html) { const f = $("#sh-foot"); f.innerHTML = html || ""; f.style.display = html ? "" : "none"; }
   function setBack(fn) { sheetBack = fn || null; $("#sheet").classList.toggle("has-back", !!fn); }
   function openSheet(title, body, foot = "", opts = {}) {
@@ -326,6 +343,7 @@
     const b = $("#sh-body"); b.className = "sh-body"; b.innerHTML = body; b.scrollTop = 0;
     sheetFoot(foot); setBack(opts.back);
     onSheetClose = opts.onClose || null;
+    measureHead();
     if (!sheetOpen) {
       sheetOpen = true;
       $("#scrim").classList.add("open"); $("#sheet").classList.add("open");
@@ -458,6 +476,7 @@
   function startOnboarding() {
     const u = inTg && tg.initDataUnsafe && tg.initDataUnsafe.user;
     ob = { step: 0, d: JSON.parse(JSON.stringify(S.profile)) };
+    if (!S.onboarded) ob.d.goal = null;
     if (!ob.d.name && u && u.first_name) ob.d.name = u.first_name;
     show("onboard", { force: true }); renderOb();
   }
@@ -482,16 +501,20 @@
       <div class="ob-prog">${Array.from({ length: OB_STEPS }, (_, i) => `<i class="${i < st ? "done" : ""}"></i>`).join("")}</div>
       <div class="ob-q s${st} fade-sw"><div class="n">Шаг ${st + 1} из ${OB_STEPS}</div><h2>${Q[st].h}</h2><p>${Q[st].p}</p></div>
       <div class="ob-body">${body}</div>
-      <div class="ob-foot">${st > 0 ? `<button class="back" id="ob-back" aria-label="Назад">${icon("back")}</button>` : ""}<button class="btn" id="ob-next">${st === OB_STEPS - 1 ? "Рассчитать норму" : "Далее"}</button></div>
+      ${st === 0 ? (S.onboarded ? `<div class="ob-foot"><button class="btn ghost" id="ob-next">Оставить как есть</button></div>` : "") : `<div class="ob-foot"><button class="back" id="ob-back" aria-label="Назад">${icon("back")}</button><button class="btn" id="ob-next">${st === OB_STEPS - 1 ? "Рассчитать норму" : "Далее"}</button></div>`}
     </div>`;
     raf2(() => { const bars = $$(".ob-prog i", s); if (bars[st]) bars[st].classList.add("done"); });
-    $$("[data-goal]", s).forEach((b) => (b.onclick = () => { d.goal = b.dataset.goal; $$("[data-goal]", s).forEach((x) => x.classList.toggle("on", x === b)); haptic("sel"); }));
+    $$("[data-goal]", s).forEach((b) => (b.onclick = () => {
+      if (ob.lock) return; ob.lock = true;
+      d.goal = b.dataset.goal; $$("[data-goal]", s).forEach((x) => x.classList.toggle("on", x === b)); haptic("sel");
+      setTimeout(() => { ob.lock = false; ob.step = 1; renderOb(); window.scrollTo({ top: 0, behavior: "smooth" }); }, 420);
+    }));
     bindSeg(s, "sex", (v) => (d.sex = v));
     bindTrain(s, d);
     bindSteppers(s, d, { age: [14, 90], height: [130, 220], weight: [35, 200] });
     const nm = $("#ob-name", s); if (nm) nm.oninput = () => (d.name = nm.value.trim());
     if ($("#ob-back", s)) $("#ob-back", s).onclick = () => { ob.step--; haptic("light"); renderOb(); };
-    $("#ob-next", s).onclick = () => { haptic("light"); if (ob.step < OB_STEPS - 1) { ob.step++; renderOb(); window.scrollTo({ top: 0, behavior: "smooth" }); } else showObResult(); };
+    if ($("#ob-next", s)) $("#ob-next", s).onclick = () => { haptic("light"); if (ob.step < OB_STEPS - 1) { ob.step++; renderOb(); window.scrollTo({ top: 0, behavior: "smooth" }); } else showObResult(); };
   }
   function trainFields(d) {
     const t = d.train;
@@ -511,33 +534,22 @@
     bindSeg(root, "ttype", (v) => (d.train.type = v));
   }
   function showObResult() {
-    const n = calcNorm(ob.d), s = $("#s-onboard"), g = GOALS[ob.d.goal];
-    const tot = n.p * 4 + n.f * 9 + n.c * 4, C = 2 * Math.PI * 96, gap = 12;
-    let off = 0;
-    const arcs = [[n.p * 4, "var(--pro-b)"], [n.c * 4, "var(--carb-b)"], [n.f * 9, "var(--fat-b)"]].map(([v, col]) => {
-      const len = Math.max(0, (v / tot) * C - gap);
-      const a = `<circle class="ring-seg" cx="116" cy="116" r="96" stroke="${col}" stroke-dasharray="${len} ${C}" stroke-dashoffset="${len}" data-off="${-off}"/>`;
-      off += (v / tot) * C; return a;
-    }).join("");
-    s.innerHTML = `<div class="ob">
+    const n = calcNorm(ob.d), s = $("#s-onboard"), g = GOALS[ob.d.goal || "keep"];
+    const parts = [["Белки", n.p, n.p * 4, "pro"], ["Углеводы", n.c, n.c * 4, "carb"], ["Жиры", n.f, n.f * 9, "fat"]];
+    const tot = parts.reduce((a, x) => a + x[2], 0), N = 60;
+    let acc = 0; const cut = parts.map((x) => (acc += x[2] / tot, Math.round(acc * N)));
+    const dots = Array.from({ length: N }, (_, i) => { const k = cut.findIndex((c) => i < c); return `<i class="k-${parts[k][3]}" style="--r:${(i / N) * 360}deg;transition-delay:${(0.15 + i * 0.018).toFixed(3)}s"></i>`; }).join("");
+    s.innerHTML = `<div class="ob ob-res">
       <div class="ob-prog">${Array.from({ length: OB_STEPS }, () => `<i class="done"></i>`).join("")}</div>
-      <div style="text-align:center;padding-top:28px" class="fade-sw">
-        <div class="muted" style="font-size:14px;display:inline-flex;align-items:center;gap:8px">${icon(g.i, "i")}${g.n} · норма в день</div>
-        <div class="ring-wrap"><svg viewBox="0 0 232 232"><circle class="ring-bg" cx="116" cy="116" r="96" stroke-dasharray="${C}"/>${arcs}</svg>
-          <div class="center"><div><div class="num" id="ob-kc" style="font-size:52px;line-height:1">0</div><div class="muted" style="margin-top:6px">ккал</div></div></div></div>
-      </div>
-      <div class="msum fade-sw" style="animation-delay:.1s">
-        <div class="stat"><span class="sl">Белки</span><b class="num"><span id="ob-p">0</span><span class="u">г</span></b></div>
-        <div class="stat"><span class="sl">Жиры</span><b class="num"><span id="ob-f">0</span><span class="u">г</span></b></div>
-        <div class="stat"><span class="sl">Углеводы</span><b class="num"><span id="ob-c">0</span><span class="u">г</span></b></div>
-      </div>
-      <p class="note fade-sw" style="animation-delay:.15s">Расход энергии около ${fmt(n.tdee)} ккал: обмен веществ ${fmt(n.bmr)}${n.train ? ", тренировки " + fmt(n.train) : ""}${n.steps ? ", шаги " + fmt(n.steps) : ""} в среднем за день. Норму можно поправить вручную в профиле.</p>
+      <div class="rs-head"><div class="res-goal">${icon(g.i)}${g.n}</div><h2>Твоя норма готова</h2></div>
+      <div class="dring" id="dring">${dots}<div class="dr-c"><div class="num" id="ob-kc">0</div><span>ккал в день</span></div></div>
+      <div class="res-legend">${parts.map((x, i) => `<div style="animation-delay:${1.1 + i * 0.1}s"><i class="k-${x[3]}"></i><span>${x[0]}</span><b class="num">${x[1]} г</b><em>${Math.round((x[2] / tot) * 100)}%</em></div>`).join("")}</div>
+      <p class="note res-note">Расход около ${fmt(n.tdee)} ккал в день: обмен веществ ${fmt(n.bmr)}${n.train ? ", тренировки " + fmt(n.train) : ""}${n.steps ? ", шаги " + fmt(n.steps) : ""}. Норму можно поправить в профиле.</p>
       <div style="flex:1"></div>
       <div class="ob-foot"><button class="back" id="ob-back" aria-label="Назад">${icon("back")}</button><button class="btn" id="ob-done">Начать</button></div>
     </div>`;
-    raf2(() => $$(".ring-seg", s).forEach((c, i) => { c.style.transitionDelay = 0.1 + i * 0.15 + "s"; c.style.strokeDashoffset = c.dataset.off; }));
-    countUp($("#ob-kc"), n.k, { from: 0, dur: 1300 });
-    countUp($("#ob-p"), n.p, { from: 0 }); countUp($("#ob-f"), n.f, { from: 0 }); countUp($("#ob-c"), n.c, { from: 0 });
+    raf2(() => $("#dring").classList.add("on"));
+    setTimeout(() => countUp($("#ob-kc"), n.k, { from: 0, dur: 1400, force: true }), 250);
     haptic("ok");
     $("#ob-back").onclick = () => { ob.step = OB_STEPS - 1; renderOb(); };
     $("#ob-done").onclick = () => {
@@ -558,7 +570,7 @@
     const s = $("#s-today");
     const now = new Date();
     s.innerHTML = `
-      <div class="top"><div><div class="date">${cap(WDF[now.getDay()])}</div><h1>${now.getDate()} ${MON[now.getMonth()]}</h1></div><div class="top-r"><button class="streak" id="t-streak" aria-label="Серия"></button><button class="avatar" id="t-ava" aria-label="Профиль">${avatarInner()}</button></div></div>
+      <div class="top"><div><h1>${now.getDate()} ${MON[now.getMonth()]}</h1><div class="date">${cap(WDF[now.getDay()])}</div></div><div class="top-r"><button class="streak" id="t-streak" aria-label="Серия"></button><button class="avatar" id="t-ava" aria-label="Профиль">${avatarInner()}</button></div></div>
       <div class="wk-head"><button class="wk-month" id="wk-month"><span id="wk-mt"></span>${icon("right")}</button><button class="wk-today" id="wk-today">${icon("refresh")}Сегодня</button></div>
       <div class="week" id="week"></div>
       <div class="gap"></div>
@@ -566,7 +578,7 @@
         <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span>Калории</span><span class="chip" id="cal-chip"></span></div>
         <div class="big"><span class="num" id="v-k">0</span><span class="of" id="v-kn"></span></div>
         ${dotRow(24, "anim")}
-        <div class="stats3"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Баланс недели</span><b class="num" id="v-week">0</b></div><div><span>Записей</span><b class="num" id="v-cnt">0</b></div></div>
+        <div class="stats3 two"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Запас недели</span><b class="num" id="v-week">0</b></div></div>
       </div>
       <div class="gap"></div>
       <div class="row2">
@@ -595,7 +607,7 @@
   }
   function macroCard(kind, label, ic, key) {
     return `<div class="grad g-${kind} tap" id="c-${key}" role="button">
-      <div class="c-head"><span class="c-title"><span class="ic">${icon(ic)}</span>${label}</span>${icon("right", "chev")}</div>
+      <div class="c-head"><span class="c-title"><span class="ic">${icon(ic)}</span>${label}</span></div>
       <div class="mid"><span class="num" id="v-${key}">0</span><span class="u">г</span></div>
       <div class="sub" id="s-${key}"></div>
       ${dotRow(12, "anim sm")}
@@ -619,7 +631,6 @@
     if (S.settings.carry && wb.days) { wl.textContent = "Перенос недели"; countUp($("#v-week"), kN - nm.k, { key: "wk", sign: true }); }
     else if (wb.days) { wl.textContent = wb.bal >= 0 ? "Запас недели" : "Перебор недели"; countUp($("#v-week"), r0(Math.abs(wb.bal)), { key: "wk" }); }
     else { wl.textContent = "Запас недели"; $("#v-week").textContent = "—"; lastVals.delete("wk"); }
-    countUp($("#v-cnt"), dayEntries(selDay).length, { key: "cnt" });
     ["p", "c", "f"].forEach((k) => {
       countUp($("#v-" + k), r0(t[k]), { key: k });
       const rest = r0(nm[k] - t[k]);
@@ -695,7 +706,6 @@
       const o = opts[new Date().getDate() % Math.max(1, Math.min(3, opts.length))] || opts[0];
       col = "pro"; ic = "protein"; title = "Добери " + r0(pLeft) + " г белка";
       text = o ? `${o.f.n}, ${o.g} г: это ${r0(o.v.p)} г белка и ${fmt(o.v.k)} ккал.` : "Добавь к следующему приёму пищи курицу, творог или яйца.";
-      if (o) btn = `<button class="btn sm" id="ins-btn" data-f="${esc(o.f.n)}" data-g="${o.g}">${icon("plus")}Добавить</button>`;
     } else if (isToday && kLeft > nm.k * 0.35 && h >= 19) {
       col = "carb"; ic = "carbs"; title = "До нормы ещё " + fmt(kLeft) + " ккал";
       text = S.profile.goal === "gain" ? "Для набора массы важно добирать калории. Проще всего: каша на молоке, орехи или банан с арахисовой пастой." : "Если не голоден, не нужно доедать через силу. Главное, чтобы был закрыт белок.";
@@ -903,51 +913,27 @@
   }
   function streakSheet() {
     haptic("light");
-    const st = streakInfo(), g = gameStats(), L = levelOf(g.xp), A = achList(), now = new Date();
+    const st = streakInfo(), A = achList(), now = new Date();
     const days = Array.from({ length: 7 }, (_, i) => { const d = addDays(now, i - 6), k = dkey(d); return { d, k, on: isLogged(k), fz: isFrozen(k), today: i === 6 }; });
-    const msg = st.today ? `Сегодня отмечено, +${g.todayXp} очков. Завтра серия вырастет до ${st.n + 1}.` : st.risk ? "Добавь хотя бы одну запись сегодня, иначе серия сгорит в полночь." : "Добавь еду сегодня, чтобы начать серию.";
-    const next = MILES.find((m) => m > st.n);
-    const trackPct = (() => { let i = MILES.findIndex((m) => m > st.n); if (i < 0) return 100; const a = i ? MILES[i - 1] : 0; return ((i + (st.n - a) / (MILES[i] - a)) / MILES.length) * 100; })();
-    const other = A.filter((a) => !a.streak).sort((x, y) => (y.done - x.done) || (y.cur / y.goal - x.cur / x.goal));
-    const ring = (a) => { const p = clamp(a.cur / a.goal, 0, 1), C = 2 * Math.PI * 21; return `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" class="rg-bg"/><circle cx="24" cy="24" r="21" class="rg-v" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${C * (1 - p)}"/></svg>`; };
+    const msg = st.today ? `Сегодня отмечено. Завтра будет ${st.n + 1}.` : st.risk ? "Добавь еду сегодня, иначе серия сгорит в полночь." : "Добавь еду сегодня, чтобы начать серию.";
+    const got = A.filter((a) => a.done).length;
+    const next = A.filter((a) => !a.done).sort((x, y) => y.cur / y.goal - x.cur / x.goal)[0];
     const body = `
       <div class="d-hero g-pro st-hero">
-        <div class="c-head"><span class="st-ic">${icon("bolt")}</span><span class="chip st-fz">${icon("snow")}${st.freezes} ${plural(st.freezes, "заморозка", "заморозки", "заморозок")}</span></div>
+        <div class="c-head"><span class="st-ic">${icon("bolt")}</span>${st.freezes ? `<span class="chip st-fz">${icon("snow")}${st.freezes}</span>` : ""}</div>
         <div class="big"><span class="num" id="st-n">0</span><span class="of">${plural(st.n, "день", "дня", "дней")} подряд</span></div>
         <p class="st-msg">${msg}</p>
         <div class="st-week">${days.map((x, i) => `<div class="${x.on ? "on" : x.fz ? "fz" : ""} ${x.today ? "today" : ""}" style="animation-delay:${0.15 + i * 0.05}s"><span>${x.on ? icon("bolt") : x.fz ? icon("snow") : ""}</span><em>${WD[x.d.getDay()]}</em></div>`).join("")}</div>
       </div>
+      ${next ? `<div class="gap"></div><div class="card st-next"><span class="sn-ic">${icon(next.ic)}</span><div class="sn-t"><em>Ближайшая награда</em><b>${esc(next.t)}</b><span>${esc(next.d)} · ${Math.min(next.cur, next.goal)} из ${next.goal}</span></div></div>` : ""}
       <div class="gap"></div>
-      <div class="card lv-card">
-        <div class="c-head"><div><div class="card-s">Уровень</div><div class="lv-n num">${L.lv}</div></div><div class="lv-xp"><b class="num">${fmt(g.xp)}</b><span>очков</span></div></div>
-        ${dotRow(24, "ink lv-dots")}
-        <div class="card-s" style="margin-top:10px">До уровня ${L.lv + 1} осталось ${fmt(L.need - L.cur)} очков</div>
-        <div class="xp-rules">
-          <div><span>День с записями</span><b>+10</b></div>
-          <div><span>Калории в норме</span><b>+5</b></div>
-          <div><span>Белок закрыт</span><b>+5</b></div>
-          <div><span>Блюдо по фото</span><b>+2</b></div>
-          <div><span>Запись веса</span><b>+3</b></div>
-        </div>
+      <div class="card"><div class="c-head"><span class="card-t">Награды</span><span class="muted">${got} из ${A.length}</span></div>
+        <div class="ach3">${A.map((a, i) => `<div class="${a.done ? "got" : ""}" style="animation-delay:${0.1 + i * 0.025}s"><span class="ab">${icon(a.ic)}</span><b>${esc(a.t)}</b><em>${a.done ? esc(a.d) : `${Math.min(a.cur, a.goal)} из ${a.goal}`}</em></div>`).join("")}</div>
       </div>
-      <div class="gap"></div>
-      <div class="card">
-        <div class="c-head"><span class="card-t">Путь серии</span><span class="muted">${next ? "до " + next + " осталось " + (next - st.n) : "все цели пройдены"}</span></div>
-        <div class="track"><div class="tr-line"><i style="--w:${trackPct}%"></i></div>${MILES.map((m, i) => `<div class="tr-m ${st.best >= m ? "got" : ""} ${st.n >= m ? "now" : ""}" style="left:${((i + 1) / MILES.length) * 100}%"><span>${icon("bolt")}</span><b class="num">${m}</b></div>`).join("")}</div>
-        <div class="card-s">Каждые 7 дней подряд дают заморозку. Она сама спасёт серию, если пропустишь день. Можно держать до двух.</div>
-      </div>
-      <div class="gap"></div>
-      <div class="card"><div class="c-head"><span class="card-t">Достижения</span><span class="muted">${A.filter((a) => a.done).length} из ${A.length}</span></div>
-        <div class="ach2">${other.map((a) => `<div class="${a.done ? "got" : ""}"><span class="ar">${ring(a)}<span class="ai">${icon(a.ic)}</span></span><b>${esc(a.t)}</b><em>${a.done ? "Получено" : `${Math.min(a.cur, a.goal)} из ${a.goal}`}</em></div>`).join("")}</div>
-      </div>
-      <p class="note">День засчитывается, если в нём есть хотя бы одна запись еды. Пропуск без заморозки обнуляет серию, очки и достижения остаются.</p>`;
+      <p class="note">Каждые 7 дней подряд дают заморозку: она сама спасёт серию, если пропустишь день.</p>`;
     openSheet("Серия и награды", body);
-    countUp($("#st-n"), st.n, { from: 0, dur: 900 });
-    setDots($(".lv-dots"), L.cur, L.need);
-    raf2(() => {
-      $$(".rg-v").forEach((c, i) => { c.style.transitionDelay = 0.2 + i * 0.05 + "s"; c.style.strokeDashoffset = c.dataset.off; });
-      $$(".st-hero, .track, .lv-card .drow").forEach((x) => x.classList.add("go"));
-    });
+    countUp($("#st-n"), st.n, { from: 0, dur: 900, force: true });
+    raf2(() => $(".st-hero").classList.add("go"));
   }
   function openCalDetail() {
     haptic("light");
@@ -1014,12 +1000,11 @@
       </div>
       <div class="gap"></div>
       <div class="card"><div class="card-t">Где взять ${M.n.toLowerCase()}</div><div class="card-s">На стандартную порцию</div>
-        ${sug.map((f) => { const v = scaleFood(f, f.g); return `<button class="fitem" data-sug="${esc(f.n)}">${ficHTML(f)}<span class="ft"><b>${esc(f.n)}</b><span>${f.g} г · ${r0(v[k])} г ${M.n.toLowerCase()} · ${fmt(v.k)} ккал</span></span><span class="plus">${icon("plus")}</span></button>`; }).join("")}
+        ${sug.map((f) => { const v = scaleFood(f, f.g); return `<div class="fitem sug"><span class="ft"><b>${esc(f.n)}</b><span>${f.g} г · ${fmt(v.k)} ккал</span></span><span class="sg-v">${r0(v[k])} г</span></div>`; }).join("")}
       </div>
       <p class="note">${M.why}${k === "p" ? dec(nm.p / S.profile.weight) + " г на кг." : ""}</p>`;
     openSheet(M.n, body);
     setDots($(".d-hero .drow"), t[k], nm[k]);
-    $$("[data-sug]").forEach((b) => (b.onclick = () => { const f = window.FOODS.find((x) => x.n === b.dataset.sug); add = newAdd("search"); portion(f, () => openMacroDetail(k)); }));
   }
 
   // =====================================================================
@@ -1037,8 +1022,13 @@
     else { $("#sh-title").textContent = ADD_T[add.tab]; const b = $("#sh-body"); b.className = "sh-body"; b.innerHTML = body; setBack(back); }
     if (home) bindAddHome(); else renderAddBody(false);
   }
+  function recentFoods() {
+    const seen = new Set(), out = [];
+    Object.keys(S.days).sort().reverse().some((k) => { S.days[k].slice().sort((a, b) => b.t - a.t).forEach((e) => { const key = e.n.toLowerCase(); if (!seen.has(key) && e.g) { seen.add(key); out.push({ n: e.n, g: e.g, k: (e.k / e.g) * 100, p: (e.p / e.g) * 100, f: (e.f / e.g) * 100, c: (e.c / e.g) * 100, img: e.img }); } }); return out.length >= 6; });
+    return out.slice(0, 6);
+  }
   function addHomeHTML() {
-    const rec = S.recent.map((n) => allFoods().find((f) => f.n === n)).filter(Boolean).slice(0, 5);
+    const rec = recentFoods();
     const combos = S.combos.slice(0, 3);
     return `${mealLine("mp-btn", add.meal)}
       <div class="hshot g-cal">
@@ -1048,11 +1038,8 @@
         <div class="hs-acts"><button class="btn white" id="h-cam">${icon("cam")}Камера</button><button class="btn glass icon-btn" id="h-gal" aria-label="Из галереи">${icon("img")}</button></div>
         ${S.settings.key ? "" : `<button class="hs-key" id="h-key">${icon("key")}Для фото нужен ключ Gemini${icon("right")}</button>`}
       </div>
-      <div class="row2 atiles">
-        <button class="atile" id="h-search"><span class="at-ic">${icon("search")}</span><b>Найти блюдо</b><span>Плов, манты, творог</span></button>
-        <button class="atile" id="h-man"><span class="at-ic">${icon("edit")}</span><b>Вручную</b><span>Данные с упаковки</span></button>
-      </div>
-      ${combos.length || rec.length ? `<div class="subh">Быстро добавить</div><div class="flist stagger">${combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="fic t-cal">${icon("star")}</span><span class="ft"><b>${esc(c.n)}</b><span>Набор · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("")}${rec.map(foodRow).join("")}</div>` : ""}`;
+      <button class="mrow" id="h-man"><span class="at-ic">${icon("edit")}</span><span class="mr-t"><b>Ввести вручную</b><span>Название и калории, например с упаковки</span></span>${icon("right", "chev")}</button>
+      ${combos.length || rec.length ? `<div class="subh">Быстро добавить</div><div class="flist stagger">${combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="ft"><b>${esc(c.n)}</b><span>Набор · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("")}${rec.map((f, i) => { const v = scaleFood(f, f.g); return `<button class="fitem" data-ri="${i}">${f.img ? `<span class="fic"><img src="${f.img}" alt=""></span>` : ""}<span class="ft"><b>${esc(f.n)}</b><span>${r0(f.g)} г · ${fmt(v.k)} ккал</span></span><span class="plus">${icon("plus")}</span></button>`; }).join("")}</div>` : ""}`;
   }
   function bindAddHome() {
     const go = (t) => { haptic("light"); add.tab = t; renderAdd(1); };
@@ -1060,10 +1047,10 @@
     $("#h-cam").onclick = () => $("#f-cam").click();
     $("#h-gal").onclick = () => $("#f-gal").click();
     if ($("#h-key")) $("#h-key").onclick = () => keySheet();
-    $("#h-search").onclick = () => go("search");
     $("#h-man").onclick = () => go("manual");
     $$(".stagger > *", $("#sh-body")).forEach((el, i) => (el.style.animationDelay = i * 0.03 + "s"));
-    $$("#sh-body .fitem").forEach((el) => (el.onclick = () => (el.dataset.combo ? (haptic("light"), comboSheet(el.dataset.combo)) : portion(allFoods().find((f) => f.n === el.dataset.n)))));
+    const rec = recentFoods();
+    $$("#sh-body .fitem").forEach((el) => (el.onclick = () => (el.dataset.combo ? (haptic("light"), comboSheet(el.dataset.combo)) : portion(rec[+el.dataset.ri]))));
     footBtn("");
   }
   function renderAddBody() {
@@ -1095,8 +1082,8 @@
     if (add.items.length) renderResults(); else if (S.settings.key) analyze(); else noKeyResults();
   }
   function noKeyResults() {
-    $("#p-res").innerHTML = `<div class="alert"><span class="ins-ic t-cal">${icon("key")}</span><div><b>Ключ Gemini не добавлен</b>Без ключа фото не распознаётся. Добавь ключ или найди блюдо через поиск.<div class="btn-row"><button class="btn sm ghost" id="nk-s">Найти в базе</button><button class="btn sm" id="nk-p">Добавить ключ</button></div></div></div>`;
-    $("#nk-s").onclick = () => { add.tab = "search"; renderAdd(0); };
+    $("#p-res").innerHTML = `<div class="alert"><span class="ins-ic t-cal">${icon("key")}</span><div><b>Ключ Gemini не добавлен</b>Без ключа фото не распознаётся. Добавь ключ или введи блюдо вручную.<div class="btn-row"><button class="btn sm ghost" id="nk-s">Ввести вручную</button><button class="btn sm" id="nk-p">Добавить ключ</button></div></div></div>`;
+    $("#nk-s").onclick = () => { add.tab = "manual"; add.photo = null; renderAdd(1); };
     $("#nk-p").onclick = () => keySheet();
     footBtn("");
   }
@@ -1143,8 +1130,8 @@
     } catch (err) {
       if (my !== anReq) return;
       haptic("err");
-      $("#p-res").innerHTML = `<div class="alert"><span class="ins-ic t-pro">${icon("info")}</span><div><b>Не получилось распознать</b>${esc(err.message || err)}<div class="btn-row"><button class="btn sm ghost" id="er-s">Найти в базе</button><button class="btn sm" id="er-r">Ещё раз</button></div></div></div>`;
-      $("#er-r").onclick = analyze; $("#er-s").onclick = () => { add.tab = "search"; renderAdd(0); };
+      $("#p-res").innerHTML = `<div class="alert"><span class="ins-ic t-pro">${icon("info")}</span><div><b>Не получилось распознать</b>${esc(err.message || err)}<div class="btn-row"><button class="btn sm ghost" id="er-s">Ввести вручную</button><button class="btn sm" id="er-r">Ещё раз</button></div></div></div>`;
+      $("#er-r").onclick = analyze; $("#er-s").onclick = () => { add.tab = "manual"; add.photo = null; renderAdd(1); };
     } finally { clearInterval(pt); if (my === anReq && pv) pv.classList.remove("scanning"); }
   }
   async function gemini(dataUrl, hint) {
@@ -1311,7 +1298,7 @@
         const g = num(m.g) || 100, it = { n: m.n.trim(), g, k, p: num(m.p), f: num(m.f), c: num(m.c) };
         it.cat = catOf(it.n);
         if (m.save && !S.my.find((x) => x.n === it.n)) S.my.unshift({ n: it.n, cat: it.cat, g, k: (k / g) * 100, p: (it.p / g) * 100, f: (it.f / g) * 100, c: (it.c / g) * 100, t: [] });
-        addEntries([it], add.meal); add.man = null; afterAdd(k);
+        it.src = "manual"; addEntries([it], add.meal); add.man = null; afterAdd(k);
       };
     };
     $$("input", b).forEach((i) => (i.oninput = upd));
@@ -1325,7 +1312,7 @@
   let hist = { range: "week", sel: null };
   function renderHistory() {
     const s = $("#s-history");
-    s.innerHTML = `<div class="top"><div><div class="date">Статистика и вес</div><h1>История</h1></div></div>
+    s.innerHTML = `<div class="top"><div><h1>История</h1><div class="date">Статистика и вес</div></div></div>
       <div style="margin-top:24px">${segHTML("range", [["week", "7 дней"], ["month", "30 дней"]], hist.range)}</div>
       <div class="gap"></div>
       <div class="card" id="h-card"></div>
@@ -1435,7 +1422,7 @@
     const s = $("#s-calendar");
     if (!calMonth) { const d = fromKey(selDay); calMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
     if (!calSel) calSel = selDay;
-    s.innerHTML = `<div class="top"><div><div class="date">Общая картина по дням</div><h1>Календарь</h1></div></div>
+    s.innerHTML = `<div class="top"><div><h1>Календарь</h1><div class="date">Общая картина по дням</div></div></div>
       <div class="gap" style="height:24px"></div>
       <div class="card" id="cal-card"></div>
       <div class="msum" id="cal-sum"></div>
@@ -1496,7 +1483,7 @@
     const allDays = Object.keys(S.days).filter((k) => S.days[k].length);
     const nEntries = allDays.reduce((a, k) => a + S.days[k].length, 0);
     const sti = streakInfo(), streak = sti.n;
-    s.innerHTML = `<div class="top"><div><div class="date">Настройки и норма</div><h1>Профиль</h1></div></div>
+    s.innerHTML = `<div class="top"><div><h1>Профиль</h1><div class="date">Настройки и норма</div></div></div>
       <div class="gap" style="height:24px"></div>
       <div class="card p-card">
         <div class="p-row">
