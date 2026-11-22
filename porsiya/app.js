@@ -213,7 +213,7 @@
       while (!isLogged(dkey(back)) && !isFrozen(dkey(back)) && miss.length < 3) { miss.push(dkey(back)); back = addDays(back, -1); }
       if ((isLogged(dkey(back)) || isFrozen(dkey(back))) && miss.length <= S.game.fz) { S.game.frozen.push(...miss); S.game.fz -= miss.length; used = miss.length; }
     }
-    if (!S.game.seen2) { S.game.seen2 = {}; achList().forEach((t) => (S.game.seen2[t.id] = t.st)); }
+    if (!S.game.seen2 || S.game.v !== 3) { S.game.seen2 = {}; achList().forEach((t) => (S.game.seen2[t.id] = t.st)); S.game.v = 3; S.game.fresh = []; S.game.unread = 0; }
     save();
     return used;
   }
@@ -244,12 +244,21 @@
     const wk = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0]));
     const w0 = S.plan ? S.plan.start : wk.length ? wk[0][1] : S.profile.weight, wc = curWeight();
     const pi = S.plan ? planInfo() : null;
-    const earlyDin = keys.filter((k) => S.days[k].some((e) => e.meal === "dinner") && S.days[k].filter((e) => e.meal === "dinner").every((e) => new Date(e.t).getHours() < 20)).length;
-    const lightDin = keys.filter((k) => { const d = S.days[k].filter((e) => e.meal === "dinner").reduce((a, e) => a + e.k, 0); return d > 0 && d <= nm.k / 3; }).length;
-    const pro2 = keys.filter((k) => T[k].p >= S.profile.weight * 2).length;
     const wks = {}; keys.forEach((k) => { const w = dkey(monday(fromKey(k))); if (Math.abs(T[k].k - nm.k) <= nm.k * 0.1) wks[w] = (wks[w] || 0) + 1; });
     const goodWeeks = Object.values(wks).filter((v) => v >= 5).length;
-    return { earlyDin, lightDin, pro2, goodWeeks, own: S.my.length + S.combos.length, days: keys.length, photos, entries, inNorm, proDays, bfDays, fullDays, weights: wk.length, combos: S.combos.length, proRun, carbRun, fatRun, noOver, surplus, lost: Math.max(0, w0 - wc), gained: Math.max(0, wc - w0), planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0, todayXp: 0, };
+    const precise = keys.filter((k) => Math.abs(T[k].k - nm.k) <= nm.k * 0.05).length;
+    const balanced = keys.filter((k) => T[k].p >= nm.p * 0.9 && Math.abs(T[k].c - nm.c) <= nm.c * 0.15 && Math.abs(T[k].f - nm.f) <= nm.f * 0.15).length;
+    const proKg = keys.filter((k) => T[k].p >= S.profile.weight * 1.8).length;
+    const wkSet = new Set(wk.map(([k]) => dkey(monday(fromKey(k)))));
+    let weighWeeks = 0; { let m = monday(new Date()); if (!wkSet.has(dkey(m))) m = addDays(m, -7); while (wkSet.has(dkey(m))) { weighWeeks++; m = addDays(m, -7); } }
+    let bestWW = 0, wrun = 0; [...wkSet].sort().forEach((k, i, a) => { wrun = i && dkey(addDays(fromKey(a[i - 1]), 7)) === k ? wrun + 1 : 1; bestWW = Math.max(bestWW, wrun); });
+    const wAvg = {}; wk.forEach(([k, v]) => { const m = dkey(monday(fromKey(k))); (wAvg[m] = wAvg[m] || []).push(v); });
+    const wl = Object.keys(wAvg).sort().map((m) => [m, wAvg[m].reduce((a, b) => a + b, 0) / wAvg[m].length]);
+    let clean = 0; for (let i = 1; i < wl.length; i++) { if (dkey(addDays(fromKey(wl[i - 1][0]), 7)) !== wl[i][0]) continue; const ch = ((wl[i][1] - wl[i - 1][1]) / wl[i - 1][1]) * 100; if (ch >= 0.1 && ch <= 0.5) clean++; }
+    return { goodWeeks, precise, balanced, proKg, weighWeeks: Math.max(weighWeeks, bestWW), clean, w0,
+      lostPct: Math.max(0, ((w0 - wc) / w0) * 100), gainedPct: Math.max(0, ((wc - w0) / w0) * 100),
+      own: S.my.length + S.combos.length, days: keys.length, photos, entries, inNorm, proDays, bfDays, fullDays, weights: wk.length, combos: S.combos.length,
+      proRun, carbRun, fatRun, noOver, surplus, planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0, todayXp: 0 };
   }
   // бесконечные этапы: дальше ряд продолжается ×1,5
   function tierAt(base, i) { if (i < base.length) return base[i]; let v = base[base.length - 1]; for (let j = base.length; j <= i; j++) v = Math.round((v * 1.5) / (v >= 10 ? 5 : 0.5)) * (v >= 10 ? 5 : 0.5); return v; }
@@ -261,30 +270,33 @@
   function achList() {
     const g = gameStats(), best = streakInfo().best, mode = S.plan ? S.plan.type : S.profile.goal;
     const n = (v) => (Number.isInteger(v) ? v : dec(v));
+    const D = (x) => `${x} ${plural(x, "день", "дня", "дней")}`;
     const L = [
-      track("streak", "bolt", "pro", "Серия", best, [3, 7, 14, 30, 60, 100], (x) => `Продержись ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
-      track("diary", "cal", "cal", "Дневник", g.days, [3, 10, 30, 60, 120, 240], (x) => `${x} ${plural(x, "день", "дня", "дней")} с записями`, "дн."),
-      track("photo", "cam", "cal", "Фотограф", g.photos, [1, 5, 15, 40, 100], (x) => `${x} ${plural(x, "блюдо", "блюда", "блюд")} по фото`, "фото"),
-      track("norm", "target", "carb", "В точку", g.inNorm, [1, 5, 15, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} в норме калорий`, "дн."),
-      track("protein", "protein", "pro", "Белок", g.proRun, [2, 5, 10, 20, 40], (x) => `Закрывай белок ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
-      track("meals", "breakfast", "fat", "Режим", g.fullDays, [1, 7, 21, 50, 100], (x) => `${x} ${plural(x, "день", "дня", "дней")} с завтраком, обедом и ужином`, "дн."),
-      track("scale", "scale", "fat", "Весы", g.weights, [1, 4, 10, 25, 50], (x) => x === 1 ? "Запиши свой вес в первый раз" : `Записывай вес: всего ${x} раз`, "раз"),
-      track("bf", "breakfast", "pro", "Ранняя пташка", g.bfDays, [3, 7, 21, 50, 100], (x) => `${x} ${plural(x, "завтрак", "завтрака", "завтраков")}`, "дн."),
+      track("streak", "bolt", "pro", "Серия", best, [3, 7, 14, 30, 60, 100], (x) => `Отмечай питание ${D(x)} подряд`, "дн."),
+      track("diary", "cal", "cal", "Дневник", g.days, [3, 10, 30, 60, 120, 240], (x) => `${D(x)} с записями`, "дн."),
+      track("norm", "target", "carb", "В точку", g.inNorm, [1, 5, 15, 30, 60], (x) => `${D(x)} в норме калорий`, "дн."),
+      track("precise", "crosshair", "cal", "Снайпер", g.precise, [1, 3, 10, 25, 50], (x) => `${D(x)}, где калории совпали с нормой до 5%`, "дн."),
+      track("protein", "protein", "pro", "Белковая серия", g.proRun, [2, 5, 10, 20, 40], (x) => `Закрывай белок ${D(x)} подряд`, "дн."),
+      track("balance", "check", "carb", "Баланс БЖУ", g.balanced, [1, 5, 15, 30, 60], (x) => `${D(x)}, где белки, жиры и углеводы в норме`, "дн."),
+      track("meals", "dinner", "fat", "Режим", g.fullDays, [1, 7, 21, 50, 100], (x) => `${D(x)} с завтраком, обедом и ужином`, "дн."),
       track("week", "star", "carb", "Идеальная неделя", g.goodWeeks, [1, 2, 4, 8, 16], (x) => `${x} ${plural(x, "неделя", "недели", "недель")}, где 5 дней в норме`, "нед."),
-      track("entries", "edit", "fat", "Летописец", g.entries, [10, 50, 150, 300, 600], (x) => `${x} ${plural(x, "запись", "записи", "записей")} еды`, "зап."),
-      track("own", "dish", "pro", "Своя кухня", g.own, [1, 3, 7, 15, 30], (x) => `${x} ${plural(x, "своё блюдо", "своих блюда", "своих блюд")} или набор`, "шт."),
+      track("weigh", "scale", "fat", "Контроль веса", g.weighWeeks, [1, 2, 4, 8, 16], (x) => x === 1 ? "Взвесься на этой неделе" : `Взвешивайся каждую неделю: ${x} ${plural(x, "неделя", "недели", "недель")} подряд`, "нед."),
+      track("photo", "cam", "cal", "Фотограф", g.photos, [1, 5, 15, 40, 100], (x) => `${x} ${plural(x, "блюдо", "блюда", "блюд")} по фото`, "фото"),
+      track("own", "bookmark", "pro", "Своя кухня", g.own, [1, 3, 7, 15, 30], (x) => `Сохрани ${x} ${plural(x, "своё блюдо", "своих блюда", "своих блюд")} или набор`, "шт."),
     ];
+    const pctT = (x, verb) => `${verb} ${n(x)}% веса, это ${dec((g.w0 * x) / 100)} кг`;
     const G = mode === "lose" ? [
-      track("minus", "down-trend", "carb", "Минус", r1(g.lost), [1, 2, 3, 5, 8, 12], (x) => `Сбрось ${n(x)} кг`, "кг"),
-      track("calm", "check", "carb", "Без срывов", g.noOver, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} подряд без перебора`, "дн."),
-      track("fat", "fat", "fat", "Жиры в норме", g.fatRun, [3, 7, 14, 30], (x) => `Держи жиры в норме ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+      track("minus", "down-trend", "carb", "Минус", r1(g.lostPct), [1, 2, 3, 5, 7, 10], (x) => pctT(x, "Сбрось"), "%"),
+      track("calm", "check", "carb", "Без срывов", g.noOver, [3, 7, 14, 30, 60], (x) => `${D(x)} подряд без перебора калорий`, "дн."),
+      track("keepm", "dumbbell", "pro", "Сохрани мышцы", g.proKg, [3, 7, 14, 30, 60], (x) => `${D(x)} с белком от 1,8 г на кг веса`, "дн."),
     ] : mode === "gain" ? [
-      track("plus", "muscle", "carb", "Плюс", r1(g.gained), [0.5, 1, 2, 3, 5, 8], (x) => `Набери ${n(x)} кг`, "кг"),
-      track("surplus", "flame", "pro", "Профицит", g.surplus, [3, 7, 14, 30, 60], (x) => `Добирай калории ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
-      track("carbs", "carbs", "carb", "Углеводы", g.carbRun, [3, 7, 14, 30], (x) => `Закрывай углеводы ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
-      track("pro2", "dumbbell", "pro", "Строитель", g.pro2, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} с белком 2 г на кг веса`, "дн."),
+      track("plus", "muscle", "carb", "Плюс", r1(g.gainedPct), [1, 2, 3, 5, 7, 10], (x) => pctT(x, "Набери"), "%"),
+      track("surplus", "flame", "pro", "Профицит", g.surplus, [3, 7, 14, 30, 60], (x) => `Добирай калории ${D(x)} подряд`, "дн."),
+      track("pro2", "dumbbell", "pro", "Строитель", g.proKg, [3, 7, 14, 30, 60], (x) => `${D(x)} с белком от 1,8 г на кг веса`, "дн."),
+      track("clean", "up-trend", "carb", "Чистый набор", g.clean, [1, 2, 4, 8, 12], (x) => `${x} ${plural(x, "неделя", "недели", "недель")} с плавным ростом веса, до 0,5% в неделю`, "нед."),
     ] : [
-      track("calm", "check", "carb", "Баланс", g.noOver, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} подряд без перебора`, "дн."),
+      track("calm", "check", "carb", "Стабильность", g.noOver, [3, 7, 14, 30, 60], (x) => `${D(x)} подряд без перебора калорий`, "дн."),
+      track("keepm", "dumbbell", "pro", "Сохрани мышцы", g.proKg, [3, 7, 14, 30, 60], (x) => `${D(x)} с белком от 1,8 г на кг веса`, "дн."),
     ];
     if (S.plan) G.push(track("stage", "flag", "carb", "Этапы цели", g.planMs, [1, 2, 3, 6, 12], (x) => `Пройди ${x} ${plural(x, "месячный этап", "месячных этапа", "месячных этапов")}`, "эт."));
     L.common = L.slice(); L.goal = G; L.mode = mode;
@@ -296,11 +308,13 @@
     if (!S.game) return null;
     const A = achList();
     if (!S.game.seen2) { S.game.seen2 = {}; A.forEach((t) => (S.game.seen2[t.id] = t.st)); save(); return null; }
-    const up = A.find((t) => t.st > (S.game.seen2[t.id] || 0));
-    A.forEach((t) => (S.game.seen2[t.id] = Math.max(t.st, S.game.seen2[t.id] || 0))); save();
-    if (!up) return null;
-    S.game.fresh = Array.from(new Set((S.game.fresh || []).concat(A.filter((t) => t.st > 0 && t.st >= (S.game.seen2[t.id] || 0) && t.id === up.id).map((t) => t.id)))); save();
-    return { id: up.id, ic: up.ic, t: `${up.t} · этап ${up.st}`, d: `Следующий этап: ${up.d.charAt(0).toLowerCase() + up.d.slice(1)}` };
+    const ups = A.filter((t) => t.st > (S.game.seen2[t.id] || 0));
+    A.forEach((t) => (S.game.seen2[t.id] = Math.max(t.st, S.game.seen2[t.id] || 0)));
+    if (!ups.length) { save(); return null; }
+    const up = ups[0];
+    S.game.fresh = Array.from(new Set((S.game.fresh || []).concat(ups.map((t) => t.id))));
+    S.game.unread = (S.game.unread || 0) + ups.length - 1; save();
+    return { id: up.id, n: ups.length, ic: up.ic, t: `${up.t} · этап ${up.st}`, d: `Следующий этап: ${up.d.charAt(0).toLowerCase() + up.d.slice(1)}` };
   }
   const status = (k) => { const n = dayEntries(k).length; if (!n) return ""; const v = totals(k).k, nm = norm().k; if (v > nm * 1.1) return "ov"; if (v >= nm * 0.9) return "in"; return "un"; };
 
@@ -693,7 +707,6 @@
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
     $("#t-ins").innerHTML = insightHTML(t, Object.assign({}, nm, { k: kN }), isToday);
-    const ib = $("#ins-btn"); if (ib) ib.onclick = () => { const f = window.FOODS.find((x) => x.n === ib.dataset.f); openAdd("search"); portion(Object.assign({}, f), null, +ib.dataset.g); };
     $("#m-title").textContent = isToday ? "Приёмы пищи" : "Приёмы пищи · " + dayLabel(selDay).toLowerCase();
     $("#m-sum").textContent = dayEntries(selDay).length ? fmt(t.k) + " ккал" : "";
     renderMeals();
@@ -743,31 +756,62 @@
 
   // ---------- insight ----------
   const PRO_FOODS = ["Куриная грудка варёная", "Творог 5%", "Греческий йогурт", "Протеиновый коктейль (молочный)", "Яйцо варёное", "Тунец консервированный"];
+  // любимые источники белка пользователя: что он сам часто ест
+  function myProteinFoods() {
+    const agg = {}, end = new Date();
+    for (let i = 1; i <= 30; i++) dayEntries(dkey(addDays(end, -i))).forEach((e) => { if (!e.k || e.p < 8) return; const n = e.n.trim(); (agg[n] = agg[n] || { n, list: [] }).list.push(e); });
+    return Object.values(agg).filter((x) => x.list.length >= 2).map((x) => {
+      const L = x.list, avg = (f) => L.reduce((a, e) => a + e[f], 0) / L.length;
+      return { n: x.n, g: avg("g"), q: L[0].q, p: avg("p"), k: avg("k"), dens: avg("p") / Math.max(1, avg("k")), times: L.length };
+    }).filter((x) => x.dens >= 0.07).sort((a, b) => b.dens - a.dens);
+  }
+  // наблюдения по истории (без нейросети)
+  function patternInsight(nm) {
+    const end = new Date(), days = [];
+    for (let i = 1; i <= 28; i++) { const k = dkey(addDays(end, -i)); if (isLogged(k)) days.push({ d: fromKey(k), t: totals(k), list: dayEntries(k) }); }
+    if (days.length < 7) return null;
+    const we = days.filter((x) => x.d.getDay() === 0 || x.d.getDay() === 6), wd = days.filter((x) => x.d.getDay() > 0 && x.d.getDay() < 6);
+    const avg = (arr, f) => arr.reduce((a, x) => a + f(x), 0) / Math.max(1, arr.length);
+    if (we.length >= 2 && wd.length >= 4) { const diff = avg(we, (x) => x.t.k) - avg(wd, (x) => x.t.k); if (diff >= 250) return { ic: "cal", col: "cal", t: `По выходным на ${fmt(diff)} ккал больше`, x: "За последние 4 недели в субботу и воскресенье ты ешь заметно больше, чем в будни. Можно заранее оставить запас в пятницу или не добирать до нормы в понедельник." }; }
+    const pClosed = days.filter((x) => x.t.p >= nm.p * 0.95).length;
+    if (pClosed / days.length < 0.5) {
+      const withBf = days.filter((x) => x.list.some((e) => e.meal === "breakfast")), noBf = days.filter((x) => !x.list.some((e) => e.meal === "breakfast"));
+      const tail = withBf.length >= 3 && noBf.length >= 3 && avg(withBf, (x) => x.t.p) - avg(noBf, (x) => x.t.p) > 15 ? ` В дни с завтраком белка у тебя в среднем на ${r0(avg(withBf, (x) => x.t.p) - avg(noBf, (x) => x.t.p))} г больше.` : " Проще всего добирать его на завтраке и перекусе.";
+      return { ic: "protein", col: "pro", t: `Белок закрыт в ${pClosed} из ${days.length} дней`, x: `Белок важнее всего для результата, а он чаще не добирается.${tail}` };
+    }
+    const din = avg(days, (x) => x.list.filter((e) => e.meal === "dinner").reduce((a, e) => a + e.k, 0) / Math.max(1, x.t.k));
+    if (din > 0.45) return { ic: "dinner", col: "cal", t: `${Math.round(din * 100)}% калорий на ужин`, x: "Большая часть еды у тебя вечером. Если днём бывает тяжело и тянет переесть, попробуй перенести часть ужина на обед." };
+    const inN = days.filter((x) => Math.abs(x.t.k - nm.k) <= nm.k * 0.1).length;
+    if (inN / days.length >= 0.6) return { ic: "check", col: "carb", t: `${inN} из ${days.length} дней в норме`, x: "Отличная стабильность. Именно регулярность, а не идеальные дни, даёт результат." };
+    return null;
+  }
   function insightHTML(t, nm, isToday) {
-    if (!dayEntries(selDay).length) return "";
     const h = new Date().getHours(), kLeft = nm.k - t.k, pLeft = nm.p - t.p;
     const wb = weekBalance(selDay);
-    let ic = "bulb", col = "cal", title = "", text = "", btn = "";
-    if (t.k > nm.k * 1.1) {
+    let ic = "bulb", col = "cal", title = "", text = "";
+    const pat = () => { const p = isToday ? patternInsight(nm) : null; if (!p) return false; ic = p.ic; col = p.col; title = p.t; text = p.x; return true; };
+    if (!dayEntries(selDay).length) { if (!pat()) return ""; }
+    else if (t.k > nm.k * 1.1) {
       col = "pro"; ic = "flame"; title = "Сверх нормы на " + fmt(t.k - nm.k) + " ккал";
       text = wb.days && wb.bal > 0 ? `С учётом недели всё в порядке: до этого дня ты недобрал ${fmt(wb.bal)} ккал.` : "На результат влияет средний показатель за неделю. Завтра просто держись нормы.";
     } else if (isToday && pLeft > 20) {
-      const opts = PRO_FOODS.map((n) => window.FOODS.find((x) => x.n === n)).filter(Boolean).map((f) => { const g = Math.round(clamp((pLeft / f.p) * 100, 60, 250) / 10) * 10; return { f, g, v: scaleFood(f, g) }; })
-        .filter((o) => o.v.k <= Math.max(kLeft, 200)).sort((a, b) => b.v.p / b.v.k - a.v.p / a.v.k);
-      const o = opts[new Date().getDate() % Math.max(1, Math.min(3, opts.length))] || opts[0];
       col = "pro"; ic = "protein"; title = "Добери " + r0(pLeft) + " г белка";
-      text = o ? `${o.f.n}, ${o.g} г: это ${r0(o.v.p)} г белка и ${fmt(o.v.k)} ккал.` : "Добавь к следующему приёму пищи курицу, творог или яйца.";
+      const mine = myProteinFoods().filter((x) => x.k <= Math.max(kLeft, 250));
+      if (mine.length) { const o = mine[0]; text = `Из того, что ты обычно ешь, лучше всего подойдёт ${o.n.toLowerCase()}: ${o.g ? r0(o.g) + " г" : "порция"} даёт ${r0(o.p)} г белка и ${fmt(o.k)} ккал.`; }
+      else text = kLeft > 0 ? `На оставшиеся ${fmt(kLeft)} ккал выбери что-то белковое: мясо, рыбу, яйца, творог или йогурт.` : "Калории уже закрыты, поэтому лучше что-то лёгкое и белковое: творог, йогурт или яйца.";
     } else if (isToday && kLeft > nm.k * 0.35 && h >= 19) {
       col = "carb"; ic = "carbs"; title = "До нормы ещё " + fmt(kLeft) + " ккал";
-      text = S.profile.goal === "gain" ? "Для набора массы важно добирать калории. Проще всего: каша на молоке, орехи или банан с арахисовой пастой." : "Если не голоден, не нужно доедать через силу. Главное, чтобы был закрыт белок.";
+      text = S.profile.goal === "gain" ? "Для набора массы важно добирать калории каждый день, иначе вес стоит на месте." : "Если не голоден, доедать через силу не нужно. Главное, чтобы был закрыт белок.";
     } else if (Math.abs(kLeft) <= nm.k * 0.1 && pLeft <= 10) {
       col = "carb"; ic = "check"; title = "Отличный день"; text = "Калории в норме, белок закрыт.";
     } else if (isToday && kLeft > 0) {
-      ic = "bulb"; title = "Осталось " + fmt(kLeft) + " ккал";
-      const next = h < 11 ? "обед и ужин" : h < 16 ? "ужин и перекус" : "ужин";
-      text = `Примерно столько можно съесть на ${next}. Белка осталось ${Math.max(0, r0(pLeft))} г.`;
+      if (h < 12 && pat()) {} else {
+        ic = "bulb"; title = "Осталось " + fmt(kLeft) + " ккал";
+        const next = h < 11 ? "обед и ужин" : h < 16 ? "ужин и перекус" : "ужин";
+        text = `Примерно столько можно съесть на ${next}. Белка осталось ${Math.max(0, r0(pLeft))} г.`;
+      }
     } else return "";
-    return `<div class="gap"></div><div class="card tip c-${col}"><div class="tip-h"><span class="tip-ic">${icon(ic)}</span><b>${title}</b></div><p>${esc(text)}</p>${btn}</div>`;
+    return `<div class="gap"></div><div class="card tip c-${col}"><div class="tip-h"><span class="tip-ic">${icon(ic)}</span><b>${title}</b></div><p>${esc(text)}</p></div>`;
   }
 
   // ---------- meals ----------
@@ -1100,7 +1144,7 @@
         <div class="tr-b"><div class="tr-h"><b>${t.t}</b>${fr.includes(t.id) ? `<span class="tr-new">Новое</span>` : ""}<span class="tr-st">${t.st ? "Этап " + t.st : "Не начато"}</span></div>
           <div class="tr-d">${esc(t.d)}</div>
           <div class="tr-bar"><i style="--w:${(t.pct * 100).toFixed(1)}%"></i></div>
-          <div class="tr-n"><span>${t.unit === "кг" ? dec(t.val) : fmt(t.val)} из ${t.unit === "кг" ? dec(t.next) : fmt(t.next)}</span><span>этап ${t.st + 1}</span></div></div></div>`;
+          <div class="tr-n"><span>${t.unit === "%" ? dec(t.val) + "%" : fmt(t.val)} из ${t.unit === "%" ? dec(t.next) + "%" : fmt(t.next)}</span><span>этап ${t.st + 1}</span></div></div></div>`;
     const modeT = A.mode === "lose" ? "Для похудения" : A.mode === "gain" ? "Для набора массы" : "Для формы";
     const body = `
       <div class="d-hero g-pro st-hero">
@@ -1113,13 +1157,13 @@
       <div class="gap"></div>
       <div class="card lvl">
         <div class="lv-ring" id="lv-ring">${Array.from({ length: 20 }, (_, i) => `<i class="${i < Math.round((LV.inLv / LV.need) * 20) ? "on" : ""}" style="--r:${i * 18}deg;transition-delay:${0.2 + i * 0.03}s"></i>`).join("")}<span class="num">${LV.lv}</span></div>
-        <div class="lv-b"><em>Твой уровень</em><b>${LV.lv} уровень</b><span>${LV.need - LV.inLv} ${plural(LV.need - LV.inLv, "этап", "этапа", "этапов")} до ${LV.lv + 1} уровня · всего ${LV.st} ${plural(LV.st, "этап", "этапа", "этапов")}</span></div>
+        <div class="lv-b"><em>Твой уровень</em><b>${LV.lv} уровень</b><span>Ещё ${LV.need - LV.inLv} ${plural(LV.need - LV.inLv, "достижение", "достижения", "достижений")} до ${LV.lv + 1} уровня</span></div>
       </div>
       <div class="subh">Достижения</div>
       <div class="trs">${A.common.map(card).join("")}</div>
       <div class="subh">${modeT}</div>
       <div class="trs">${A.goal.map((t, i) => card(t, i + A.common.length)).join("")}</div>
-      <p class="note">Каждый пройденный этап открывает следующий, чуть сложнее. За этапы растёт твой уровень. Неделя без пропусков даёт заморозку: она сохранит серию, если однажды забудешь отметиться.</p>`;
+      <p class="note">Каждое достижение открывает следующую ступень, чуть сложнее. Каждые 3 достижения поднимают уровень. Неделя без пропусков даёт заморозку: она сохранит серию, если однажды забудешь отметиться.</p>`;
     openSheet("Прогресс и награды", body);
     if (scrollNew) { setTimeout(() => { const n = $("#sh-body .tr.fresh"); if (n) n.scrollIntoView({ behavior: "smooth", block: "center" }); }, 450); onSheetClose = () => { S.game.fresh = []; save(); }; }
     countUp($("#st-n"), st.n, { from: 0, dur: 900, force: true });
@@ -1167,35 +1211,48 @@
     raf2(() => { $("#d-hours").classList.add("go"); $("#d-wbal").classList.add("go"); });
   }
   const MACRO = {
-    p: { n: "Белки", i: "protein", kind: "pro", why: "Белок нужен для роста и восстановления мышц. Норма считается от веса: ", foods: ["Куриная грудка варёная", "Творог 5%", "Греческий йогурт", "Яйцо варёное", "Тунец консервированный", "Протеиновый коктейль (молочный)"] },
-    c: { n: "Углеводы", i: "carbs", kind: "carb", why: "Углеводы дают энергию для тренировок и восполняют гликоген в мышцах.", foods: ["Рис варёный", "Гречка варёная", "Овсянка на молоке", "Банан", "Лепёшка (нон)", "Картофель варёный"] },
-    f: { n: "Жиры", i: "fat", kind: "fat", why: "Жиры нужны для гормонов и усвоения витаминов. Опускать их ниже нормы не стоит.", foods: ["Грецкие орехи", "Арахисовая паста", "Авокадо", "Лосось", "Яйцо варёное", "Масло оливковое"] },
+    p: { n: "Белки", g: "белка", i: "protein", kind: "pro", tip: (nm) => `Раздели белок на 3–4 приёма примерно по ${Math.round(nm.p / 4 / 5) * 5} г: так он лучше идёт в мышцы, чем одна большая порция вечером.` },
+    c: { n: "Углеводы", g: "углеводов", i: "carbs", kind: "carb", tip: () => "Больше углеводов стоит оставлять на приёмы до и после тренировки: это энергия для подходов и восстановление." },
+    f: { n: "Жиры", g: "жиров", i: "fat", kind: "fat", tip: (nm) => `Не опускай жиры ниже ${Math.round(S.profile.weight * 0.8)} г в день: они нужны для гормонов, в том числе для роста мышц.` },
   };
   function openMacroDetail(k) {
     haptic("light");
     const M = MACRO[k], nm = norm(), t = totals(selDay), list = dayEntries(selDay);
-    const srcs = list.filter((e) => e[k] > 0.5).sort((a, b) => b[k] - a[k]).slice(0, 6);
-    const kcalShare = t.k ? Math.round((((k === "f" ? 9 : 4) * t[k]) / t.k) * 100) : 0;
+    const srcs = list.filter((e) => e[k] > 0.5).sort((a, b) => b[k] - a[k]).slice(0, 5);
     const rest = Math.max(0, nm[k] - t[k]);
-    const sug = M.foods.map((n) => window.FOODS.find((x) => x.n === n)).filter(Boolean).slice(0, 4);
+    // 7 дней
+    const end = fromKey(selDay), days = Array.from({ length: 7 }, (_, i) => { const d = addDays(end, i - 6), kk = dkey(d); return { d, kk, v: totals(kk)[k], has: isLogged(kk) }; });
+    const logged = days.filter((x) => x.has), avg = logged.length ? logged.reduce((a, x) => a + x.v, 0) / logged.length : 0;
+    const okDays = logged.filter((x) => (k === "f" ? Math.abs(x.v - nm[k]) <= nm[k] * 0.2 : x.v >= nm[k] * 0.9)).length;
+    const rows = 10, unit = (nm[k] * 1.3) / rows, nRow = Math.round(nm[k] / unit);
+    // главные источники за 30 дней
+    const agg = {};
+    for (let i = 0; i < 30; i++) { const kk = dkey(addDays(end, -i)); dayEntries(kk).forEach((e) => { const n = e.n.trim(); if (!agg[n]) agg[n] = { n, v: 0, times: 0, img: e.img }; agg[n].v += e[k]; agg[n].times++; }); }
+    const tot30 = Object.values(agg).reduce((a, x) => a + x.v, 0);
+    const top = Object.values(agg).filter((x) => x.v > 1).sort((a, b) => b.v - a.v).slice(0, 5);
     const body = `
       <div class="d-hero g-${M.kind}">
         <div class="c-head"><span class="c-title"><span class="ic">${icon(M.i)}</span>${dayLabel(selDay)}</span><span class="chip">${nm[k] ? Math.round((t[k] / nm[k]) * 100) : 0}% нормы</span></div>
         <div class="big"><span class="num">${r0(t[k])}</span><span class="of">из ${nm[k]} г</span></div>
         ${dotRow(24)}
-        <div class="stats3"><div><span>${rest > 0 ? "Осталось" : "Сверх нормы"}</span><b class="num">${r0(rest > 0 ? rest : t[k] - nm[k])} г</b></div><div><span>Доля калорий</span><b class="num">${kcalShare}%</b></div><div><span>На кг веса</span><b class="num">${dec(t[k] / S.profile.weight)} г</b></div></div>
+        <div class="stats3 two"><div><span>${rest > 0 ? "Осталось" : "Сверх нормы"}</span><b class="num">${r0(rest > 0 ? rest : t[k] - nm[k])} г</b></div><div><span>На кг веса</span><b class="num">${dec(t[k] / S.profile.weight)} г</b></div></div>
       </div>
       <div class="gap"></div>
-      <div class="card"><div class="card-t">Источники за день</div>
-        ${srcs.length ? srcs.map((e) => `<div class="src">${ficHTML(e)}<span class="st">${esc(e.n)}</span><span class="sv">${r0(e[k])} г<span>${t[k] ? Math.round((e[k] / t[k]) * 100) : 0}%</span></span></div>`).join("") : `<div class="card-s">Пока нет записей.</div>`}
+      <div class="card"><div class="c-head"><span class="card-t">7 дней</span><span class="muted">${logged.length ? `в норме ${okDays} из ${logged.length}` : "нет записей"}</span></div>
+        <div class="card-s" style="margin-top:4px">${logged.length ? `В среднем ${r0(avg)} г в день, норма ${nm[k]} г` : "Здесь появится неделя, когда начнёшь записывать еду"}</div>
+        <div class="wbal mw k-${M.kind}" id="mw">${days.map((x, i) => { const on = Math.min(rows, Math.round(x.v / unit)); let c = ""; for (let r = 0; r < rows; r++) c += `<i class="${r < on ? (r >= nRow ? "ov" : "on") : r < nRow ? "" : "x"}" style="transition-delay:${(i * 0.05 + r * 0.02).toFixed(3)}s"></i>`; return `<div class="wb ${x.kk === selDay ? "today" : ""}"><div class="dcol">${c}</div><span>${WD[x.d.getDay()]}</span></div>`; }).join("")}</div>
       </div>
       <div class="gap"></div>
-      <div class="card"><div class="card-t">Где взять ${M.n.toLowerCase()}</div><div class="card-s">На стандартную порцию</div>
-        ${sug.map((f) => { const v = scaleFood(f, f.g); return `<div class="fitem sug"><span class="ft"><b>${esc(f.n)}</b><span>${f.g} г · ${fmt(v.k)} ккал</span></span><span class="sg-v">${r0(v[k])} г</span></div>`; }).join("")}
-      </div>
-      <p class="note">${M.why}${k === "p" ? dec(nm.p / S.profile.weight) + " г на кг." : ""}</p>`;
+      ${srcs.length ? `<div class="card"><div class="card-t">Из чего ${k === "p" ? "белок" : k === "c" ? "углеводы" : "жиры"} ${selDay === todayKey() ? "сегодня" : "в этот день"}</div>
+        ${srcs.map((e) => `<div class="src"><span class="st">${esc(e.n)}</span><span class="sv">${r0(e[k])} г<span>${t[k] ? Math.round((e[k] / t[k]) * 100) : 0}%</span></span></div>`).join("")}
+      </div><div class="gap"></div>` : ""}
+      ${top.length >= 2 ? `<div class="card"><div class="card-t">Твои главные источники</div><div class="card-s" style="margin-top:2px">За 30 дней, по количеству ${M.g}</div>
+        ${top.map((x) => `<div class="src"><span class="st">${esc(x.n)}<em>${x.times} ${plural(x.times, "раз", "раза", "раз")}</em></span><span class="sv">${fmt(x.v)} г<span>${Math.round((x.v / tot30) * 100)}%</span></span></div>`).join("")}
+      </div>` : ""}
+      <div class="tip-line">${icon("bulb")}<span>${M.tip(nm)}</span></div>`;
     openSheet(M.n, body);
     setDots($(".d-hero .drow"), t[k], nm[k]);
+    raf2(() => { const w = $("#mw"); if (w) w.classList.add("go"); });
   }
 
   // =====================================================================
@@ -1416,7 +1473,7 @@
       haptic("ok"); bumpStreak();
       const old = $(".ach-ban"); if (old) old.remove();
       const el = document.createElement("button"); el.className = "ach-ban";
-      el.innerHTML = `<span class="ab-ic">${icon(a.ic)}</span><span class="ab-t"><em>Новое достижение</em><b>${esc(a.t)}</b></span>${icon("right", "chev")}`;
+      el.innerHTML = `<span class="ab-ic">${icon(a.ic)}</span><span class="ab-t"><em>${a.n > 1 ? `Новых достижений: ${a.n}` : "Новое достижение"}</em><b>${esc(a.t)}</b></span>${icon("right", "chev")}`;
       document.body.appendChild(el); raf2(() => el.classList.add("on"));
       const close = () => { el.classList.remove("on"); setTimeout(() => el.remove(), 500); };
       const t = setTimeout(close, 4200);
