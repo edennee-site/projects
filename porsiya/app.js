@@ -149,9 +149,11 @@
     let k = tdee * (1 + g.adj);
     if (p.goal === "lose") k = Math.max(k, tdee - 600);
     if (plan) { const adj = planAdj(plan); k = clamp(tdee + adj, tdee * 0.75, tdee * 1.2); }
+    k = Math.max(k, bmr * 0.9, p.sex === "f" ? 1200 : 1500); // не ниже безопасного минимума
     k = Math.round(k / 10) * 10;
-    const pr = Math.round(p.weight * g.pk);
-    const fa = Math.round(Math.max(p.weight * 0.9, (k * 0.25) / 9));
+    const hM = p.height / 100, refW = Math.min(p.weight, 25 * hM * hM); // при лишнем весе белок считаем от нормального веса
+    const pr = Math.min(220, Math.round(refW * g.pk));
+    const fa = Math.round(Math.max(refW * 0.8, (k * 0.25) / 9));
     const ca = Math.max(0, Math.round((k - pr * 4 - fa * 9) / 4));
     return { k, p: pr, f: fa, c: ca, tdee: Math.round(tdee), bmr: Math.round(bmr), train: Math.round(train), steps: Math.round(steps) };
   }
@@ -159,13 +161,18 @@
   const PACE = { lose: [0.35, 0.5, 0.75], gain: [0.15, 0.25, 0.4] };
   const PACE_N = ["Спокойно", "Умеренно", "Быстрее"];
   const planKgWeek = (pl) => (pl.start * PACE[pl.type][pl.pace]) / 100;
-  const planAdj = (pl) => (pl.type === "lose" ? -1 : 0.75) * (planKgWeek(pl) * 7700) / 7;
+  const planAdj = (pl) => (pl.type === "lose" ? -1 : 1.2) * (planKgWeek(pl) * 7700) / 7;
   const curWeight = () => { const e = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0])); return e.length ? e[e.length - 1][1] : S.profile.weight; };
   const weightAt = (k) => { const e = Object.entries(S.weights).filter(([d]) => d <= k).sort((a, b) => a[0].localeCompare(b[0])); return e.length ? e[e.length - 1][1] : null; };
   const addMonths = (d, m) => { const x = new Date(d); x.setMonth(x.getMonth() + m); return x; };
+  // реальный темп: если калорийность упёрлась в безопасный минимум, темп ниже выбранного
+  function planKgWeekEff(pl, p = S.profile) {
+    const n = calcNorm(Object.assign({}, p, { manual: { on: false } }), pl), ach = (Math.abs(n.k - n.tdee) * 7) / 7700 / (pl.type === "lose" ? 1 : 1.2);
+    return Math.max(0.05, Math.min(planKgWeek(pl), ach));
+  }
   function planInfo(pl = S.plan) {
     if (!pl) return null;
-    const sign = pl.type === "lose" ? -1 : 1, total = Math.abs(pl.target - pl.start), kw = planKgWeek(pl);
+    const sign = pl.type === "lose" ? -1 : 1, total = Math.abs(pl.target - pl.start), kw = planKgWeekEff(pl);
     const weeks = Math.max(1, total / kw), sd = fromKey(pl.startDate), end = addDays(sd, Math.round(weeks * 7));
     const now = new Date(), wElapsed = Math.max(0, (now - sd) / 6048e5);
     const expected = pl.start + sign * Math.min(total, kw * wElapsed), cur = curWeight();
@@ -492,11 +499,11 @@
   function bindSteppers(root, obj, limits, onChange) {
     $$("[data-step]", root).forEach((st) => {
       const f = st.dataset.step, inc = parseFloat(st.dataset.inc) || 1;
-      const [mn, mx] = limits[f] || [0, 99999];
+      const L = () => limits[f] || [0, 99999];
       const out = $("[data-v]", st);
       const show = () => { out.textContent = STEP_FMT[f] ? STEP_FMT[f](obj[f]) : dec(obj[f]); };
       let hold, rep;
-      const bump = (dir) => { const nv = clamp(Math.round((obj[f] + dir * inc) * 10) / 10, mn, mx); if (nv === obj[f]) return; obj[f] = nv; show(); haptic("sel"); onChange && onChange(f, obj[f]); };
+      const bump = (dir) => { const [mn, mx] = L(); const nv = clamp(Math.round((obj[f] + dir * inc) * 10) / 10, mn, mx); if (nv === obj[f]) return; obj[f] = nv; show(); haptic("sel"); onChange && onChange(f, obj[f]); };
       $$("button", st).forEach((b) => {
         const dir = +b.dataset.d;
         const start = (e) => { e.preventDefault(); bump(dir); hold = setTimeout(() => { rep = setInterval(() => bump(dir), 70); }, 380); };
@@ -510,7 +517,7 @@
         const inp = document.createElement("input");
         inp.type = "text"; inp.inputMode = inc < 1 ? "decimal" : "numeric"; inp.value = String(obj[f]).replace(".", ","); inp.className = "val-in";
         out.style.display = "none"; val.prepend(inp); inp.focus(); inp.select();
-        const commit = () => { const n = parseFloat(inp.value.replace(",", ".").replace(/\s/g, "")); if (!isNaN(n)) { obj[f] = clamp(Math.round(n * 10) / 10, mn, mx); onChange && onChange(f, obj[f]); } show(); inp.remove(); out.style.display = ""; };
+        const commit = () => { const n = parseFloat(inp.value.replace(",", ".").replace(/\s/g, "")); if (!isNaN(n)) { const [mn, mx] = L(); obj[f] = clamp(Math.round(n * 10) / 10, mn, mx); onChange && onChange(f, obj[f]); } show(); inp.remove(); out.style.display = ""; };
         inp.addEventListener("blur", commit); inp.addEventListener("keydown", (e) => { if (e.key === "Enter") inp.blur(); });
       });
     });
@@ -825,7 +832,7 @@
         const m = mealByTime(), ys = dayEntries(dkey(addDays(new Date(), -1))).filter((e) => e.meal === m);
         if (ys.length) rep = `<button class="btn sm ghost" id="rep-btn">${icon("refresh")}Повторить вчерашний ${meal(m).n.toLowerCase()}</button>`;
       }
-      box.innerHTML = `<div class="meal-group"><div class="empty"><div class="em">${icon("dish")}</div><b>${selDay === todayKey() ? "Пока пусто" : "В этот день записей нет"}</b><p>Сфотографируй еду или найди её в базе, калории посчитаются сами.</p>${rep || `<button class="btn sm" id="empty-add">${icon("plus")}Добавить еду</button>`}</div></div>`;
+      box.innerHTML = `<div class="meal-group"><div class="empty"><div class="em">${icon("dish")}</div><b>${selDay === todayKey() ? "Пока пусто" : "В этот день записей нет"}</b><p>Сфотографируй тарелку или добавь блюдо вручную.</p>${rep || `<button class="btn sm" id="empty-add">${icon("plus")}Добавить еду</button>`}</div></div>`;
       if ($("#empty-add")) $("#empty-add").onclick = () => { haptic("medium"); openAdd(); };
       if ($("#rep-btn")) $("#rep-btn").onclick = () => {
         const m = mealByTime(), ys = dayEntries(dkey(addDays(new Date(), -1))).filter((e) => e.meal === m);
@@ -927,7 +934,7 @@
     const items = dayEntries(selDay).filter((e) => e.meal === mealId), sum = items.reduce((a, e) => a + e.k, 0);
     const def = "Мой " + meal(mealId).n.toLowerCase();
     openSheet("Новый набор", `<label class="field"><span>Название</span><input id="cb-n" maxlength="40" value="${esc(def)}"></label>
-      <p class="note">Набор добавляется в один тап из поиска. Удобно для завтрака, который повторяется каждый день.</p>
+      <p class="note">Набор появится в «Моих блюдах» и добавится в одно касание. Удобно для завтрака, который повторяется каждый день.</p>
       <div class="meal-group" style="margin-top:14px">${items.map((e) => `<div class="item" style="pointer-events:none">${ficHTML(e)}<span class="it"><b>${esc(e.n)}</b><span>${r0(e.g)} г</span></span><span class="kc">${fmt(e.k)}</span></div>`).join("")}</div>`,
       `<button class="btn" id="cb-save">Сохранить · ${fmt(sum)} ккал</button>`);
     $("#cb-save").onclick = () => {
@@ -1085,19 +1092,23 @@
     setSheet(ex ? "Изменить цель" : "Новая цель", body, `<button class="btn" id="pe-save">${ex ? "Сохранить" : "Поставить цель"}</button>`, planTop ? null : back, planTop ? 0 : 1); planTop = false;
     const root = $("#sh-body");
     const upd = () => {
-      if (st.type === "lose" && st.target >= cw) st.target = r1(cw - 0.5); if (st.type === "gain" && st.target <= cw) st.target = r1(cw + 0.5);
+      // реалистичные рамки: похудение не ниже здорового веса и не больше 25% за одну цель, набор не больше 15%
+      const lo = st.type === "lose" ? Math.max(minW, r1(cw * 0.75)) : r1(cw + 0.5), hi = st.type === "lose" ? r1(cw - 0.5) : r1(cw * 1.15);
+      st.target = clamp(st.target, Math.min(lo, hi), Math.max(lo, hi));
       $('[data-step="target"] [data-v]').textContent = dec(st.target);
       const pl = { type: st.type, start: cw, startDate: todayKey(), target: st.target, pace: st.pace }, pi = planInfo(pl);
       const k = calcNorm(S.profile, pl).k, months = Math.round(pi.weeks / 4.345 * 10) / 10;
       let warn = "";
-      if (st.type === "lose" && st.target < minW) warn = `Это ниже здорового веса для твоего роста (около ${dec(minW)} кг). Лучше выбрать цель повыше.`;
+      if (planKgWeekEff(pl) < planKgWeek(pl) - 0.01) warn = "Для твоих параметров быстрее нельзя: норма упёрлась в безопасный минимум калорий. Срок посчитан по реальному темпу.";
+      else if (st.type === "lose" && st.target < minW) warn = `Это ниже здорового веса для твоего роста (около ${dec(minW)} кг). Лучше выбрать цель повыше.`;
       else if (pi.total > cw * 0.2) warn = "Большая цель. Лучше разбить её на несколько этапов и начать с первого.";
       else if (st.type === "gain" && st.pace === 2) warn = "Быстрый набор чаще идёт в жир. Для мышц обычно хватает умеренного темпа.";
       $("#pe-sum").innerHTML = `<div class="ps-row"><span>В месяц</span><b>${st.type === "lose" ? "−" : "+"}${dec(pi.km)} кг</b></div><div class="ps-row"><span>Срок</span><b>${months < 1 ? "меньше месяца" : "≈ " + dec(months) + " " + plural(Math.ceil(months), "месяц", "месяца", "месяцев")}</b></div><div class="ps-row"><span>Финиш</span><b>${fmtD(pi.end)} ${pi.end.getFullYear()}</b></div><div class="ps-row"><span>Норма в день</span><b>${fmt(k)} ккал</b></div>${warn ? `<div class="ps-warn">${icon("info")}<span>${warn}</span></div>` : ""}`;
     };
     bindSeg(root, "ptype", (v) => { st.type = v; st.target = r1(cw + (v === "lose" ? -4 : 3)); upd(); });
     bindSeg(root, "pace", (v) => { st.pace = +v; upd(); });
-    bindSteppers(root, st, { target: [30, 250] }, upd);
+    const lim = () => (st.type === "lose" ? [Math.min(Math.max(minW, r1(cw * 0.75)), r1(cw - 0.5)), r1(cw - 0.5)] : [r1(cw + 0.5), r1(cw * 1.15)]);
+    bindSteppers(root, st, { get target() { return lim(); } }, upd);
     upd();
     $("#pe-save").onclick = () => {
       S.plan = { type: st.type, start: cw, startDate: ex && ex.start === cw ? ex.startDate : todayKey(), target: st.target, pace: st.pace };
@@ -1321,10 +1332,10 @@
     const img = $("#pv img"); const loaded = () => $("#pv").classList.add("loaded"); if (img.complete) raf2(loaded); else img.onload = loaded;
     const ta = $("#p-hint");
     const grow = () => { ta.style.height = "auto"; ta.style.height = Math.min(140, ta.scrollHeight) + "px"; };
-    ta.oninput = () => { add.hint = ta.value; grow(); if (add.items.length) renderFoot(); };
+    ta.oninput = () => { add.hint = ta.value; grow(); if (add.done) renderFoot(); };
     raf2(grow);
-    $("#p-retake").onclick = () => { add.tab = "home"; add.photo = null; add.items = []; add.hint = ""; anReq++; haptic("light"); renderAdd(-1); };
-    if (has) renderResults();
+    $("#p-retake").onclick = () => { add.tab = "home"; add.photo = null; add.items = []; add.done = false; add.hint = ""; anReq++; haptic("light"); renderAdd(-1); };
+    if (has || add.done) renderResults();
     else if (!canRecognize()) noService();
     else sheetFoot(`<button class="btn" id="p-go">${icon("bolt")}Распознать</button>`), ($("#p-go").onclick = analyze);
   }
@@ -1339,7 +1350,7 @@
       const { full, thumb } = await compress(file, 1024, 120);
       const wasOpen = sheetOpen;
       if (!sheetOpen) { add = newAdd("photo"); openSheet("Фото еды", ""); }
-      add.photo = full; add.thumb = thumb; add.items = []; add.hint = ""; add.tab = "photo"; renderAdd(wasOpen ? 1 : 0);
+      add.photo = full; add.thumb = thumb; add.items = []; add.done = false; add.hint = ""; add.tab = "photo"; renderAdd(wasOpen ? 1 : 0);
     } catch (e) { toast("Не удалось открыть фото"); }
   }
   $("#f-cam").addEventListener("change", (e) => { onFile(e.target.files[0]); e.target.value = ""; });
@@ -1373,7 +1384,7 @@
     try {
       const items = await recognize(add.photo, add.hint);
       if (my !== anReq) return;
-      add.items = items; add.lastHint = add.hint; haptic(items.length ? "ok" : "err");
+      add.items = items; add.done = true; add.cleared = false; add.lastHint = add.hint; haptic(items.length ? "ok" : "err");
       renderPhoto();
     } catch (err) {
       if (my !== anReq) return;
@@ -1416,13 +1427,17 @@
   function renderFoot() {
     const changed = (add.hint || "").trim() && add.hint.trim() !== (add.lastHint || "").trim();
     const sum = add.items.reduce((a, x) => a + x.k, 0);
-    if (!add.items.length) { sheetFoot(changed ? `<button class="btn" id="p-re">${icon("refresh")}Пересчитать</button>` : ""); if ($("#p-re")) $("#p-re").onclick = analyze; return; }
+    if (!add.items.length) { sheetFoot(`<button class="btn" id="p-re">${icon("refresh")}${changed ? "Пересчитать" : "Распознать ещё раз"}</button>`); if ($("#p-re")) $("#p-re").onclick = analyze; return; }
     sheetFoot(changed ? `<div class="btn-row" style="margin:0"><button class="btn ghost" id="p-re">${icon("refresh")}Пересчитать</button><button class="btn" id="r-add">Добавить · ${fmt(sum)}</button></div>` : `<button class="btn" id="r-add">Добавить ${add.items.length} ${plural(add.items.length, "позицию", "позиции", "позиций")} · ${fmt(sum)} ккал</button>`);
     $("#r-add").onclick = commitPhoto; if ($("#p-re")) $("#p-re").onclick = analyze;
   }
+  function addBlank() { haptic("light"); add.items.push({ n: "", g: 100, k: 0, p: 0, f: 0, c: 0, per: { k: 0, p: 0, f: 0, c: 0 } }); renderResults(); setTimeout(() => { const i = add.items.length - 1; $("#re-" + i).classList.add("open"); const n = $(`[data-name="${i}"]`); n.placeholder = "Название"; n.focus(); }, 60); }
   function renderResults() {
     const box = $("#p-res");
-    if (!add.items.length) { box.innerHTML = `<div class="alert"><span class="ins-ic t-n">${icon("info")}</span><div><b>Еды на фото не видно</b>Опиши блюдо в поле выше и нажми «Пересчитать» или сними ближе при хорошем свете.</div></div>`; renderFoot(); return; }
+    if (!add.items.length) {
+      box.innerHTML = `<div class="alert"><span class="ins-ic t-n">${icon("info")}</span><div><b>${add.cleared ? "Список пуст" : "Еды на фото не видно"}</b>${add.cleared ? "Добавь блюдо сам или распознай фото ещё раз." : "Опиши блюдо в поле выше и распознай снова или сними ближе при хорошем свете."}</div></div><button class="res-addi" id="r-more">${icon("plus")}Добавить блюдо вручную</button>`;
+      $("#r-more").onclick = addBlank; renderFoot(); return;
+    }
     box.innerHTML = `<div class="subh">Распознано</div>` + add.items.map((x, i) => `<div class="res-item" style="animation-delay:${i * 0.06}s">
         <div class="res-top"><input value="${esc(x.n)}" data-name="${i}" aria-label="Название"><button class="del" data-del="${i}" aria-label="Убрать">${icon("x")}</button></div>
         <button class="res-mac" data-edit="${i}"><span class="macros" id="rm-${i}"></span>${icon("edit")}</button>
@@ -1430,7 +1445,7 @@
         <div class="res-bot"><span class="muted">Порция</span>${stepperHTML("g" + i, x.g, "г", 10)}</div>
       </div>`).join("") + `<button class="res-addi" id="r-more">${icon("plus")}Добавить то, чего нет в списке</button>
       <div class="res-sum"><span class="muted">Итого</span><b><span class="num" id="r-sum">0</span> <span class="muted" style="font-size:15px">ккал</span></b></div>
-      <p class="note" style="padding-top:4px">Нейросеть оценивает порции на глаз. Если знаешь вес или состав точнее, поправь граммы или нажми на БЖУ, чтобы ввести свои цифры.</p>`;
+      <p class="note" style="padding-top:4px">Порции оценены по фото. Если знаешь вес или состав точнее, поправь граммы или нажми на БЖУ и введи свои цифры.</p>`;
     const upd = () => {
       let sum = 0;
       add.items.forEach((x, i) => { const v = scaleFood(x.per, x.g); Object.assign(x, { k: v.k, p: v.p, f: v.f, c: v.c }); const m = $("#rm-" + i); if (m) m.innerHTML = macroTags(v); sum += v.k; $$(`[data-mv^="${i}:"]`).forEach((inp) => { if (document.activeElement !== inp) inp.value = r0(x[inp.dataset.mv.split(":")[1]]); }); });
@@ -1440,22 +1455,22 @@
     const lim = {}; add.items.forEach((x, i) => (lim["g" + i] = [5, 3000]));
     const proxy = new Proxy({}, { get: (_, k) => add.items[+String(k).slice(1)].g, set: (_, k, v) => { add.items[+String(k).slice(1)].g = v; return true; } });
     bindSteppers(box, proxy, lim, upd);
-    $$("[data-name]", box).forEach((inp) => (inp.oninput = () => (add.items[+inp.dataset.name].n = inp.value)));
+    $$("[data-name]", box).forEach((inp) => (inp.oninput = () => { const x = add.items[+inp.dataset.name]; x.n = inp.value; x.cat = undefined; }));
     $$("[data-edit]", box).forEach((b) => (b.onclick = () => { haptic("sel"); $("#re-" + b.dataset.edit).classList.toggle("open"); b.classList.toggle("on"); }));
     $$("[data-mv]", box).forEach((inp) => (inp.oninput = () => {
       const [i, k] = inp.dataset.mv.split(":"), x = add.items[+i], v = Math.max(0, parseFloat(inp.value.replace(",", ".")) || 0);
       x.per[k] = (v / x.g) * 100; if (k !== "k") { /* калории остаются как есть, пользователь может поправить отдельно */ }
       const vv = scaleFood(x.per, x.g); Object.assign(x, vv); $("#rm-" + i).innerHTML = macroTags(vv); $("#r-sum").textContent = fmt(add.items.reduce((a, y) => a + y.k, 0)); renderFoot();
     }));
-    $("#r-more").onclick = () => { haptic("light"); add.items.push({ n: "", g: 100, k: 0, p: 0, f: 0, c: 0, per: { k: 0, p: 0, f: 0, c: 0 } }); renderResults(); setTimeout(() => { const i = add.items.length - 1; $("#re-" + i).classList.add("open"); const n = $(`[data-name="${i}"]`); n.placeholder = "Название"; n.focus(); }, 60); };
+    $("#r-more").onclick = addBlank;
     $$("[data-del]", box).forEach((b) => (b.onclick = () => {
       const i = +b.dataset.del, card = b.closest(".res-item");
       card.style.transition = "opacity .25s, transform .35s var(--ease-out)"; card.style.opacity = "0"; card.style.transform = "scale(.96)"; haptic("light");
-      setTimeout(() => { add.items.splice(i, 1); renderResults(); }, 240);
+      setTimeout(() => { add.items.splice(i, 1); if (!add.items.length) add.cleared = true; renderResults(); }, 240);
     }));
     upd();
   }
-  function commitPhoto() { const arr = add.items.filter((x) => x.k > 0 || x.n.trim()).map((x) => ({ n: x.n.trim() || "Блюдо", cat: x.cat, g: x.g, k: x.k, p: x.p, f: x.f, c: x.c, img: add.thumb, src: "photo" })); addEntries(arr, add.meal); afterAdd(arr.reduce((a, x) => a + x.k, 0)); }
+  function commitPhoto() { const arr = add.items.filter((x) => x.k > 0 || x.n.trim()).map((x) => ({ n: x.n.trim() || "Блюдо", cat: x.cat || catOf(x.n.trim()), g: x.g, k: x.k, p: x.p, f: x.f, c: x.c, img: add.thumb, src: "photo" })); addEntries(arr, add.meal); afterAdd(arr.reduce((a, x) => a + x.k, 0)); }
   function afterAdd(k) {
     closeSheet(); haptic("ok"); if (cur !== "today") show("today"); else { renderWeek(); updateToday(); }
     const bump = streakBump; streakBump = 0;
@@ -2003,5 +2018,5 @@
   }
   if (/[?&]dev\b/.test(location.search)) { try { const d = JSON.parse(localStorage.getItem(KEY) || "{}"); d.settings = Object.assign(d.settings || {}, { dev: true }); localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
   init();
-  window.__porsiya = { get state() { return S; }, show, openAdd };
+  window.__porsiya = { get state() { return S; }, show, openAdd, calcNorm, planInfo, achList, streakInfo, gameStats };
 })();
