@@ -1182,3 +1182,10 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 /* стабильный слой для закреплённых элементов: без мерцания при прокрутке */
 .tabbar { will-change: transform; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
 .navp, .fab, .bfade { transform: translateZ(0); -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+
+/* ноутбуки и ПК: без backdrop-filter у меню — на десктопных WebView он мерцает при прокрутке */
+@media (hover: hover) and (pointer: fine) {
+  .navp { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--card); }
+  .tabbar { will-change: auto; }
+  .navp, .fab, .bfade { transform: none; }
+}
