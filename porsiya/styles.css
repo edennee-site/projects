@@ -1113,3 +1113,5 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .mg-head .mg-t { align-items: center; }
 .mg-head .mg-t svg { width: 18px; height: 18px; color: var(--g60); margin-right: 2px; flex: none; }
 .mg-head .mg-t em { margin-left: 2px; }
+.mg-n { display: inline-flex; align-items: baseline; gap: 8px; }
+.mg-head .mg-t em { margin-left: 0; }
