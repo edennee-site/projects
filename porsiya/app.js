@@ -1349,11 +1349,17 @@
   const API = window.NOMI_API || "";
   // сводка дня для сервера: по ней бот шлёт напоминания (серия, белок, взвешивание, итоги недели)
   let lastSync = "";
+  // итоги последних 7 дней (без сегодня) для недельной сводки бота
+  function weekSum() {
+    const nm = norm(); let days = 0, k = 0, p = 0, inN = 0;
+    for (let i = 1; i <= 7; i++) { const d = dkey(addDays(new Date(), -i)); if (!isLogged(d)) continue; const t = totals(d); days++; k += t.k; p += t.p; if (Math.abs(t.k - nm.k) <= nm.k * 0.1) inN++; }
+    return { days, avgK: days ? r0(k / days) : 0, avgP: days ? r0(p / days) : 0, inNorm: inN };
+  }
   function serverSync() {
     if (!API || !inTg || !tg.initData || !S.onboarded) return;
     const tk = todayKey(), t = totals(tk), nm = norm(), st = streakInfo(), wk = Object.keys(S.weights).sort();
     const body = JSON.stringify({ tz: -new Date().getTimezoneOffset(), day: tk, logged: isLogged(tk), k: r0(t.k), p: r0(t.p), nk: nm.k, np: nm.p, streak: st.n, best: st.best,
-      goal: S.profile.goal, plan: S.plan ? { type: S.plan.type, start: S.plan.start, target: S.plan.target } : null, weight: curWeight(), lastWeigh: wk[wk.length - 1] || null });
+      goal: S.profile.goal, plan: S.plan ? { type: S.plan.type, start: S.plan.start, target: S.plan.target } : null, weight: curWeight(), lastWeigh: wk[wk.length - 1] || null, week: weekSum() });
     if (body === lastSync) return;
     lastSync = body;
     fetch(API.replace(/\/$/, "") + "/sync", { method: "POST", headers: { "Content-Type": "application/json", "X-Init-Data": tg.initData }, body, keepalive: true }).catch(() => { lastSync = ""; });

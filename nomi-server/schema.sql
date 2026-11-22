@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS users (
+  uid INTEGER PRIMARY KEY,
+  name TEXT,
+  tz INTEGER DEFAULT 300,
+  summary TEXT DEFAULT '{}',
+  updated INTEGER,
+  sent TEXT,
+  muted INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS usage (
+  uid INTEGER,
+  day TEXT,
+  n INTEGER DEFAULT 0,
+  PRIMARY KEY (uid, day)
+);
