@@ -637,6 +637,8 @@
       if (S.plan && S.plan.type !== S.profile.goal) S.plan = null;
       if (first) S.weights[todayKey()] = ob.d.weight;
       S.onboarded = true; save(); gameInit(); haptic("ok"); lastVals.clear(); show("today", { force: true });
+      // разрешение боту писать напоминания (нужно, если приложение открыли не из чата с ботом)
+      if (first && window.NOMI_API && inTg && tg.requestWriteAccess && tg.isVersionAtLeast && tg.isVersionAtLeast("6.9")) setTimeout(() => { try { tg.requestWriteAccess(); } catch (e) {} }, 1200);
     };
   }
 
