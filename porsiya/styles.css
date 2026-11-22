@@ -736,3 +736,4 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .ld-bar i { display: block; height: 100%; width: 40%; border-radius: 2px; background: var(--ink); animation: ldB 1.1s cubic-bezier(.65,0,.35,1) infinite; }
 @keyframes ldB { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
 @media (prefers-reduced-motion: reduce) { .ld-bar i, .ld-name span { animation: none; opacity: 1; transform: none; } }
+#w-card:empty { min-height: 300px; }

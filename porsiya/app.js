@@ -1122,7 +1122,7 @@
       <div class="section-h"><h2>По дням</h2></div>
       <div id="h-days"></div>`;
     bindSeg(s, "range", (v) => { hist.range = v; hist.sel = null; drawHist(true); });
-    drawHist(); drawWeight();
+    drawHist(); requestAnimationFrame(drawWeight);
   }
   const histDays = () => { const n = hist.range === "week" ? 7 : 30, end = new Date(); return Array.from({ length: n }, (_, i) => dkey(addDays(end, i - n + 1))); };
   function drawHist(swap) {
