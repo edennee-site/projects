@@ -534,10 +534,11 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .hbars-wrap { position: relative; margin-top: 22px; }
 .hbars { display: flex; align-items: flex-end; height: 152px; position: relative; z-index: 1; }
 .hbars .hb { flex: 1; display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; height: 100%; border-radius: 10px; padding-bottom: 2px; }
-.hbars .hb i { width: 6px; height: 6px; border-radius: 50%; background: var(--g20); transform: scale(0); transition: transform .45s var(--spring), background-color .3s; flex: none; }
+.hbars .hb i { width: 6px; height: 6px; border-radius: 50%; background: var(--g20); transition: background-color .3s; flex: none; }
+.hbars .hb { clip-path: inset(100% 0 0 0); transition: clip-path .7s var(--ease-out); }
+.hbars.go .hb { clip-path: inset(0 0 0 0); }
 .hbars.month .hb i { width: 4px; height: 4px; gap: 3px; }
 .hbars.month .hb { gap: 3px; }
-.hbars.go .hb i { transform: scale(1); }
 .hbars .hb i.on { background: var(--cal-c); }
 .hbars .hb i.ov { background: var(--pro-c); }
 .hbars .hb.sel i.on { background: var(--cal-a); }
@@ -642,3 +643,7 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
   .stats3 > div + div { padding-left: 10px; }
   .stats3 span { font-size: 11px; }
 }
+.nrow.col { flex-direction: column; align-items: stretch; gap: 12px; }
+.nrow.col .seg { width: 100%; }
+.nrow > span:first-child { min-width: 0; }
+.hbars.month { height: 118px; }

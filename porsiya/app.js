@@ -391,10 +391,10 @@
   }
   function trainFields(d) {
     const t = d.train;
-    return `<div class="nrow"><span><b>Тренировок в неделю</b><span class="ns">зал, спорт, бег</span></span>${stepperHTML("tn", t.n, "")}</div>
+    return `<div class="nrow"><span><b>Тренировки</b><span class="ns">раз в неделю</span></span>${stepperHTML("tn", t.n, "")}</div>
       <div class="nrow" id="tr-more" style="${t.n ? "" : "display:none"}"><span><b>Длительность</b><span class="ns">одной тренировки</span></span>${stepperHTML("tmin", t.min, "мин", 15)}</div>
-      <div class="nrow" id="tr-type" style="${t.n ? "" : "display:none"}"><span><b>Тип</b></span>${segHTML("ttype", [["strength", "Силовые"], ["cardio", "Кардио"], ["mixed", "Смеш."]], t.type)}</div>
-      <div class="nrow"><span><b>Шаги в день</b><span class="ns">в среднем, по желанию</span></span>${stepperHTML("steps", d.steps, "", 1000)}</div>`;
+      <div class="nrow col" id="tr-type" style="${t.n ? "" : "display:none"}"><span><b>Тип тренировок</b></span>${segHTML("ttype", [["strength", "Силовые"], ["cardio", "Кардио"], ["mixed", "Смешанные"]], t.type)}</div>
+      <div class="nrow"><span><b>Шаги</b><span class="ns">в день, по желанию</span></span>${stepperHTML("steps", d.steps, "", 1000)}</div>`;
   }
   function bindTrain(root, d) {
     if (!$('[data-step="tn"]', root)) return;
@@ -1084,8 +1084,8 @@
       <div class="hbars-wrap"><div class="norm-ln" style="bottom:${nLine}px"></div><span class="norm-tag" style="bottom:${nLine}px">${fmt(nm.k)}</span>
       <div class="hbars ${month ? "month" : ""}" id="hbars">${days.map((k, i) => {
         const v = vals[i].k, on = Math.round(v / unit); let dots = "";
-        for (let r = 0; r < rows; r++) dots += `<i class="${r < on ? (r >= nrmRow ? "ov" : "on") : ""}" style="transition-delay:${(i * (month ? 0.012 : 0.045) + r * 0.016).toFixed(3)}s"></i>`;
-        return `<button class="hb ${k === sel ? "sel" : ""}" data-k="${k}" aria-label="${dayLabel(k)}">${dots}</button>`;
+        for (let r = 0; r < rows; r++) dots += `<i class="${r < on ? (r >= nrmRow ? "ov" : "on") : ""}"></i>`;
+        return `<button class="hb ${k === sel ? "sel" : ""}" data-k="${k}" aria-label="${dayLabel(k)}" style="transition-delay:${(i * (month ? 0.014 : 0.04)).toFixed(3)}s">${dots}</button>`;
       }).join("")}</div></div>
       <div class="hlabels ${month ? "month" : ""}">${days.map((k, i) => { const d = fromKey(k); const lab = month ? (i % 5 === 4 || i === 0 ? d.getDate() : "") : WD[d.getDay()]; return `<span class="${k === sel ? "sel" : ""}">${lab}</span>`; }).join("")}</div>
       <div class="legend"><span><i style="background:var(--cal-b)"></i>в пределах нормы</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span><span><i class="ln"></i>норма</span></div>`;
