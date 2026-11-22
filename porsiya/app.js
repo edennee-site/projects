@@ -212,7 +212,7 @@
       while (!isLogged(dkey(back)) && !isFrozen(dkey(back)) && miss.length < 3) { miss.push(dkey(back)); back = addDays(back, -1); }
       if ((isLogged(dkey(back)) || isFrozen(dkey(back))) && miss.length <= S.game.fz) { S.game.frozen.push(...miss); S.game.fz -= miss.length; used = miss.length; }
     }
-    if (S.game.seen == null || S.game.v !== 2) { S.game.seen = achList().filter((a) => a.done).map((a) => a.id); S.game.v = 2; }
+    if (!S.game.seen2) { S.game.seen2 = {}; achList().forEach((t) => (S.game.seen2[t.id] = t.st)); }
     save();
     return used;
   }
@@ -221,63 +221,74 @@
     if (st.n && st.n % 7 === 0 && S.game.fzAward !== st.start + ":" + st.n && S.game.fz < 2) { S.game.fz++; S.game.fzAward = st.start + ":" + st.n; save(); return true; }
     return false;
   }
+  function runs(keys, pred) { let best = 0, cur = 0, prev = null; keys.forEach((k) => { const ok = pred(k); const cont = prev && dkey(addDays(fromKey(prev), 1)) === k; cur = ok ? (cont ? cur + 1 : 1) : 0; if (!ok) cur = 0; best = Math.max(best, cur); prev = k; }); return best; }
   function gameStats() {
-    const keys = Object.keys(S.days).filter(isLogged), nm = norm();
-    let photos = 0, entries = 0, inNorm = 0, proDays = 0, xp = 0, todayXp = 0, bfDays = 0, fullDays = 0, manual = 0;
+    const keys = Object.keys(S.days).filter(isLogged).sort(), nm = norm();
+    let photos = 0, entries = 0, inNorm = 0, proDays = 0, xp = 0, todayXp = 0, bfDays = 0, fullDays = 0;
+    const T = {}; keys.forEach((k) => (T[k] = totals(k)));
     keys.forEach((k) => {
-      const t = totals(k), arr = S.days[k];
-      entries += arr.length; const ph = arr.filter((e) => e.src === "photo").length; photos += ph;
-      manual += arr.filter((e) => e.src === "manual").length;
-      const okN = Math.abs(t.k - nm.k) <= nm.k * 0.1, okP = t.p >= nm.p * 0.95;
-      if (okN) inNorm++; if (okP) proDays++;
+      const t = T[k], arr = S.days[k];
+      entries += arr.length; photos += arr.filter((e) => e.src === "photo").length;
+      if (Math.abs(t.k - nm.k) <= nm.k * 0.1) inNorm++; if (t.p >= nm.p * 0.95) proDays++;
       if (arr.some((e) => e.meal === "breakfast")) bfDays++;
       if (["breakfast", "lunch", "dinner"].every((m) => arr.some((e) => e.meal === m))) fullDays++;
-      const dx = 10 + (okN ? 5 : 0) + (okP ? 5 : 0) + Math.min(ph, 5) * 2;
-      xp += dx; if (k === todayKey()) todayXp = dx;
     });
-    const wN = Object.keys(S.weights).length; xp += wN * 3;
+    const all = []; if (keys.length) for (let d = fromKey(keys[0]); dkey(d) <= todayKey(); d = addDays(d, 1)) all.push(dkey(d));
+    const has = (k) => !!T[k];
+    const proRun = runs(all, (k) => has(k) && T[k].p >= nm.p * 0.95);
+    const carbRun = runs(all, (k) => has(k) && T[k].c >= nm.c * 0.9);
+    const fatRun = runs(all, (k) => has(k) && T[k].f <= nm.f * 1.1);
+    const noOver = runs(all, (k) => has(k) && T[k].k <= nm.k * 1.1);
+    const surplus = runs(all, (k) => has(k) && T[k].k >= nm.k * 0.95);
+    const wk = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0]));
+    const w0 = S.plan ? S.plan.start : wk.length ? wk[0][1] : S.profile.weight, wc = curWeight();
     const pi = S.plan ? planInfo() : null;
-    return { days: keys.length, photos, entries, inNorm, proDays, xp, todayXp, weights: wN, combos: S.combos.length, bfDays, fullDays, manual, planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0 };
+    return { days: keys.length, photos, entries, inNorm, proDays, bfDays, fullDays, weights: wk.length, combos: S.combos.length, proRun, carbRun, fatRun, noOver, surplus, lost: Math.max(0, w0 - wc), gained: Math.max(0, wc - w0), planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0, todayXp: 0, };
   }
-  const LVL = [0, 60, 150, 300, 500, 750, 1050, 1400, 1800, 2300, 2900, 3600, 4400, 5300, 6300];
-  function levelOf(xp) { let i = 0; while (i < LVL.length - 1 && xp >= LVL[i + 1]) i++; const from = LVL[i], to = LVL[i + 1] || from + 1000; return { lv: i + 1, from, to, cur: xp - from, need: to - from }; }
+  // бесконечные этапы: дальше ряд продолжается ×1,5
+  function tierAt(base, i) { if (i < base.length) return base[i]; let v = base[base.length - 1]; for (let j = base.length; j <= i; j++) v = Math.round((v * 1.5) / (v >= 10 ? 5 : 0.5)) * (v >= 10 ? 5 : 0.5); return v; }
+  function track(id, ic, col, t, val, base, desc, unit) {
+    let st = 0; while (val >= tierAt(base, st)) st++;
+    const prev = st ? tierAt(base, st - 1) : 0, next = tierAt(base, st);
+    return { id, ic, col, t, val, st, prev, next, pct: clamp((val - prev) / (next - prev), 0, 1), d: desc(next), unit, done: st > 0 };
+  }
   function achList() {
-    const g = gameStats(), best = streakInfo().best;
-    const A = [
-      { id: "e1", ic: "sprout", t: "Начало", d: "Первая запись еды", cur: g.entries, goal: 1 },
-      { id: "s3", ic: "bolt", t: "Разгон", d: "3 дня подряд", cur: best, goal: 3 },
-      { id: "s7", ic: "flame", t: "Неделя", d: "7 дней подряд", cur: best, goal: 7 },
-      { id: "s14", ic: "rocket", t: "Две недели", d: "14 дней подряд", cur: best, goal: 14 },
-      { id: "s30", ic: "moon", t: "Месяц", d: "30 дней подряд", cur: best, goal: 30 },
-      { id: "s60", ic: "infinity", t: "Привычка", d: "60 дней подряд", cur: best, goal: 60 },
-      { id: "s100", ic: "crown", t: "Легенда", d: "100 дней подряд", cur: best, goal: 100 },
-      { id: "ph1", ic: "cam", t: "Первый кадр", d: "Блюдо по фото", cur: g.photos, goal: 1 },
-      { id: "ph10", ic: "aperture", t: "Фотограф", d: "10 блюд по фото", cur: g.photos, goal: 10 },
-      { id: "ph50", ic: "sparkles", t: "Фуд-блогер", d: "50 блюд по фото", cur: g.photos, goal: 50 },
-      { id: "n1", ic: "target", t: "В точку", d: "День в норме калорий", cur: g.inNorm, goal: 1 },
-      { id: "n7", ic: "crosshair", t: "Снайпер", d: "7 дней в норме", cur: g.inNorm, goal: 7 },
-      { id: "p1", ic: "protein", t: "Белковый день", d: "Белок закрыт", cur: g.proDays, goal: 1 },
-      { id: "p7", ic: "dumbbell", t: "Строитель", d: "7 дней с белком", cur: g.proDays, goal: 7 },
-      { id: "bf7", ic: "breakfast", t: "Ранняя пташка", d: "7 завтраков", cur: g.bfDays, goal: 7 },
-      { id: "fd1", ic: "clock", t: "Полный день", d: "Завтрак, обед и ужин", cur: g.fullDays, goal: 1 },
-      { id: "w1", ic: "scale", t: "На старте", d: "Первая запись веса", cur: g.weights, goal: 1 },
-      { id: "w10", ic: "eye", t: "Наблюдатель", d: "10 записей веса", cur: g.weights, goal: 10 },
-      { id: "e100", ic: "medal", t: "Сотня", d: "100 записей еды", cur: g.entries, goal: 100 },
-      { id: "c1", ic: "bookmark", t: "Свой набор", d: "Сохрани набор блюд", cur: g.combos, goal: 1 },
-      { id: "d30", ic: "heart", t: "Месяц с нами", d: "30 дней с записями", cur: g.days, goal: 30 },
-      { id: "pl0", ic: "flag", t: "Цель", d: "Поставь цель по весу", cur: S.plan ? 1 : 0, goal: 1 },
-      { id: "pl1", ic: "mountain", t: "Этап", d: "Месячный этап цели", cur: g.planMs, goal: 1 },
-      { id: "pl2", ic: "trophy", t: "Вершина", d: "Цель по весу достигнута", cur: g.planDone, goal: 1 },
+    const g = gameStats(), best = streakInfo().best, mode = S.plan ? S.plan.type : S.profile.goal;
+    const n = (v) => (Number.isInteger(v) ? v : dec(v));
+    const L = [
+      track("streak", "bolt", "pro", "Серия", best, [3, 7, 14, 30, 60, 100], (x) => `Продержись ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+      track("diary", "cal", "cal", "Дневник", g.days, [3, 10, 30, 60, 120, 240], (x) => `${x} ${plural(x, "день", "дня", "дней")} с записями`, "дн."),
+      track("photo", "cam", "cal", "Фотограф", g.photos, [1, 5, 15, 40, 100], (x) => `${x} ${plural(x, "блюдо", "блюда", "блюд")} по фото`, "фото"),
+      track("norm", "target", "carb", "В точку", g.inNorm, [1, 5, 15, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} в норме калорий`, "дн."),
+      track("protein", "protein", "pro", "Белок", g.proRun, [2, 5, 10, 20, 40], (x) => `Закрывай белок ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+      track("meals", "breakfast", "fat", "Режим", g.fullDays, [1, 7, 21, 50, 100], (x) => `${x} ${plural(x, "день", "дня", "дней")} с завтраком, обедом и ужином`, "дн."),
+      track("scale", "scale", "fat", "Весы", g.weights, [1, 4, 10, 25, 50], (x) => `${x} ${plural(x, "взвешивание", "взвешивания", "взвешиваний")}`, "раз"),
     ];
-    A.forEach((a) => (a.done = a.cur >= a.goal));
-    return A;
+    const G = mode === "lose" ? [
+      track("minus", "down-trend", "carb", "Минус", r1(g.lost), [1, 2, 3, 5, 8, 12], (x) => `Сбрось ${n(x)} кг`, "кг"),
+      track("calm", "check", "carb", "Без срывов", g.noOver, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} подряд без перебора`, "дн."),
+      track("fat", "fat", "fat", "Жиры в норме", g.fatRun, [3, 7, 14, 30], (x) => `Держи жиры в норме ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+    ] : mode === "gain" ? [
+      track("plus", "up-trend", "carb", "Плюс", r1(g.gained), [0.5, 1, 2, 3, 5, 8], (x) => `Набери ${n(x)} кг`, "кг"),
+      track("surplus", "flame", "pro", "Профицит", g.surplus, [3, 7, 14, 30, 60], (x) => `Добирай калории ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+      track("carbs", "carbs", "carb", "Углеводы", g.carbRun, [3, 7, 14, 30], (x) => `Закрывай углеводы ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+    ] : [
+      track("calm", "check", "carb", "Баланс", g.noOver, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} подряд без перебора`, "дн."),
+    ];
+    if (S.plan) G.push(track("stage", "flag", "carb", "Этапы цели", g.planMs, [1, 2, 3, 6, 12], (x) => `Пройди ${x} ${plural(x, "месячный этап", "месячных этапа", "месячных этапов")}`, "эт."));
+    L.common = L.slice(); L.goal = G; L.mode = mode;
+    const all = L.concat(G); all.common = L; all.goal = G; all.mode = mode;
+    return all;
   }
+  function gameLevel(A) { const st = A.reduce((a, t) => a + t.st, 0); const lv = 1 + Math.floor(st / 2); return { lv, st, inLv: st % 2, need: 2 }; }
   function checkAch() {
-    if (!S.game || !S.game.seen) return null;
-    const fresh = achList().filter((a) => a.done && !S.game.seen.includes(a.id));
-    if (!fresh.length) return null;
-    S.game.seen.push(...fresh.map((a) => a.id)); save();
-    return fresh[0];
+    if (!S.game) return null;
+    const A = achList();
+    if (!S.game.seen2) { S.game.seen2 = {}; A.forEach((t) => (S.game.seen2[t.id] = t.st)); save(); return null; }
+    const up = A.find((t) => t.st > (S.game.seen2[t.id] || 0));
+    A.forEach((t) => (S.game.seen2[t.id] = Math.max(t.st, S.game.seen2[t.id] || 0))); save();
+    if (!up) return null;
+    return { ic: up.ic, t: `${up.t} · этап ${up.st}`, d: `Следующий этап: ${up.d.charAt(0).toLowerCase() + up.d.slice(1)}` };
   }
   const status = (k) => { const n = dayEntries(k).length; if (!n) return ""; const v = totals(k).k, nm = norm().k; if (v > nm * 1.1) return "ov"; if (v >= nm * 0.9) return "in"; return "un"; };
 
@@ -392,6 +403,7 @@
     if (cur !== "onboard") $("#tabbar").classList.remove("hide");
     document.body.style.overflow = "";
     const cb = onSheetClose; onSheetClose = null; if (cb) cb();
+    if (cur === "today") updateToday();
     updateBack();
   }
   function sheetFades() { const b = $("#sh-body"); $("#sheet").classList.toggle("scrolled", b.scrollTop > 2); const rest = b.scrollHeight - b.clientHeight - b.scrollTop; $("#sheet").classList.toggle("more", rest > 2 && !!$("#sh-foot").innerHTML); }
@@ -598,7 +610,6 @@
       <div class="top"><div><h1>${now.getDate()} ${MON[now.getMonth()]}</h1><div class="date">${cap(WDF[now.getDay()])}</div></div><div class="top-r"><button class="streak" id="t-streak" aria-label="Серия"></button><button class="avatar" id="t-ava" aria-label="Профиль">${avatarInner()}</button></div></div>
       <div class="wk-head"><button class="wk-month" id="wk-month"><span id="wk-mt"></span>${icon("right")}</button><button class="wk-today" id="wk-today">${icon("refresh")}Сегодня</button></div>
       <div class="week" id="week"></div>
-      <div id="t-goal"></div>
       <div class="gap"></div>
       <div class="grad g-cal tap" id="c-cal" role="button">
         <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span>Калории</span><span class="chip" id="cal-chip"></span></div>
@@ -607,6 +618,7 @@
         <div class="stats3 two"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Запас недели</span><b class="num" id="v-week">0</b></div></div>
       </div>
       <div class="gap"></div>
+      <div id="t-goal"></div>
       <div class="row2">
         ${macroCard("pro", "Белки", "protein", "p")}
         ${macroCard("carb", "Углеводы", "carbs", "c")}
@@ -948,12 +960,13 @@
   function goalCardHTML() {
     const pi = planInfo();
     if (!pi) return `<button class="card goal-cta" id="goal-open"><span class="gc-ic">${icon("flag")}</span><span class="gc-t"><b>Поставь цель по весу</b><span>Посчитаю норму под цель и разобью путь на месячные этапы</span></span>${icon("right", "chev")}</button>`;
-    const pl = S.plan, st = goalStatus(pi), cm = pi.ms.find((m) => m.cur);
+    const pl = S.plan;
     return `<button class="card goal-card" id="goal-open">
-      <div class="c-head"><div><span class="card-t">${pl.type === "lose" ? "Похудение" : "Набор массы"}</span><div class="card-s" style="margin-top:2px">${pl.type === "lose" ? "−" : "+"}${dec(pi.total)} кг · до ${fmtD(pi.end)}</div></div><span class="gs ${st.cls}">${st.t}</span></div>
-      <div class="gc-row"><span class="gc-pct num">${Math.round(pi.done * 100)}<small>%</small></span><span class="gc-sub">${dec(pi.cur)} кг сейчас<br>цель ${dec(pl.target)} кг</span></div>
+      <div class="gk-row"><span class="gk-ic">${icon(pl.type === "lose" ? "down-trend" : "up-trend")}</span>
+        <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>${dec(pi.cur)} → ${dec(pl.target)} кг</span></span>
+        <span class="gk-p num">${Math.round(pi.done * 100)}<small>%</small></span></div>
       ${dotRow(24, "ink gc-dots")}
-      ${weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься, чтобы сверить прогресс</span><span class="gc-btn" data-weigh>Записать</span></div>` : cm && !pi.reached ? `<div class="gc-m">${icon("flag")}Этап до ${fmtD(cm.d)}: ${dec(cm.exp)} кг</div>` : ""}
+      ${weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : ""}
     </button>`;
   }
   function goalStatus(pi) {
@@ -1055,16 +1068,21 @@
   }
   function renderTodayGoal() {
     const box = $("#t-goal"); if (!box) return;
-    const html = `<div class="gap"></div>${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}`;
+    const html = `${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}<div class="gap"></div>`;
     if (box._h === html) return; box._h = html; box.innerHTML = html; bindGoalCard(null);
   }
   function streakSheet() {
     haptic("light");
-    const st = streakInfo(), A = achList(), now = new Date();
+    const st = streakInfo(), A = achList(), now = new Date(), LV = gameLevel(A);
     const days = Array.from({ length: 7 }, (_, i) => { const d = addDays(now, i - 6), k = dkey(d); return { d, k, on: isLogged(k), fz: isFrozen(k), today: i === 6 }; });
     const msg = st.today ? `Сегодня отмечено. Завтра будет ${st.n + 1}.` : st.risk ? "Добавь еду сегодня, иначе серия сгорит в полночь." : "Добавь еду сегодня, чтобы начать серию.";
-    const got = A.filter((a) => a.done).length;
-    const next = A.filter((a) => !a.done).sort((x, y) => y.cur / y.goal - x.cur / x.goal)[0];
+    const card = (t, i) => `<div class="tr ${t.st ? "got" : ""} c-${t.col}" style="animation-delay:${0.08 + i * 0.03}s">
+        <span class="tr-ic">${icon(t.ic)}</span>
+        <div class="tr-b"><div class="tr-h"><b>${t.t}</b><span class="tr-st">${t.st ? "Этап " + t.st : "Не начато"}</span></div>
+          <div class="tr-d">${esc(t.d)}</div>
+          <div class="tr-bar"><i style="--w:${(t.pct * 100).toFixed(1)}%"></i></div>
+          <div class="tr-n"><span>${t.unit === "кг" ? dec(t.val) : fmt(t.val)} из ${t.unit === "кг" ? dec(t.next) : fmt(t.next)}</span><span>этап ${t.st + 1}</span></div></div></div>`;
+    const modeT = A.mode === "lose" ? "Для похудения" : A.mode === "gain" ? "Для набора массы" : "Для формы";
     const body = `
       <div class="d-hero g-pro st-hero">
         <div class="c-head"><span class="st-ic">${icon("bolt")}</span>${st.freezes ? `<span class="chip st-fz">${icon("snow")}${st.freezes}</span>` : ""}</div>
@@ -1073,17 +1091,18 @@
         <div class="st-week">${days.map((x, i) => `<div class="${x.on ? "on" : x.fz ? "fz" : ""} ${x.today ? "today" : ""}" style="animation-delay:${0.15 + i * 0.05}s"><span>${x.on ? icon("bolt") : x.fz ? icon("snow") : ""}</span><em>${WD[x.d.getDay()]}</em></div>`).join("")}</div>
       </div>
       <div class="gap"></div>${goalCardHTML()}
-      ${next ? `<div class="gap"></div><div class="card st-next"><span class="sn-ic">${icon(next.ic)}</span><div class="sn-t"><em>Ближайшая награда</em><b>${esc(next.t)}</b><span>${esc(next.d)} · ${Math.min(next.cur, next.goal)} из ${next.goal}</span></div></div>` : ""}
       <div class="gap"></div>
-      <div class="card"><div class="c-head"><span class="card-t">Награды</span><span class="muted">${got} из ${A.length} · ${Math.round((got / A.length) * 100)}%</span></div>${dotRow(A.length, "ink rw-dots")}
-        <div class="ach3">${A.map((a, i) => `<div class="${a.done ? "got" : ""}" style="animation-delay:${0.1 + i * 0.025}s"><span class="ab">${icon(a.ic)}</span><b>${esc(a.t)}</b><em>${a.done ? esc(a.d) : `${Math.min(a.cur, a.goal)} из ${a.goal}`}</em></div>`).join("")}</div>
-      </div>
-      <p class="note">Каждые 7 дней подряд дают заморозку: она сама спасёт серию, если пропустишь день.</p>`;
+      <div class="card lvl"><div class="lv-badge"><span class="num" id="lv-n">${LV.lv}</span><em>уровень</em></div>
+        <div class="lv-b"><b>Уровень ${LV.lv}</b><span>Пройдено этапов: ${LV.st}. До ${LV.lv + 1} уровня ещё ${LV.need - LV.inLv} ${plural(LV.need - LV.inLv, "этап", "этапа", "этапов")}</span><div class="tr-bar"><i style="--w:${(LV.inLv / LV.need) * 100}%"></i></div></div></div>
+      <div class="subh">Достижения</div>
+      <div class="trs">${A.common.map(card).join("")}</div>
+      <div class="subh">${modeT}</div>
+      <div class="trs">${A.goal.map((t, i) => card(t, i + A.common.length)).join("")}</div>
+      <p class="note">У каждого достижения бесконечные этапы: после последнего цель растёт. Каждые 2 этапа поднимают общий уровень. Каждые 7 дней подряд дают заморозку серии.</p>`;
     openSheet("Прогресс и награды", body);
     countUp($("#st-n"), st.n, { from: 0, dur: 900, force: true });
-    setDots($(".rw-dots"), got, A.length);
     bindGoalCard(streakSheet);
-    raf2(() => $(".st-hero").classList.add("go"));
+    raf2(() => { $(".st-hero").classList.add("go"); $$("#sh-body .tr-bar").forEach((b) => b.classList.add("go")); });
   }
   function openCalDetail() {
     haptic("light");
@@ -1349,7 +1368,7 @@
     const ach = checkAch(), st = streakInfo(), g = gameStats();
     if (ach) celebrate(ach);
     else if (bump) {
-      setTimeout(() => { toast(gotFz ? `Серия ${st.n} ${plural(st.n, "день", "дня", "дней")}. Получена заморозка` : `Серия: ${st.n} ${plural(st.n, "день", "дня", "дней")} подряд · +${g.todayXp} очков`, null, "bolt"); bumpStreak(); haptic("ok"); }, 450);
+      setTimeout(() => { toast(gotFz ? `Серия ${st.n} ${plural(st.n, "день", "дня", "дней")}. Получена заморозка` : `Серия: ${st.n} ${plural(st.n, "день", "дня", "дней")} подряд`, null, "bolt"); bumpStreak(); haptic("ok"); }, 450);
     } else toast(`Добавлено · ${fmt(k)} ккал`);
   }
   function bumpStreak() { const sp = $("#t-streak"); if (sp) { sp.classList.remove("bump"); void sp.offsetWidth; sp.classList.add("bump"); } }

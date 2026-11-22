@@ -1023,3 +1023,42 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .pc-hero b { display: block; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; margin-top: 14px; }
 .pc-hero p { margin: 8px auto 0; max-width: 320px; font-size: 14px; line-height: 1.5; color: var(--g70); }
 .pc-acts .btn { flex: 1; }
+/* достижения с этапами */
+.lvl { display: flex; align-items: center; gap: 16px; }
+.lv-badge { width: 74px; height: 74px; border-radius: 24px; background: var(--g-cal); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: none; }
+.lv-badge .num { font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: -0.04em; }
+.lv-badge em { font-style: normal; font-size: 10.5px; opacity: .85; margin-top: 3px; }
+.lv-b { flex: 1; min-width: 0; }
+.lv-b b { display: block; font-size: 17px; font-weight: 500; }
+.lv-b > span { display: block; font-size: 12.5px; color: var(--g60); margin-top: 3px; line-height: 1.35; }
+.lvl .tr-bar { margin-top: 12px; }
+.lvl .tr-bar i { background: var(--g-cal); }
+.trs { display: flex; flex-direction: column; gap: 8px; }
+.tr { background: var(--card); border-radius: var(--r-lg); padding: 16px; display: flex; gap: 14px; align-items: flex-start; animation: fadeSw .45s var(--ease-out) both; }
+.tr-ic { width: 46px; height: 46px; border-radius: 15px; background: var(--card-2); color: var(--g40); display: grid; place-items: center; flex: none; }
+.tr-ic svg { width: 22px; height: 22px; }
+.tr.got.c-pro .tr-ic { background: var(--g-pro); color: #fff; }
+.tr.got.c-cal .tr-ic { background: var(--g-cal); color: #fff; }
+.tr.got.c-carb .tr-ic { background: var(--g-carb); color: #fff; }
+.tr.got.c-fat .tr-ic { background: var(--g-fat); color: #fff; }
+.tr-b { flex: 1; min-width: 0; }
+.tr-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tr-h b { font-size: 15.5px; font-weight: 500; }
+.tr-st { font-size: 11.5px; font-weight: 500; height: 22px; padding: 0 9px; border-radius: 99px; background: var(--card-2); color: var(--g60); display: inline-flex; align-items: center; flex: none; }
+.tr.got .tr-st { color: var(--ink); }
+.tr-d { font-size: 13px; color: var(--g60); margin-top: 3px; line-height: 1.35; }
+.tr-bar { height: 6px; border-radius: 6px; background: var(--card-2); margin-top: 12px; overflow: hidden; }
+.tr-bar i { display: block; height: 100%; width: 0; border-radius: 6px; transition: width 1s var(--ease-out) .15s; }
+.tr-bar.go i { width: var(--w); }
+.c-pro .tr-bar i { background: var(--g-pro); } .c-cal .tr-bar i { background: var(--g-cal); } .c-carb .tr-bar i { background: var(--g-carb); } .c-fat .tr-bar i { background: var(--g-fat); }
+.tr-n { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--g60); margin-top: 6px; font-feature-settings: "tnum" 1; }
+
+.gk-row { display: flex; align-items: center; gap: 14px; }
+.gk-ic { width: 44px; height: 44px; border-radius: 50%; background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); display: grid; place-items: center; flex: none; }
+.gk-ic svg { width: 20px; height: 20px; }
+.gk-t { flex: 1; min-width: 0; }
+.gk-t b { display: block; font-size: 16px; font-weight: 500; }
+.gk-t span { display: block; font-size: 13px; color: var(--g60); margin-top: 2px; }
+.gk-p { font-size: 32px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; }
+.gk-p small { font-size: 15px; color: var(--g60); margin-left: 1px; letter-spacing: 0; }
+.goal-card .drow { margin-top: 16px; }
