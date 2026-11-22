@@ -1189,3 +1189,5 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
   .tabbar { will-change: auto; }
   .navp, .fab, .bfade { transform: none; }
 }
+@media (max-width: 360px) { .stat .ss { white-space: normal; } .stat { padding: 14px 12px 13px 13px; } .stat b { font-size: 22px; } }
+@media (max-width: 360px) { .p-id span { font-size: 12px; } }

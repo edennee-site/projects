@@ -1684,13 +1684,13 @@
     const avg = (f) => (filled.length ? filled.reduce((a, k) => a + totals(k)[f], 0) / filled.length : 0);
     const inNorm = filled.filter((k) => status(k) === "in").length;
     $("#h-stats").innerHTML = `<div class="stat"><span class="sl">В среднем</span><b class="num"><span id="st-a">${filled.length ? 0 : "—"}</span></b><span class="ss">ккал в день</span></div>
-      <div class="stat"><span class="sl">Белок</span><b class="num"><span id="st-p">0</span><span class="u">г</span></b><span class="ss">норма ${nm.p} г</span></div>
+      <div class="stat"><span class="sl">Белок</span><b class="num"><span id="st-p">0</span><span class="u">г</span></b><span class="ss">норма ${nm.p}&nbsp;г</span></div>
       <div class="stat"><span class="sl">В норме</span>${filled.length ? `<b class="num">${inNorm}<span class="u">из ${filled.length}</span></b><span class="ss">${plural(filled.length, "дня", "дней", "дней")}</span>` : `<b class="num">—</b><span class="ss">нет записей</span>`}</div>`;
     if (filled.length) { countUp($("#st-a"), r0(avg("k")), { from: 0 }); countUp($("#st-p"), r0(avg("p")), { from: 0 }); }
     const list = days.slice().reverse().filter((k) => dayEntries(k).length);
     $("#h-days").innerHTML = list.length ? `<div class="list">${list.map((k) => {
       const v = totals(k), pc = Math.round((v.k / nm.k) * 100), st = status(k), dl = dayLabel(k);
-      return `<button class="prow" data-k="${k}"><span class="pi ${st === "ov" ? "t-pro" : st === "in" ? "t-cal" : "t-n"} pd">${fromKey(k).getDate()}</span><span class="pl"><b>${dl === "Сегодня" || dl === "Вчера" ? dl : cap(WDF[fromKey(k).getDay()])}</b><span>${dayEntries(k).length} ${plural(dayEntries(k).length, "запись", "записи", "записей")} · белки ${r0(v.p)} г</span></span><span class="pv pv2"><b>${fmt(v.k)}</b><span>${pc}% нормы</span></span></button>`;
+      return `<button class="prow" data-k="${k}"><span class="pi ${st === "ov" ? "t-pro" : st === "in" ? "t-cal" : "t-n"} pd">${fromKey(k).getDate()}</span><span class="pl"><b>${dl === "Сегодня" || dl === "Вчера" ? dl : cap(WDF[fromKey(k).getDay()])}</b><span>${dayEntries(k).length} ${plural(dayEntries(k).length, "запись", "записи", "записей")} · белок&nbsp;${r0(v.p)}&nbsp;г</span></span><span class="pv pv2"><b>${fmt(v.k)}</b><span>${pc}% нормы</span></span></button>`;
     }).join("")}</div>` : `<div class="card"><div class="empty"><div class="em">${icon("chart")}</div><b>Здесь появится статистика</b><p>Добавляй еду каждый день, и тут будет видно, сколько ты ешь в среднем.</p></div></div>`;
     $$("#h-days [data-k]").forEach((b) => (b.onclick = () => { selDay = b.dataset.k; weekAnchor = fromKey(selDay); show("today"); }));
   }
@@ -1819,7 +1819,7 @@
       <div class="card p-card">
         <div class="p-row">
           <button class="p-ava" id="pr-ava" aria-label="Сменить фото">${avatarInner()}<span class="p-ava-edit">${icon("cam")}</span></button>
-          <div class="p-id"><b>${esc(p.name || "Без имени")}</b><span>${u && u.username ? "@" + esc(u.username) + " · " : ""}${p.sex === "f" ? "Жен." : "Муж."}, ${p.age} · ${p.height} см · ${dec(p.weight)} кг</span></div>
+          <div class="p-id"><b>${esc(p.name || "Без имени")}</b><span>${p.age} ${plural(p.age, "год", "года", "лет")} · ${p.height} см · ${dec(p.weight)} кг</span></div>
           <button class="p-edit" id="pr-name" aria-label="Изменить имя">${icon("edit")}</button>
         </div>
         <div class="p-stats">
