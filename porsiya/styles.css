@@ -516,3 +516,8 @@ input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 
 .week .pill, .seg .knob { will-change: transform; }
 .item.enter { animation: itemIn .5s var(--ease-out) both, flash 1.6s var(--ease) .2s; }
 @keyframes flash { 0% { background: color-mix(in srgb, var(--cal-b) 16%, transparent); } 100% { background: var(--card); } }
+.mg-head span { display: flex; align-items: center; gap: 10px; }
+.mg-save { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--g60); padding: 4px 10px; border-radius: 99px; background: var(--card-2); transition: transform .25s var(--spring); }
+.mg-save svg { width: 12px; height: 12px; }
+.mg-save:active { transform: scale(.92); }
+.fitem[data-combo] .em { font-size: 15px; letter-spacing: -5px; padding-right: 5px; }

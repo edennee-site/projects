@@ -45,6 +45,7 @@
     days: {},
     weights: {},
     my: [],
+    combos: [],
     recent: [],
     settings: { theme: "auto", key: "", model: "gemini-flash-latest" },
   });
@@ -58,6 +59,7 @@
         S.profile = Object.assign(defaults().profile, d.profile || {});
         S.profile.manual = Object.assign(defaults().profile.manual, (d.profile || {}).manual || {});
         S.settings = Object.assign(defaults().settings, d.settings || {});
+        if (!Array.isArray(S.combos)) S.combos = [];
       }
     } catch (e) { S = defaults(); }
   }
@@ -673,11 +675,40 @@
       const items = list.filter((e) => e.meal === m.id).sort((a, b) => a.t - b.t);
       if (!items.length) return "";
       const sum = items.reduce((a, e) => a + e.k, 0);
-      return `<div class="meal-group fade-up d6"><div class="mg-head"><b>${m.e} ${m.n}</b><span>${fmt(sum)} ккал</span></div>
+      return `<div class="meal-group fade-up d6"><div class="mg-head"><b>${m.e} ${m.n}</b><span>${items.length > 1 ? `<button class="mg-save" data-save="${m.id}">${icon("plus")} Набор</button>` : ""}${fmt(sum)} ккал</span></div>
         ${items.map((e) => itemHTML(e, fresh.has(e.id))).join("")}</div>`;
     }).join("");
     fresh.clear();
+    $$("[data-save]", box).forEach((b) => b.onclick = (ev) => { ev.stopPropagation(); saveCombo(b.dataset.save); });
     $$(".item", box).forEach((el) => { el.onclick = () => { if (!el.dataset.sw) editEntry(el.dataset.id); }; bindSwipe(el); });
+  }
+  // ---------- наборы (сохранённые приёмы пищи) ----------
+  function saveCombo(mealId) {
+    const items = dayEntries(selDay).filter((e) => e.meal === mealId);
+    const sum = items.reduce((a, e) => a + e.k, 0);
+    const def = "Мой " + mealName(mealId).toLowerCase();
+    openSheet("Сохранить набор", `<p class="note" style="padding:0 6px 12px">Набор добавляется в один тап из поиска. Удобно для завтрака, который повторяется каждый день.</p>
+      <label class="field"><span>Название</span><input id="cb-n" maxlength="40" value="${esc(def)}"></label>
+      <div class="meal-group" style="margin-top:10px">${items.map((e) => `<div class="item" style="pointer-events:none"><span class="ib ${tint(e)}">${e.img ? `<img src="${e.img}" alt="">` : esc(e.e)}</span><span class="it"><b>${esc(e.n)}</b><span>${r0(e.g)} г</span></span><span class="kc">${fmt(e.k)}</span></div>`).join("")}</div>`,
+      `<button class="btn" id="cb-save">Сохранить · ${fmt(sum)} ккал</button>`);
+    $("#cb-save").onclick = () => {
+      const n = $("#cb-n").value.trim() || def;
+      S.combos = S.combos.filter((c) => c.n !== n);
+      S.combos.unshift({ id: uid(), n, items: items.map((e) => ({ n: e.n, e: e.e, g: e.g, k: e.k, p: e.p, f: e.f, c: e.c })) });
+      save(); closeSheet(); haptic("ok"); toast("Набор сохранён");
+    };
+  }
+  function comboSheet(id) {
+    const c = S.combos.find((x) => x.id === id); if (!c) return;
+    const t = c.items.reduce((a, e) => { a.k += e.k; a.p += e.p; a.f += e.f; a.c += e.c; return a; }, { k: 0, p: 0, f: 0, c: 0 });
+    setSheet(c.n, `<div class="portion"><div class="kbig display" style="margin-top:0"><span>${fmt(t.k)}</span> <span class="muted" style="font-size:18px">ккал</span></div><div class="macros">${macroTags(t)}</div></div>
+      <div class="meal-group" style="margin-top:10px">${c.items.map((e) => `<div class="item" style="pointer-events:none"><span class="ib ${tint(e)}">${esc(e.e)}</span><span class="it"><b>${esc(e.n)}</b><span>${r0(e.g)} г</span></span><span class="kc">${fmt(e.k)}</span></div>`).join("")}</div>
+      <div class="subh">Приём пищи</div><div class="chips" id="cb-meal">${MEALS.map((m) => `<button class="fchip ${m.id === add.meal ? "on" : ""}" data-m="${m.id}">${m.e} ${m.n}</button>`).join("")}</div>`,
+      `<div style="display:flex;gap:8px"><button class="btn ghost" id="cb-del" style="width:54px;padding:0;flex:none">${icon("trash")}</button><button class="btn" id="cb-add">Добавить · ${fmt(t.k)} ккал</button></div>`, () => renderAdd());
+    $("#cb-del svg").style.cssText = "width:20px;height:20px";
+    $$("#cb-meal .fchip").forEach((b) => b.onclick = () => { add.meal = b.dataset.m; $$("#cb-meal .fchip").forEach((x) => x.classList.toggle("on", x === b)); haptic("sel"); });
+    $("#cb-add").onclick = () => { addEntries(c.items.map((e) => Object.assign({}, e, { src: "combo" })), add.meal); afterAdd(t.k); };
+    $("#cb-del").onclick = () => { S.combos = S.combos.filter((x) => x.id !== id); save(); haptic("medium"); toast("Набор удалён"); renderAdd(); };
   }
   function bindSwipe(el) {
     const wrap = el.parentElement; let x0, y0, dx = 0, mode = null;
@@ -1013,6 +1044,7 @@
     if (!q) {
       const rec = S.recent.map((n) => allFoods().find((f) => f.n === n)).filter(Boolean);
       if (rec.length) html += `<div class="subh">Недавние</div>` + rec.slice(0, 6).map(row).join("");
+      if (S.combos.length) html += `<div class="subh">Мои наборы</div>` + S.combos.map((c, i) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}" style="width:100%;text-align:left;animation-delay:${i * 0.025}s"><span class="em">${esc(c.items.map((e) => e.e).slice(0, 2).join(""))}</span><span class="ft"><b>${esc(c.n)}</b><span>${c.items.length} ${plural(c.items.length, "продукт", "продукта", "продуктов")} · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("");
       if (S.my.length) html += `<div class="subh">Мои продукты</div>` + S.my.slice(0, 8).map(row).join("");
       html += `<div class="subh">Популярное</div>` + window.FOODS.slice(0, 14).map(row).join("");
     } else {
@@ -1021,7 +1053,7 @@
       html = res.length ? res.slice(0, 40).map(row).join("") : `<div class="empty"><div class="em">🔍</div><b>Не нашлось</b>Добавь продукт вручную, он сохранится в «Мои продукты».<br><button class="btn sm" id="to-man" style="margin-top:14px">Ввести вручную</button></div>`;
     }
     fl.innerHTML = html;
-    $$(".fitem", fl).forEach((el) => el.onclick = () => portion(allFoods().find((f) => f.n === el.dataset.n)));
+    $$(".fitem", fl).forEach((el) => el.onclick = () => el.dataset.combo ? (haptic("light"), comboSheet(el.dataset.combo)) : portion(allFoods().find((f) => f.n === el.dataset.n)));
     if ($("#to-man")) $("#to-man").onclick = () => { add.tab = "manual"; add.manualName = add.q; renderAdd(); };
   }
   function portion(f) {
@@ -1123,6 +1155,7 @@
     const card = $("#h-card");
     card.innerHTML = `<div class="c-head"><span class="wc-title">${sel === todayKey() ? "Сегодня" : WDF[sd.getDay()] + ", " + sd.getDate() + " " + MONS[sd.getMonth()]}</span><span class="muted" style="font-size:13px">норма ${fmt(nm.k)}</span></div>
       <div class="mid display" style="color:var(--ink);margin-top:12px"><span id="h-val">${fmt(sv.k)}</span><small class="muted">ккал</small></div>
+      <div class="macros" id="h-mac">${macroTags(sv).replace(/<span class="mtag k">[^<]*<\/span>/, "")}</div>
       <div class="hbars" id="hbars">${days.map((k, i) => {
         const v = vals[i].k; const on = Math.round(v / unit); const over = v > nm.k * 1.1;
         let dots = ""; for (let r = 0; r < rows; r++) dots += `<i class="${r < on ? (over ? "over" : "on") : ""}" style="transition-delay:${(i * (hist.range === "week" ? 0.05 : 0.015) + r * 0.018).toFixed(3)}s${hist.range === "month" ? ";width:4px;height:4px" : ""}"></i>`;
@@ -1138,6 +1171,7 @@
       const d = fromKey(hist.sel), v = totals(hist.sel);
       $("#h-card .wc-title").textContent = hist.sel === todayKey() ? "Сегодня" : WDF[d.getDay()] + ", " + d.getDate() + " " + MONS[d.getMonth()];
       countUp($("#h-val"), r0(v.k), { key: "hv", dur: 500 });
+      $("#h-mac").innerHTML = macroTags(v).replace(/<span class="mtag k">[^<]*<\/span>/, "");
     });
     lastVals.set("hv", r0(sv.k));
     // stats
