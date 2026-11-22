@@ -1447,12 +1447,14 @@
     applyTheme();
     cloudPull(() => {
       load(); applyTheme(); if (!S.onboarded) startOnboarding(); else show("today");
-      const wait = Math.max(0, 750 - performance.now());
-      setTimeout(() => {
-        if (cur === "today") { lastVals.clear(); buildToday(); }
-        const ld = $("#loader"); if (ld) { ld.classList.add("out"); setTimeout(() => ld.remove(), 600); }
-        setTimeout(() => document.documentElement.classList.remove("boot"), 520);
-      }, wait);
+      const fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]) : Promise.resolve();
+      fonts.then(() => {
+        const wait = Math.max(0, 650 - performance.now());
+        setTimeout(() => {
+          const ld = $("#loader"); if (ld) { ld.classList.add("out"); setTimeout(() => ld.remove(), 500); }
+          setTimeout(() => document.documentElement.classList.remove("boot"), 480);
+        }, wait);
+      });
     });
   }
   if (/[?&]demo/.test(location.search)) {
