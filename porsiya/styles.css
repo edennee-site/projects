@@ -191,12 +191,13 @@ svg.i { width: 20px; height: 20px; flex: none; }
 .muted { color: var(--g60); }
 .meal-group { background: var(--card); border-radius: var(--r-xl); padding: 8px; box-shadow: var(--shadow); }
 .meal-group + .meal-group { margin-top: 12px; }
-.mg-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 12px 8px; }
-.mg-head .mg-t { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 14.5px; }
+.mg-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 12px 6px; min-height: 48px; }
+.mg-head .mg-t { display: flex; align-items: baseline; gap: 8px; font-weight: 500; font-size: 16px; }
+.mg-head .mg-t em { font-style: normal; font-weight: 400; font-size: 13px; color: var(--g60); }
 .mg-head .mg-t svg { width: 17px; height: 17px; color: var(--g60); }
 .mg-head .mg-r { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--g60); }
-.mg-save { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--g70); height: 28px; padding: 0 11px; border-radius: 99px; background: var(--card-2); transition: transform .3s var(--spring); }
-.mg-save svg { width: 13px; height: 13px; }
+.mg-save { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--g60); background: var(--card-2); transition: transform .3s var(--spring); }
+.mg-save svg { width: 15px; height: 15px; }
 .mg-save:active { transform: scale(.93); }
 
 .item-wrap { position: relative; border-radius: 20px; overflow: hidden; }
@@ -1062,3 +1063,34 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .gk-p { font-size: 32px; font-weight: 500; letter-spacing: -0.04em; line-height: 1; }
 .gk-p small { font-size: 15px; color: var(--g60); margin-left: 1px; letter-spacing: 0; }
 .goal-card .drow { margin-top: 16px; }
+
+.big .num { letter-spacing: -0.055em; }
+/* цель: средний вариант */
+.gk-w { display: flex; align-items: flex-end; gap: 14px; margin-top: 18px; }
+.gk-w > span { flex: none; }
+.gk-w em { display: block; font-style: normal; font-size: 11.5px; color: var(--g60); }
+.gk-w b { display: block; font-size: 15px; font-weight: 500; margin-top: 2px; }
+.gk-w .drow { flex: 1; margin: 0 0 6px; }
+.goal-card .gk-w .drow i.on { background: var(--ok); }
+.gc-m span { flex: 1; }
+/* уровень */
+.lvl { display: flex; align-items: center; gap: 18px; }
+.lv-ring { position: relative; width: 84px; height: 84px; flex: none; display: grid; place-items: center; }
+.lv-ring > i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: var(--g20); transform: rotate(var(--r)) translateY(-38px) scale(.4); opacity: 0; transition: transform .6s cubic-bezier(.34,1.56,.64,1), opacity .3s, background-color .3s; }
+.lv-ring.go > i { transform: rotate(var(--r)) translateY(-38px); opacity: 1; }
+.lv-ring > i.on { background: var(--cal-b); }
+.lv-ring .num { font-size: 34px; font-weight: 500; letter-spacing: -0.05em; }
+.lv-b em { display: block; font-style: normal; font-size: 12px; color: var(--g60); }
+.lv-b b { display: block; font-size: 19px; font-weight: 500; margin-top: 2px; letter-spacing: -0.02em; }
+.lv-b > span { margin-top: 4px; }
+/* уведомление о достижении */
+.ach-ban { position: fixed; left: 50%; top: calc(10px + var(--safe-t) + var(--tg-top)); z-index: 70; width: min(calc(100vw - 32px), 420px); transform: translate(-50%, -140%); transition: transform .6s cubic-bezier(.32,.72,0,1); background: var(--ink); color: var(--ink-inv); border-radius: 22px; padding: 10px 14px 10px 10px; display: flex; align-items: center; gap: 12px; text-align: left; }
+.ach-ban.on { transform: translate(-50%, 0); }
+.ab-ic { width: 40px; height: 40px; border-radius: 14px; background: var(--g-pro); color: #fff; display: grid; place-items: center; flex: none; }
+.ab-ic svg { width: 19px; height: 19px; }
+.ab-t { flex: 1; min-width: 0; }
+.ab-t em { display: block; font-style: normal; font-size: 11.5px; opacity: .65; }
+.ab-t b { display: block; font-size: 14.5px; font-weight: 500; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ach-ban .chev { width: 16px; height: 16px; opacity: .5; }
+.streak { position: relative; }
+.sbadge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: #F2545B; color: #fff; font-size: 11px; font-weight: 600; font-style: normal; display: grid; place-items: center; border: 2px solid var(--bg); animation: bump .5s var(--spring); }

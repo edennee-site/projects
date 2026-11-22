@@ -10,7 +10,7 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
   const r0 = (n) => Math.round(n || 0);
   const r1 = (n) => Math.round((n || 0) * 10) / 10;
-  const fmt = (n) => { const v = r0(n); return (v < 0 ? "−" : "") + Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0"); };
+  const fmt = (n) => { const v = r0(n); return (v < 0 ? "−" : "") + Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f"); };
   const fmtS = (n) => (n > 0 ? "+" : "") + fmt(n);
   const dec = (n) => String(r1(n)).replace(".", ",");
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -243,7 +243,12 @@
     const wk = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0]));
     const w0 = S.plan ? S.plan.start : wk.length ? wk[0][1] : S.profile.weight, wc = curWeight();
     const pi = S.plan ? planInfo() : null;
-    return { days: keys.length, photos, entries, inNorm, proDays, bfDays, fullDays, weights: wk.length, combos: S.combos.length, proRun, carbRun, fatRun, noOver, surplus, lost: Math.max(0, w0 - wc), gained: Math.max(0, wc - w0), planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0, todayXp: 0, };
+    const earlyDin = keys.filter((k) => S.days[k].some((e) => e.meal === "dinner") && S.days[k].filter((e) => e.meal === "dinner").every((e) => new Date(e.t).getHours() < 20)).length;
+    const lightDin = keys.filter((k) => { const d = S.days[k].filter((e) => e.meal === "dinner").reduce((a, e) => a + e.k, 0); return d > 0 && d <= nm.k / 3; }).length;
+    const pro2 = keys.filter((k) => T[k].p >= S.profile.weight * 2).length;
+    const wks = {}; keys.forEach((k) => { const w = dkey(monday(fromKey(k))); if (Math.abs(T[k].k - nm.k) <= nm.k * 0.1) wks[w] = (wks[w] || 0) + 1; });
+    const goodWeeks = Object.values(wks).filter((v) => v >= 5).length;
+    return { earlyDin, lightDin, pro2, goodWeeks, own: S.my.length + S.combos.length, days: keys.length, photos, entries, inNorm, proDays, bfDays, fullDays, weights: wk.length, combos: S.combos.length, proRun, carbRun, fatRun, noOver, surplus, lost: Math.max(0, w0 - wc), gained: Math.max(0, wc - w0), planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0, todayXp: 0, };
   }
   // бесконечные этапы: дальше ряд продолжается ×1,5
   function tierAt(base, i) { if (i < base.length) return base[i]; let v = base[base.length - 1]; for (let j = base.length; j <= i; j++) v = Math.round((v * 1.5) / (v >= 10 ? 5 : 0.5)) * (v >= 10 ? 5 : 0.5); return v; }
@@ -263,15 +268,22 @@
       track("protein", "protein", "pro", "Белок", g.proRun, [2, 5, 10, 20, 40], (x) => `Закрывай белок ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
       track("meals", "breakfast", "fat", "Режим", g.fullDays, [1, 7, 21, 50, 100], (x) => `${x} ${plural(x, "день", "дня", "дней")} с завтраком, обедом и ужином`, "дн."),
       track("scale", "scale", "fat", "Весы", g.weights, [1, 4, 10, 25, 50], (x) => `${x} ${plural(x, "взвешивание", "взвешивания", "взвешиваний")}`, "раз"),
+      track("bf", "breakfast", "pro", "Ранняя пташка", g.bfDays, [3, 7, 21, 50, 100], (x) => `${x} ${plural(x, "завтрак", "завтрака", "завтраков")}`, "дн."),
+      track("early", "dinner", "cal", "Ужин вовремя", g.earlyDin, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "ужин", "ужина", "ужинов")} до 20:00`, "дн."),
+      track("week", "star", "carb", "Идеальная неделя", g.goodWeeks, [1, 2, 4, 8, 16], (x) => `${x} ${plural(x, "неделя", "недели", "недель")}, где 5 дней в норме`, "нед."),
+      track("entries", "edit", "fat", "Летописец", g.entries, [10, 50, 150, 300, 600], (x) => `${x} ${plural(x, "запись", "записи", "записей")} еды`, "зап."),
+      track("own", "dish", "pro", "Своя кухня", g.own, [1, 3, 7, 15, 30], (x) => `${x} ${plural(x, "своё блюдо", "своих блюда", "своих блюд")} или набор`, "шт."),
     ];
     const G = mode === "lose" ? [
       track("minus", "down-trend", "carb", "Минус", r1(g.lost), [1, 2, 3, 5, 8, 12], (x) => `Сбрось ${n(x)} кг`, "кг"),
       track("calm", "check", "carb", "Без срывов", g.noOver, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} подряд без перебора`, "дн."),
       track("fat", "fat", "fat", "Жиры в норме", g.fatRun, [3, 7, 14, 30], (x) => `Держи жиры в норме ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+      track("light", "moon", "cal", "Лёгкий ужин", g.lightDin, [3, 7, 14, 30], (x) => `${x} ${plural(x, "день", "дня", "дней")}, где ужин меньше трети нормы`, "дн."),
     ] : mode === "gain" ? [
       track("plus", "up-trend", "carb", "Плюс", r1(g.gained), [0.5, 1, 2, 3, 5, 8], (x) => `Набери ${n(x)} кг`, "кг"),
       track("surplus", "flame", "pro", "Профицит", g.surplus, [3, 7, 14, 30, 60], (x) => `Добирай калории ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
       track("carbs", "carbs", "carb", "Углеводы", g.carbRun, [3, 7, 14, 30], (x) => `Закрывай углеводы ${x} ${plural(x, "день", "дня", "дней")} подряд`, "дн."),
+      track("pro2", "dumbbell", "pro", "Строитель", g.pro2, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} с белком 2 г на кг веса`, "дн."),
     ] : [
       track("calm", "check", "carb", "Баланс", g.noOver, [3, 7, 14, 30, 60], (x) => `${x} ${plural(x, "день", "дня", "дней")} подряд без перебора`, "дн."),
     ];
@@ -280,7 +292,7 @@
     const all = L.concat(G); all.common = L; all.goal = G; all.mode = mode;
     return all;
   }
-  function gameLevel(A) { const st = A.reduce((a, t) => a + t.st, 0); const lv = 1 + Math.floor(st / 2); return { lv, st, inLv: st % 2, need: 2 }; }
+  function gameLevel(A) { const st = A.reduce((a, t) => a + t.st, 0); const lv = 1 + Math.floor(st / 3); return { lv, st, inLv: st % 3, need: 3 }; }
   function checkAch() {
     if (!S.game) return null;
     const A = achList();
@@ -658,7 +670,7 @@
     setMonthLabel(weekAnchor || fromKey(selDay));
     const st = streakInfo(), sp = $("#t-streak");
     sp.className = "streak" + (st.today ? " on" : st.risk ? " risk" : "") + (sp.classList.contains("bump") ? " bump" : "");
-    sp.innerHTML = `${icon("bolt")}<span class="num">${st.n}</span>`;
+    sp.innerHTML = `${icon("bolt")}<span class="num">${st.n}</span>`; updBadge();
     $("#wk-today").classList.toggle("show", !isToday);
     $("#cal-chip").textContent = t.k ? pct + "% нормы" : "Норма " + fmt(kN);
     $("#v-kn").textContent = "из " + fmt(kN) + " ккал";
@@ -780,7 +792,7 @@
     box.innerHTML = MEALS.map((m) => {
       const items = list.filter((e) => e.meal === m.id).sort((a, b) => a.t - b.t); if (!items.length) return "";
       const sum = items.reduce((a, e) => a + e.k, 0);
-      return `<div class="meal-group"><div class="mg-head"><span class="mg-t">${icon(m.i)}${m.n}</span><span class="mg-r">${items.length > 1 ? `<button class="mg-save" data-save="${m.id}" aria-label="Сохранить как набор">${icon("star")}<span>В наборы</span></button>` : ""}<span>${fmt(sum)} ккал</span></span></div>
+      return `<div class="meal-group"><div class="mg-head"><span class="mg-t">${m.n}<em>${fmt(sum)} ккал</em></span>${items.length > 1 ? `<button class="mg-save" data-save="${m.id}" aria-label="Сохранить как набор">${icon("star")}</button>` : ""}</div>
         ${items.map((e) => itemHTML(e, fresh.has(e.id))).join("")}</div>`;
     }).join("");
     fresh.clear();
@@ -960,13 +972,13 @@
   function goalCardHTML() {
     const pi = planInfo();
     if (!pi) return `<button class="card goal-cta" id="goal-open"><span class="gc-ic">${icon("flag")}</span><span class="gc-t"><b>Поставь цель по весу</b><span>Посчитаю норму под цель и разобью путь на месячные этапы</span></span>${icon("right", "chev")}</button>`;
-    const pl = S.plan;
+    const pl = S.plan, cm = pi.ms.find((m) => m.cur);
     return `<button class="card goal-card" id="goal-open">
       <div class="gk-row"><span class="gk-ic">${icon(pl.type === "lose" ? "down-trend" : "up-trend")}</span>
-        <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>${dec(pi.cur)} → ${dec(pl.target)} кг</span></span>
+        <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>до ${fmtD(pi.end)}</span></span>
         <span class="gk-p num">${Math.round(pi.done * 100)}<small>%</small></span></div>
-      ${dotRow(24, "ink gc-dots")}
-      ${weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : ""}
+      <div class="gk-w"><span><em>Сейчас</em><b class="num">${dec(pi.cur)} кг</b></span>${dotRow(14, "ink gc-dots")}<span style="text-align:right"><em>Цель</em><b class="num">${dec(pl.target)} кг</b></span></div>
+      ${weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : cm && !pi.reached ? `<div class="gc-m">${icon("flag")}<span>Этап к ${fmtD(cm.d)}: ${dec(cm.exp)} кг</span></div>` : ""}
     </button>`;
   }
   function goalStatus(pi) {
@@ -1072,7 +1084,7 @@
     if (box._h === html) return; box._h = html; box.innerHTML = html; bindGoalCard(null);
   }
   function streakSheet() {
-    haptic("light");
+    haptic("light"); if (S.game && S.game.unread) { S.game.unread = 0; save(); updBadge(); }
     const st = streakInfo(), A = achList(), now = new Date(), LV = gameLevel(A);
     const days = Array.from({ length: 7 }, (_, i) => { const d = addDays(now, i - 6), k = dkey(d); return { d, k, on: isLogged(k), fz: isFrozen(k), today: i === 6 }; });
     const msg = st.today ? `Сегодня отмечено. Завтра будет ${st.n + 1}.` : st.risk ? "Добавь еду сегодня, иначе серия сгорит в полночь." : "Добавь еду сегодня, чтобы начать серию.";
@@ -1092,17 +1104,19 @@
       </div>
       <div class="gap"></div>${goalCardHTML()}
       <div class="gap"></div>
-      <div class="card lvl"><div class="lv-badge"><span class="num" id="lv-n">${LV.lv}</span><em>уровень</em></div>
-        <div class="lv-b"><b>Уровень ${LV.lv}</b><span>Пройдено этапов: ${LV.st}. До ${LV.lv + 1} уровня ещё ${LV.need - LV.inLv} ${plural(LV.need - LV.inLv, "этап", "этапа", "этапов")}</span><div class="tr-bar"><i style="--w:${(LV.inLv / LV.need) * 100}%"></i></div></div></div>
+      <div class="card lvl">
+        <div class="lv-ring" id="lv-ring">${Array.from({ length: 20 }, (_, i) => `<i class="${i < Math.round((LV.inLv / LV.need) * 20) ? "on" : ""}" style="--r:${i * 18}deg;transition-delay:${0.2 + i * 0.03}s"></i>`).join("")}<span class="num">${LV.lv}</span></div>
+        <div class="lv-b"><em>Твой уровень</em><b>${LV.lv} уровень</b><span>${LV.need - LV.inLv} ${plural(LV.need - LV.inLv, "этап", "этапа", "этапов")} до ${LV.lv + 1} уровня · всего ${LV.st} ${plural(LV.st, "этап", "этапа", "этапов")}</span></div>
+      </div>
       <div class="subh">Достижения</div>
       <div class="trs">${A.common.map(card).join("")}</div>
       <div class="subh">${modeT}</div>
       <div class="trs">${A.goal.map((t, i) => card(t, i + A.common.length)).join("")}</div>
-      <p class="note">У каждого достижения бесконечные этапы: после последнего цель растёт. Каждые 2 этапа поднимают общий уровень. Каждые 7 дней подряд дают заморозку серии.</p>`;
+      <p class="note">У каждого достижения бесконечные этапы: после последнего цель растёт. Каждые 3 этапа поднимают общий уровень. Каждые 7 дней подряд дают заморозку серии.</p>`;
     openSheet("Прогресс и награды", body);
     countUp($("#st-n"), st.n, { from: 0, dur: 900, force: true });
     bindGoalCard(streakSheet);
-    raf2(() => { $(".st-hero").classList.add("go"); $$("#sh-body .tr-bar").forEach((b) => b.classList.add("go")); });
+    raf2(() => { $(".st-hero").classList.add("go"); $$("#sh-body .tr-bar").forEach((b) => b.classList.add("go")); const lr = $("#lv-ring"); if (lr) lr.classList.add("go"); });
   }
   function openCalDetail() {
     haptic("light");
@@ -1373,15 +1387,20 @@
   }
   function bumpStreak() { const sp = $("#t-streak"); if (sp) { sp.classList.remove("bump"); void sp.offsetWidth; sp.classList.add("bump"); } }
   function celebrate(a) {
+    S.game.unread = (S.game.unread || 0) + 1; save(); updBadge();
     setTimeout(() => {
       haptic("ok"); bumpStreak();
-      const el = document.createElement("div"); el.className = "celeb";
-      el.innerHTML = `<div class="cb-card"><div class="cb-burst">${Array.from({ length: 12 }, (_, i) => `<i style="--a:${i * 30}deg"></i>`).join("")}</div><span class="cb-ic">${icon(a.ic)}</span><em>Новое достижение</em><b>${esc(a.t)}</b><p>${esc(a.d)}</p><button class="btn white" id="cb-ok">Отлично</button></div>`;
+      const old = $(".ach-ban"); if (old) old.remove();
+      const el = document.createElement("button"); el.className = "ach-ban";
+      el.innerHTML = `<span class="ab-ic">${icon(a.ic)}</span><span class="ab-t"><em>Новое достижение</em><b>${esc(a.t)}</b></span>${icon("right", "chev")}`;
       document.body.appendChild(el); raf2(() => el.classList.add("on"));
-      const close = () => { el.classList.remove("on"); setTimeout(() => el.remove(), 450); };
-      el.onclick = (e) => { if (e.target === el || e.target.id === "cb-ok") close(); };
+      const close = () => { el.classList.remove("on"); setTimeout(() => el.remove(), 500); };
+      const t = setTimeout(close, 4200);
+      el.onclick = () => { clearTimeout(t); close(); if (sheetOpen) closeSheet(); setTimeout(streakSheet, sheetOpen ? 300 : 0); };
     }, 500);
   }
+  function updBadge() { const sp = $("#t-streak"); if (!sp) return; let b = $(".sbadge", sp); const n = (S.game && S.game.unread) || 0; if (!n) { if (b) b.remove(); return; } if (!b) { b = document.createElement("i"); b.className = "sbadge"; sp.appendChild(b); } b.textContent = n; }
+
 
   // ----- search -----
   const allFoods = () => S.my.concat(window.FOODS);
