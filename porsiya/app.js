@@ -598,6 +598,7 @@
       <div class="top"><div><h1>${now.getDate()} ${MON[now.getMonth()]}</h1><div class="date">${cap(WDF[now.getDay()])}</div></div><div class="top-r"><button class="streak" id="t-streak" aria-label="Серия"></button><button class="avatar" id="t-ava" aria-label="Профиль">${avatarInner()}</button></div></div>
       <div class="wk-head"><button class="wk-month" id="wk-month"><span id="wk-mt"></span>${icon("right")}</button><button class="wk-today" id="wk-today">${icon("refresh")}Сегодня</button></div>
       <div class="week" id="week"></div>
+      <div id="t-goal"></div>
       <div class="gap"></div>
       <div class="grad g-cal tap" id="c-cal" role="button">
         <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span>Калории</span><span class="chip" id="cal-chip"></span></div>
@@ -662,7 +663,7 @@
       $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
-    updWater();
+    updWater(); renderTodayGoal();
     const av = $("#t-ava"), ai = avatarInner(); if (av && av._ai !== ai) { av.innerHTML = ai; av._ai = ai; }
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
@@ -937,15 +938,22 @@
     $("#ws-m").onclick = () => addWater(-(S.settings.glass || 250));
   }
   const fmtD = (d) => d.getDate() + " " + MON[d.getMonth()];
+  let planTop = false;
+  function openGoal(after) {
+    haptic("light"); openSheet("Цель по весу", "");
+    const back = () => { closeSheet(); if (after) after(); };
+    planTop = true; if (S.plan) planDetail(back); else planEdit(back);
+  }
+  const weighDue = () => { if (!S.plan) return false; const e = Object.keys(S.weights).sort(); const last = e.length ? fromKey(e[e.length - 1]) : null; return !last || (new Date() - last) / 864e5 >= 7; };
   function goalCardHTML() {
     const pi = planInfo();
     if (!pi) return `<button class="card goal-cta" id="goal-open"><span class="gc-ic">${icon("flag")}</span><span class="gc-t"><b>Поставь цель по весу</b><span>Посчитаю норму под цель и разобью путь на месячные этапы</span></span>${icon("right", "chev")}</button>`;
     const pl = S.plan, st = goalStatus(pi), cm = pi.ms.find((m) => m.cur);
     return `<button class="card goal-card" id="goal-open">
-      <div class="c-head"><span class="card-t">${pl.type === "lose" ? "Сбросить" : "Набрать"} ${dec(pi.total)} кг</span><span class="gs ${st.cls}">${st.t}</span></div>
-      <div class="gc-row"><span class="gc-pct num">${Math.round(pi.done * 100)}<small>%</small></span><span class="gc-sub">${dec(pi.cur)} кг сейчас<br>цель ${dec(pl.target)} кг к ${fmtD(pi.end)}</span></div>
+      <div class="c-head"><div><span class="card-t">${pl.type === "lose" ? "Похудение" : "Набор массы"}</span><div class="card-s" style="margin-top:2px">${pl.type === "lose" ? "−" : "+"}${dec(pi.total)} кг · до ${fmtD(pi.end)}</div></div><span class="gs ${st.cls}">${st.t}</span></div>
+      <div class="gc-row"><span class="gc-pct num">${Math.round(pi.done * 100)}<small>%</small></span><span class="gc-sub">${dec(pi.cur)} кг сейчас<br>цель ${dec(pl.target)} кг</span></div>
       ${dotRow(24, "ink gc-dots")}
-      ${cm && !pi.reached ? `<div class="gc-m">${icon("flag")}Этап до ${fmtD(cm.d)}: ${dec(cm.exp)} кг</div>` : ""}
+      ${weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься, чтобы сверить прогресс</span><span class="gc-btn" data-weigh>Записать</span></div>` : cm && !pi.reached ? `<div class="gc-m">${icon("flag")}Этап до ${fmtD(cm.d)}: ${dec(cm.exp)} кг</div>` : ""}
     </button>`;
   }
   function goalStatus(pi) {
@@ -957,13 +965,13 @@
   function bindGoalCard(back) {
     const b = $("#goal-open"); if (!b) return;
     if (S.plan) setDots($(".gc-dots"), planInfo().done, 1);
-    b.onclick = () => { haptic("light"); if (S.plan) planDetail(back); else planEdit(back); };
+    b.onclick = (e) => { if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (!back) { openGoal(); return; } haptic("light"); if (S.plan) planDetail(back); else planEdit(back); };
   }
   function planDetail(back) {
     const pi = planInfo(), pl = S.plan, st = goalStatus(pi), nm = norm();
     const body = `
       <div class="d-hero g-carb">
-        <div class="c-head"><span class="c-title"><span class="ic">${icon(pi.reached ? "trophy" : "flag")}</span>${pl.type === "lose" ? "Сбросить" : "Набрать"} ${dec(pi.total)} кг</span><span class="chip">${st.t}</span></div>
+        <div class="c-head"><span class="c-title"><span class="ic">${icon(pi.reached ? "trophy" : "flag")}</span>${pl.type === "lose" ? "Похудение" : "Набор массы"}</span><span class="chip">${st.t}</span></div>
         <div class="big"><span class="num" id="pd-p">0</span><span class="of">% пути</span></div>
         ${dotRow(24)}
         <div class="stats3"><div><span>Старт</span><b class="num">${dec(pl.start)} кг</b></div><div><span>Сейчас</span><b class="num">${dec(pi.cur)} кг</b></div><div><span>Цель</span><b class="num">${dec(pl.target)} кг</b></div></div>
@@ -979,7 +987,7 @@
         <button class="prow" id="pd-re"><span class="pi">${icon("refresh")}</span><span class="pl"><b>Пересчитать от текущего веса</b><span>Старт сегодня, цель та же</span></span></button>
         <button class="prow danger" id="pd-del"><span class="pi t-pro">${icon("trash")}</span><span class="pl"><b>Удалить цель</b></span></button>
       </div>`;
-    setSheet("Цель по весу", body, "", back, 1);
+    setSheet("Цель по весу", body, "", planTop ? null : back, planTop ? 0 : 1); planTop = false;
     countUp($("#pd-p"), Math.round(pi.done * 100), { from: 0, dur: 900, force: true });
     setDots($(".d-hero .drow"), pi.done, 1);
     $("#pd-edit").onclick = () => planEdit(() => planDetail(back));
@@ -1001,7 +1009,7 @@
       ${segHTML("pace", PACE_N.map((n, i) => [String(i), n]), String(st.pace))}
       <div class="gap"></div>
       <div class="card" id="pe-sum"></div>`;
-    setSheet(ex ? "Изменить цель" : "Новая цель", body, `<button class="btn" id="pe-save">${ex ? "Сохранить" : "Поставить цель"}</button>`, back, 1);
+    setSheet(ex ? "Изменить цель" : "Новая цель", body, `<button class="btn" id="pe-save">${ex ? "Сохранить" : "Поставить цель"}</button>`, planTop ? null : back, planTop ? 0 : 1); planTop = false;
     const root = $("#sh-body");
     const upd = () => {
       if (st.type === "lose" && st.target >= cw) st.target = r1(cw - 0.5); if (st.type === "gain" && st.target <= cw) st.target = r1(cw + 0.5);
@@ -1025,6 +1033,30 @@
       const a = checkAch(); if (a) celebrate(a);
       if (S.plan) planDetail(back);
     };
+  }
+  function planCheck() {
+    const pi = planInfo(), pl = S.plan, lose = pl.type === "lose";
+    let ic = "check", tone = "ok", t = "", txt = "", acts = "";
+    if (pi.reached) { ic = "trophy"; t = "Цель достигнута"; txt = `Ты дошёл до ${dec(pl.target)} кг. Можно поставить новую цель или перейти на поддержание формы.`; acts = `<button class="btn ghost" data-pc="keep">Поддерживать вес</button><button class="btn" data-pc="new">Новая цель</button>`; }
+    else if (pi.diff <= -0.6) { ic = "info"; tone = "warn"; t = `Отстаёшь на ${dec(-pi.diff)} кг`; txt = `По плану сейчас должно быть ${dec(pi.expected)} кг. Это нормально: вес колеблется. Можно сдвинуть финиш, сохранив темп, или ${pl.pace < 2 ? "ускорить темп" : "оставить как есть"}.${lose ? " Проверь, что все приёмы пищи записаны, включая перекусы и напитки." : " Проверь, что добираешь калории каждый день."}`; acts = `<button class="btn ghost" data-pc="shift">Сдвинуть финиш</button>${pl.pace < 2 ? `<button class="btn" data-pc="faster">Ускорить темп</button>` : `<button class="btn" data-pc="ok">Оставить</button>`}`; }
+    else if (pi.diff >= 0.6) { ic = "rocket"; t = `Впереди на ${dec(pi.diff)} кг`; txt = `Отличный темп. ${lose ? "Если чувствуешь сильный голод или упадок сил, лучше немного замедлиться." : "Если растёт живот, стоит немного замедлиться, чтобы набирать именно мышцы."}`; acts = `${pl.pace > 0 ? `<button class="btn ghost" data-pc="slower">Замедлить темп</button>` : ""}<button class="btn" data-pc="ok">Продолжать</button>`; }
+    else { t = "Всё по плану"; txt = `Сейчас ${dec(pi.cur)} кг, по плану ${dec(pi.expected)} кг. Норма остаётся прежней, продолжай в том же духе.`; acts = `<button class="btn" data-pc="ok">Отлично</button>`; }
+    setSheet("Сверка с целью", `<div class="pc-hero"><span class="pc-ic ${tone}">${icon(ic)}</span><b>${t}</b><p>${txt}</p></div>
+      <div class="card"><div class="ps-row"><span>Сейчас</span><b>${dec(pi.cur)} кг</b></div><div class="ps-row"><span>По плану</span><b>${dec(pi.expected)} кг</b></div><div class="ps-row"><span>Цель</span><b>${dec(pl.target)} кг</b></div><div class="ps-row"><span>Пройдено</span><b>${Math.round(pi.done * 100)}%</b></div></div>`, `<div class="btn-row pc-acts" style="margin:0">${acts}</div>`, null, 1);
+    $$("[data-pc]").forEach((b) => (b.onclick = () => {
+      const a = b.dataset.pc; haptic("ok");
+      if (a === "shift") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); toast("Финиш сдвинут"); }
+      if (a === "faster") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); S.plan.pace++; toast("Темп ускорен, норма обновлена"); }
+      if (a === "slower") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); S.plan.pace--; toast("Темп снижен, норма обновлена"); }
+      if (a === "keep") { S.plan = null; S.profile.goal = "keep"; toast("Режим поддержания"); }
+      save(); if (a === "new") { S.plan = null; save(); planTop = true; planEdit(closeSheet); return; }
+      closeSheet(); if (cur === "today") updateToday(); if (cur === "history") drawWeight();
+    }));
+  }
+  function renderTodayGoal() {
+    const box = $("#t-goal"); if (!box) return;
+    const html = `<div class="gap"></div>${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}`;
+    if (box._h === html) return; box._h = html; box.innerHTML = html; bindGoalCard(null);
   }
   function streakSheet() {
     haptic("light");
@@ -1528,7 +1560,13 @@
         <p class="note" style="text-align:center;padding:18px 0 0">Лучше взвешиваться утром натощак. ${S.profile.manual.on ? "" : "Норма калорий пересчитается под новый вес."}</p></div>`,
       `<button class="btn" id="ws-save">Сохранить</button>`);
     bindSteppers($("#sh-body"), st, { w: [30, 250] });
-    $("#ws-save").onclick = () => { S.weights[todayKey()] = st.w; S.profile.weight = st.w; save(); closeSheet(); haptic("ok"); toast("Вес записан"); if (cur === "history") drawWeight(); const a = checkAch(); if (a) celebrate(a); };
+    $("#ws-save").onclick = () => {
+      S.weights[todayKey()] = st.w; S.profile.weight = st.w; save(); haptic("ok");
+      if (cur === "history") drawWeight(); if (cur === "today") updateToday();
+      const a = checkAch();
+      if (S.plan) { planCheck(); if (a) celebrate(a); return; }
+      closeSheet(); toast("Вес записан"); if (a) celebrate(a);
+    };
   }
 
   // =====================================================================
@@ -1664,7 +1702,7 @@
     $$("[data-m]", s).forEach((i) => (i.oninput = () => { p.manual[i.dataset.m] = Math.max(0, parseInt(i.value, 10) || 0); save(); updNormCard(); }));
     $("#pc-t").onclick = () => { S.settings.carry = !S.settings.carry; save(); haptic("sel"); $("#pc-t .toggle").classList.toggle("on", S.settings.carry); lastVals.delete("wk"); };
     $("#pr-key").onclick = keySheet;
-    $("#pr-plan").onclick = () => { haptic("light"); openSheet("Цель по весу", ""); const back = () => { closeSheet(); renderProfile(); }; if (S.plan) planDetail(back); else planEdit(back); setBack(null); };
+    $("#pr-plan").onclick = () => openGoal(renderProfile);
     $("#d-redo").onclick = () => startOnboarding();
     $("#d-reset").onclick = confirmReset;
   }
