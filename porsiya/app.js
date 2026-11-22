@@ -792,7 +792,7 @@
     box.innerHTML = MEALS.map((m) => {
       const items = list.filter((e) => e.meal === m.id).sort((a, b) => a.t - b.t); if (!items.length) return "";
       const sum = items.reduce((a, e) => a + e.k, 0);
-      return `<div class="meal-group"><div class="mg-head"><span class="mg-t">${m.n}<em>${fmt(sum)} ккал</em></span>${items.length > 1 ? `<button class="mg-save" data-save="${m.id}" aria-label="Сохранить как набор">${icon("star")}</button>` : ""}</div>
+      return `<div class="meal-group"><div class="mg-head"><span class="mg-t">${icon(m.i)}${m.n}<em>${fmt(sum)} ккал</em></span>${items.length > 1 ? `<button class="mg-save" data-save="${m.id}" aria-label="Сохранить как набор">${icon("star")}</button>` : ""}</div>
         ${items.map((e) => itemHTML(e, fresh.has(e.id))).join("")}</div>`;
     }).join("");
     fresh.clear();
