@@ -1227,7 +1227,6 @@
         <b>Сфотографируй тарелку</b>
         <span class="hs-s">Нейросеть узнает блюда и посчитает калории и БЖУ</span>
         <div class="hs-acts"><button class="btn white" id="h-cam">${icon("cam")}Камера</button><button class="btn glass icon-btn" id="h-gal" aria-label="Из галереи">${icon("img")}</button></div>
-        ${S.settings.key ? "" : `<button class="hs-key" id="h-key">${icon("key")}Для фото нужен ключ Gemini${icon("right")}</button>`}
       </div>
       <button class="mrow" id="h-man"><span class="at-ic">${icon("edit")}</span><span class="mr-t"><b>Ввести вручную</b><span>Можно сохранить блюдо, чтобы добавлять в одно касание</span></span>${icon("right", "chev")}</button>
       ${combos.length || mine.length ? `<div class="subh">Мои блюда</div><div class="flist stagger">${combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="ft"><b>${esc(c.n)}</b><span>Набор · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("")}${mine.map((f, i) => { const v = f.g ? scaleFood(f, f.g) : f; return `<button class="fitem" data-mi="${i}"><span class="ft"><b>${esc(f.n)}</b><span>${f.g ? r0(f.g) + " г" : "1 порция"} · ${fmt(v.k)} ккал</span></span><span class="plus">${icon("plus")}</span></button>`; }).join("")}</div>` : ""}`;
@@ -1237,7 +1236,6 @@
     bindMealLine("mp-btn", (v) => (add.meal = v));
     $("#h-cam").onclick = () => $("#f-cam").click();
     $("#h-gal").onclick = () => $("#f-gal").click();
-    if ($("#h-key")) $("#h-key").onclick = () => keySheet();
     $("#h-man").onclick = () => go("manual");
     $$(".stagger > *", $("#sh-body")).forEach((el, i) => (el.style.animationDelay = i * 0.03 + "s"));
     $$("#sh-body .fitem").forEach((el) => (el.onclick = () => (el.dataset.combo ? (haptic("light"), comboSheet(el.dataset.combo)) : portion(S.my[+el.dataset.mi]))));
@@ -1249,33 +1247,34 @@
   function footBtn(label, id, disabled) { sheetFoot(label ? `<button class="btn" id="${id}" ${disabled ? "disabled" : ""}>${label}</button>` : ""); }
 
   // ----- photo -----
+  // распознавание: через сервер Nomi (ключ хранится на сервере); для разработки можно указать свой ключ (?dev)
+  const API = window.NOMI_API || "";
+  const canRecognize = () => !!(API || S.settings.key);
   function renderPhoto() {
     const b = $("#a-body");
-    if (!add.photo) {
-      b.innerHTML = `<div class="shoot"><span class="tile">${icon("cam")}</span>
-        <h4>Сфотографируй тарелку</h4><p>Нейросеть узнает блюда, оценит порции и посчитает КБЖУ. Результат можно поправить.</p>
-        <div class="acts"><button class="btn white" id="p-cam">${icon("cam")}Камера</button><button class="btn glass" id="p-gal">${icon("img")}Галерея</button></div></div>
-        ${S.settings.key ? `<div class="tips"><div class="tip">${icon("lunch")}<span>Снимай сверху и при хорошем свете, чтобы было видно всю тарелку.</span></div><div class="tip">${icon("edit")}<span>Если в блюде много масла или соуса, напиши это в подсказке после снимка.</span></div></div>`
-        : `<div class="gap"></div><div class="alert"><span class="ins-ic t-cal">${icon("key")}</span><div><b>Нужен ключ Gemini</b>Чтобы распознавать фото, добавь бесплатный ключ в профиле. Поиск и ручной ввод работают и без него.<div class="btn-row"><button class="btn sm" id="p-key">Добавить ключ</button></div></div></div>`}`;
-      $("#p-cam").onclick = () => $("#f-cam").click();
-      $("#p-gal").onclick = () => $("#f-gal").click();
-      if ($("#p-key")) $("#p-key").onclick = () => keySheet();
-      footBtn(""); return;
-    }
+    if (!add.photo) { add.tab = "home"; renderAdd(0); return; }
+    const has = add.items.length > 0;
     b.innerHTML = `<div class="preview" id="pv"><img src="${add.photo}" alt=""><span class="scan"></span><span class="status" id="pv-st"><span class="spin"></span><span id="pv-tx">Смотрю на тарелку</span></span><button class="retake" id="p-retake">${icon("refresh")}Другое фото</button></div>
-      <div class="search" style="margin-top:12px"><input id="p-hint" placeholder="Подсказка: «рис 200 г, масла много»" value="${esc(add.hint)}"><button id="p-re" class="btn sm">Оценить</button></div>
-      <div id="p-res" style="margin-top:14px"></div>`;
+      <div class="hint-box">
+        <label for="p-hint">${has ? "Что-то распознано не так?" : "Что на тарелке"} <em>необязательно</em></label>
+        <textarea id="p-hint" rows="2" placeholder="${has ? "Например: это не грибы, а рис с курицей" : "Например: рис с курицей, салат с маслом"}">${esc(add.hint)}</textarea>
+        <span class="hb-note">${has ? "Напиши, и Nomi пересчитает с учётом уточнения" : "Описание помогает точнее узнать блюда и порции"}</span>
+      </div>
+      <div id="p-res"></div>`;
     const img = $("#pv img"); const loaded = () => $("#pv").classList.add("loaded"); if (img.complete) raf2(loaded); else img.onload = loaded;
-    $("#p-hint").oninput = (e) => (add.hint = e.target.value);
-    $("#p-re").onclick = () => analyze();
-    $("#p-retake").onclick = () => { add.tab = "home"; add.photo = null; add.items = []; anReq++; haptic("light"); renderAdd(-1); };
-    if (add.items.length) renderResults(); else if (S.settings.key) analyze(); else noKeyResults();
+    const ta = $("#p-hint");
+    const grow = () => { ta.style.height = "auto"; ta.style.height = Math.min(140, ta.scrollHeight) + "px"; };
+    ta.oninput = () => { add.hint = ta.value; grow(); if (add.items.length) renderFoot(); };
+    raf2(grow);
+    $("#p-retake").onclick = () => { add.tab = "home"; add.photo = null; add.items = []; add.hint = ""; anReq++; haptic("light"); renderAdd(-1); };
+    if (has) renderResults();
+    else if (!canRecognize()) noService();
+    else sheetFoot(`<button class="btn" id="p-go">${icon("bolt")}Распознать</button>`), ($("#p-go").onclick = analyze);
   }
-  function noKeyResults() {
-    $("#p-res").innerHTML = `<div class="alert"><span class="ins-ic t-cal">${icon("key")}</span><div><b>Ключ Gemini не добавлен</b>Без ключа фото не распознаётся. Добавь ключ или введи блюдо вручную.<div class="btn-row"><button class="btn sm ghost" id="nk-s">Ввести вручную</button><button class="btn sm" id="nk-p">Добавить ключ</button></div></div></div>`;
+  function noService() {
+    $("#p-res").innerHTML = `<div class="alert"><span class="ins-ic t-cal">${icon("cam")}</span><div><b>Распознавание фото скоро заработает</b>Пока можно добавить блюдо вручную: название и калории.<div class="btn-row"><button class="btn sm" id="nk-s">Ввести вручную</button></div></div></div>`;
     $("#nk-s").onclick = () => { add.tab = "manual"; add.photo = null; renderAdd(1); };
-    $("#nk-p").onclick = () => keySheet();
-    footBtn("");
+    sheetFoot("");
   }
   async function onFile(file) {
     if (!file) return;
@@ -1283,7 +1282,7 @@
       const { full, thumb } = await compress(file, 1024, 120);
       const wasOpen = sheetOpen;
       if (!sheetOpen) { add = newAdd("photo"); openSheet("Фото еды", ""); }
-      add.photo = full; add.thumb = thumb; add.items = []; add.tab = "photo"; renderAdd(wasOpen ? 1 : 0);
+      add.photo = full; add.thumb = thumb; add.items = []; add.hint = ""; add.tab = "photo"; renderAdd(wasOpen ? 1 : 0);
     } catch (e) { toast("Не удалось открыть фото"); }
   }
   $("#f-cam").addEventListener("change", (e) => { onFile(e.target.files[0]); e.target.value = ""; });
@@ -1306,75 +1305,92 @@
   }
   let anReq = 0;
   async function analyze() {
-    if (!S.settings.key) return noKeyResults();
+    if (!canRecognize()) return noService();
     const my = ++anReq, pv = $("#pv");
-    pv.classList.add("scanning");
+    if (document.activeElement) document.activeElement.blur();
+    pv.classList.add("scanning"); haptic("light");
     const phrases = ["Смотрю на тарелку", "Узнаю блюда", "Оцениваю порции", "Считаю КБЖУ"]; let pi = 0;
     $("#pv-tx").textContent = phrases[0];
     const pt = setInterval(() => { pi = (pi + 1) % phrases.length; const tx = $("#pv-tx"); if (tx) tx.textContent = phrases[pi]; }, 1500);
-    $("#p-res").innerHTML = ""; footBtn("");
+    $("#p-res").innerHTML = ""; sheetFoot(`<button class="btn" disabled><span class="spin"></span>Распознаю</button>`);
     try {
-      const items = await gemini(add.photo, add.hint);
+      const items = await recognize(add.photo, add.hint);
       if (my !== anReq) return;
-      add.items = items; haptic(items.length ? "ok" : "err"); renderResults();
+      add.items = items; add.lastHint = add.hint; haptic(items.length ? "ok" : "err");
+      renderPhoto();
     } catch (err) {
       if (my !== anReq) return;
       haptic("err");
       $("#p-res").innerHTML = `<div class="alert"><span class="ins-ic t-pro">${icon("info")}</span><div><b>Не получилось распознать</b>${esc(err.message || err)}<div class="btn-row"><button class="btn sm ghost" id="er-s">Ввести вручную</button><button class="btn sm" id="er-r">Ещё раз</button></div></div></div>`;
       $("#er-r").onclick = analyze; $("#er-s").onclick = () => { add.tab = "manual"; add.photo = null; renderAdd(1); };
+      sheetFoot("");
     } finally { clearInterval(pt); if (my === anReq && pv) pv.classList.remove("scanning"); }
   }
-  async function gemini(dataUrl, hint) {
+  const PROMPT = (hint) => `Ты нутрициолог. На фото еда. Определи каждое отдельное блюдо или продукт, оцени вес порции в граммах по размеру тарелки и приборов, затем калорийность и БЖУ именно этой порции. Учитывай типичное количество масла при домашней готовке (особенно для узбекской и восточной кухни). Названия пиши по-русски, коротко, как в меню. Для каждого укажи категорию из списка: ${CATS.join(", ")}. Если на фото нет еды, верни пустой список.${hint ? "\nОписание от пользователя, оно важнее того, что видно на фото: " + hint : ""}`;
+  async function recognize(dataUrl, hint) {
     const b64 = dataUrl.split(",")[1];
-    const prompt = `Ты нутрициолог. На фото еда. Определи каждое отдельное блюдо или продукт, оцени вес порции в граммах по размеру тарелки и приборов, затем калорийность и БЖУ именно этой порции. Учитывай типичное количество масла при домашней готовке (особенно для узбекской и восточной кухни). Названия пиши по-русски, коротко, как в меню. Для каждого укажи категорию из списка: ${CATS.join(", ")}. Если на фото нет еды, верни пустой список.${hint ? "\nПодсказка от пользователя (приоритетна): " + hint : ""}`;
-    const body = {
-      contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: "image/jpeg", data: b64 } }] }],
-      generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { items: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, category: { type: "STRING", enum: CATS }, grams: { type: "NUMBER" }, kcal: { type: "NUMBER" }, protein: { type: "NUMBER" }, fat: { type: "NUMBER" }, carbs: { type: "NUMBER" } }, required: ["name", "grams", "kcal", "protein", "fat", "carbs"] } } }, required: ["items"] } },
-    };
-    const model = (S.settings.model || "gemini-flash-latest").trim();
     const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 45000);
-    let r;
-    try { r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": S.settings.key.trim() }, body: JSON.stringify(body), signal: ctrl.signal }); }
-    catch (e) { throw new Error(e.name === "AbortError" ? "Слишком долго нет ответа. Проверь интернет и попробуй ещё раз." : "Нет соединения с Gemini. Проверь интернет."); }
+    let r, j;
+    try {
+      if (API) {
+        r = await fetch(API.replace(/\/$/, "") + "/recognize", { method: "POST", headers: { "Content-Type": "application/json", "X-Init-Data": (inTg && tg.initData) || "" }, body: JSON.stringify({ image: b64, hint: hint || "" }), signal: ctrl.signal });
+      } else {
+        const body = {
+          contents: [{ parts: [{ text: PROMPT(hint) }, { inline_data: { mime_type: "image/jpeg", data: b64 } }] }],
+          generationConfig: { temperature: 0.2, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { items: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, category: { type: "STRING", enum: CATS }, grams: { type: "NUMBER" }, kcal: { type: "NUMBER" }, protein: { type: "NUMBER" }, fat: { type: "NUMBER" }, carbs: { type: "NUMBER" } }, required: ["name", "grams", "kcal", "protein", "fat", "carbs"] } } }, required: ["items"] } },
+        };
+        r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(S.settings.model || "gemini-flash-latest")}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": S.settings.key.trim() }, body: JSON.stringify(body), signal: ctrl.signal });
+      }
+    } catch (e) { throw new Error(e.name === "AbortError" ? "Слишком долго нет ответа. Проверь интернет и попробуй ещё раз." : "Нет соединения. Проверь интернет и попробуй ещё раз."); }
     finally { clearTimeout(to); }
-    const j = await r.json().catch(() => ({}));
+    j = await r.json().catch(() => ({}));
     if (!r.ok) {
-      const m = (j.error && j.error.message) || "";
-      if (r.status === 400 && /API key/i.test(m)) throw new Error("Ключ Gemini не подходит. Проверь его в профиле.");
-      if (r.status === 403) throw new Error("Доступ запрещён. Возможно, ключ отключён или Gemini недоступен в твоём регионе.");
-      if (r.status === 404) throw new Error("Модель «" + model + "» не найдена. Поменяй модель в профиле на gemini-flash-latest.");
-      if (r.status === 429) throw new Error("Исчерпан бесплатный лимит запросов. Попробуй позже или найди блюдо в базе.");
-      throw new Error("Ошибка Gemini (" + r.status + "). " + m.slice(0, 140));
+      if (r.status === 429) throw new Error(API && j.error === "daily_limit" ? "На сегодня лимит фото закончился. Завтра снова можно, а сейчас добавь блюдо вручную." : "Сейчас слишком много запросов. Попробуй через минуту.");
+      throw new Error("Сервис распознавания временно недоступен. Попробуй чуть позже.");
     }
-    const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
-    const txt = parts.map((p) => p.text || "").join("");
-    let data; try { data = JSON.parse(txt.replace(/^```json|```$/g, "").trim()); } catch (e) { throw new Error("Не удалось прочитать ответ нейросети. Попробуй ещё раз."); }
+    let data = j;
+    if (!API) { const parts = (((j.candidates || [])[0] || {}).content || {}).parts || []; try { data = JSON.parse(parts.map((p) => p.text || "").join("").replace(/^```json|```$/g, "").trim()); } catch (e) { throw new Error("Не удалось разобрать ответ. Попробуй ещё раз."); } }
     return (data.items || []).filter((x) => x && x.name).map((x) => {
-      const it = { n: String(x.name).slice(0, 60), cat: catOf(String(x.name), x.category), g: Math.max(1, +x.grams || 100), k: Math.max(0, +x.kcal || 0), p: Math.max(0, +x.protein || 0), f: Math.max(0, +x.fat || 0), c: Math.max(0, +x.carbs || 0) };
+      const it = { n: String(x.name).slice(0, 60), cat: catOf(String(x.name), x.category), g: clamp(Math.round(+x.grams || 100), 1, 3000), k: Math.max(0, +x.kcal || 0), p: Math.max(0, +x.protein || 0), f: Math.max(0, +x.fat || 0), c: Math.max(0, +x.carbs || 0) };
       it.per = { k: (it.k / it.g) * 100, p: (it.p / it.g) * 100, f: (it.f / it.g) * 100, c: (it.c / it.g) * 100 };
       return it;
     });
   }
+  function renderFoot() {
+    const changed = (add.hint || "").trim() && add.hint.trim() !== (add.lastHint || "").trim();
+    const sum = add.items.reduce((a, x) => a + x.k, 0);
+    if (!add.items.length) { sheetFoot(changed ? `<button class="btn" id="p-re">${icon("refresh")}Пересчитать</button>` : ""); if ($("#p-re")) $("#p-re").onclick = analyze; return; }
+    sheetFoot(changed ? `<div class="btn-row" style="margin:0"><button class="btn ghost" id="p-re">${icon("refresh")}Пересчитать</button><button class="btn" id="r-add">Добавить · ${fmt(sum)}</button></div>` : `<button class="btn" id="r-add">Добавить ${add.items.length} ${plural(add.items.length, "позицию", "позиции", "позиций")} · ${fmt(sum)} ккал</button>`);
+    $("#r-add").onclick = commitPhoto; if ($("#p-re")) $("#p-re").onclick = analyze;
+  }
   function renderResults() {
     const box = $("#p-res");
-    if (!add.items.length) { box.innerHTML = `<div class="alert"><span class="ins-ic t-n">${icon("info")}</span><div><b>Еды на фото не видно</b>Попробуй снять ближе и при хорошем свете или напиши подсказку.</div></div>`; footBtn(""); return; }
-    box.innerHTML = add.items.map((x, i) => `<div class="res-item" style="animation-delay:${i * 0.07}s">
-        <div class="res-top">${ficHTML(x)}<input value="${esc(x.n)}" data-name="${i}" aria-label="Название"><button class="del" data-del="${i}" aria-label="Убрать">${icon("x")}</button></div>
-        <div class="macros" id="rm-${i}"></div>
+    if (!add.items.length) { box.innerHTML = `<div class="alert"><span class="ins-ic t-n">${icon("info")}</span><div><b>Еды на фото не видно</b>Опиши блюдо в поле выше и нажми «Пересчитать» или сними ближе при хорошем свете.</div></div>`; renderFoot(); return; }
+    box.innerHTML = `<div class="subh">Распознано</div>` + add.items.map((x, i) => `<div class="res-item" style="animation-delay:${i * 0.06}s">
+        <div class="res-top"><input value="${esc(x.n)}" data-name="${i}" aria-label="Название"><button class="del" data-del="${i}" aria-label="Убрать">${icon("x")}</button></div>
+        <button class="res-mac" data-edit="${i}"><span class="macros" id="rm-${i}"></span>${icon("edit")}</button>
+        <div class="res-ed collapse" id="re-${i}"><div><div class="re-grid">${[["k", "Ккал"], ["p", "Белки"], ["f", "Жиры"], ["c", "Углев."]].map(([k, l]) => `<label class="field"><span>${l}</span><input inputmode="decimal" data-mv="${i}:${k}" value="${r0(x[k])}"></label>`).join("")}</div></div></div>
         <div class="res-bot"><span class="muted">Порция</span>${stepperHTML("g" + i, x.g, "г", 10)}</div>
-      </div>`).join("") + `<div class="res-sum"><span class="muted">Итого</span><b><span class="num" id="r-sum">0</span> <span class="muted" style="font-size:15px">ккал</span></b></div>
-      <p class="note" style="padding-top:4px">Оценка по фото примерная, обычно погрешность около 20–30%. Поправь граммы, если знаешь точнее.</p>`;
+      </div>`).join("") + `<button class="res-addi" id="r-more">${icon("plus")}Добавить то, чего нет в списке</button>
+      <div class="res-sum"><span class="muted">Итого</span><b><span class="num" id="r-sum">0</span> <span class="muted" style="font-size:15px">ккал</span></b></div>
+      <p class="note" style="padding-top:4px">Нейросеть оценивает порции на глаз. Если знаешь вес или состав точнее, поправь граммы или нажми на БЖУ, чтобы ввести свои цифры.</p>`;
     const upd = () => {
       let sum = 0;
-      add.items.forEach((x, i) => { const v = scaleFood(x.per, x.g); Object.assign(x, { k: v.k, p: v.p, f: v.f, c: v.c }); const m = $("#rm-" + i); if (m) m.innerHTML = macroTags(v); sum += v.k; });
+      add.items.forEach((x, i) => { const v = scaleFood(x.per, x.g); Object.assign(x, { k: v.k, p: v.p, f: v.f, c: v.c }); const m = $("#rm-" + i); if (m) m.innerHTML = macroTags(v); sum += v.k; $$(`[data-mv^="${i}:"]`).forEach((inp) => { if (document.activeElement !== inp) inp.value = r0(x[inp.dataset.mv.split(":")[1]]); }); });
       $("#r-sum").textContent = fmt(sum);
-      footBtn(`Добавить ${add.items.length} ${plural(add.items.length, "позицию", "позиции", "позиций")} · ${fmt(sum)} ккал`, "r-add");
-      $("#r-add").onclick = commitPhoto;
+      renderFoot();
     };
     const lim = {}; add.items.forEach((x, i) => (lim["g" + i] = [5, 3000]));
     const proxy = new Proxy({}, { get: (_, k) => add.items[+String(k).slice(1)].g, set: (_, k, v) => { add.items[+String(k).slice(1)].g = v; return true; } });
     bindSteppers(box, proxy, lim, upd);
     $$("[data-name]", box).forEach((inp) => (inp.oninput = () => (add.items[+inp.dataset.name].n = inp.value)));
+    $$("[data-edit]", box).forEach((b) => (b.onclick = () => { haptic("sel"); $("#re-" + b.dataset.edit).classList.toggle("open"); b.classList.toggle("on"); }));
+    $$("[data-mv]", box).forEach((inp) => (inp.oninput = () => {
+      const [i, k] = inp.dataset.mv.split(":"), x = add.items[+i], v = Math.max(0, parseFloat(inp.value.replace(",", ".")) || 0);
+      x.per[k] = (v / x.g) * 100; if (k !== "k") { /* калории остаются как есть, пользователь может поправить отдельно */ }
+      const vv = scaleFood(x.per, x.g); Object.assign(x, vv); $("#rm-" + i).innerHTML = macroTags(vv); $("#r-sum").textContent = fmt(add.items.reduce((a, y) => a + y.k, 0)); renderFoot();
+    }));
+    $("#r-more").onclick = () => { haptic("light"); add.items.push({ n: "", g: 100, k: 0, p: 0, f: 0, c: 0, per: { k: 0, p: 0, f: 0, c: 0 } }); renderResults(); setTimeout(() => { const i = add.items.length - 1; $("#re-" + i).classList.add("open"); const n = $(`[data-name="${i}"]`); n.placeholder = "Название"; n.focus(); }, 60); };
     $$("[data-del]", box).forEach((b) => (b.onclick = () => {
       const i = +b.dataset.del, card = b.closest(".res-item");
       card.style.transition = "opacity .25s, transform .35s var(--ease-out)"; card.style.opacity = "0"; card.style.transform = "scale(.96)"; haptic("light");
@@ -1382,7 +1398,7 @@
     }));
     upd();
   }
-  function commitPhoto() { const arr = add.items.map((x) => ({ n: x.n.trim() || "Блюдо", cat: x.cat, g: x.g, k: x.k, p: x.p, f: x.f, c: x.c, img: add.thumb, src: "photo" })); addEntries(arr, add.meal); afterAdd(arr.reduce((a, x) => a + x.k, 0)); }
+  function commitPhoto() { const arr = add.items.filter((x) => x.k > 0 || x.n.trim()).map((x) => ({ n: x.n.trim() || "Блюдо", cat: x.cat, g: x.g, k: x.k, p: x.p, f: x.f, c: x.c, img: add.thumb, src: "photo" })); addEntries(arr, add.meal); afterAdd(arr.reduce((a, x) => a + x.k, 0)); }
   function afterAdd(k) {
     closeSheet(); haptic("ok"); if (cur !== "today") show("today"); else { renderWeek(); updateToday(); }
     const bump = streakBump; streakBump = 0;
@@ -1748,11 +1764,11 @@
       <div class="ptitle">Приложение</div>
       <button class="home-card" id="pr-home"><img src="logo.png?v=3" alt="Nomi"><span class="hc-t"><b>На рабочий стол</b><span>Nomi в одно касание</span></span><span class="hc-btn">${icon("plus")}</span></button>
       <div class="list">
-        <button class="prow" id="pr-key"><span class="pi">${icon("key")}</span><span class="pl"><b>Распознавание фото</b><span>${S.settings.key ? "Ключ Gemini добавлен" : "Нужен бесплатный ключ Gemini"}</span></span><span class="pv">${S.settings.key ? `<span class="mtag c">Вкл</span>` : ""}${icon("right")}</span></button>
+        ${S.settings.dev ? `<button class="prow" id="pr-key"><span class="pi">${icon("key")}</span><span class="pl"><b>Ключ для разработки</b><span>${S.settings.key ? "Добавлен" : "Не задан"}</span></span><span class="pv">${icon("right")}</span></button>` : ""}
         <button class="prow" id="d-redo"><span class="pi">${icon("refresh")}</span><span class="pl"><b>Пройти анкету заново</b><span>Пересчитать норму с нуля</span></span><span class="pv">${icon("right")}</span></button>
         <button class="prow danger" id="d-reset"><span class="pi t-pro">${icon("trash")}</span><span class="pl"><b>Удалить все данные</b><span>Записи еды, вес и настройки</span></span></button>
       </div>
-      <p class="note" style="text-align:center;margin-top:20px">Nomi · калории и КБЖУ ориентировочные</p>`;
+      <p class="note" style="text-align:center;margin-top:20px">Nomi · версия 1.0</p>`;
     updNormCard();
     bindSeg(s, "goal", (v) => { if (S.plan && S.plan.type !== v) { S.plan = null; toast("Цель по весу сброшена"); } p.goal = v; if (p.manual.on) { p.manual.on = false; $("#pm-t .toggle").classList.remove("on"); $("#pm-f").classList.remove("open"); } save(); updNormCard(); });
     bindSeg(s, "theme", (v) => { S.settings.theme = v; save(); applyTheme(true); });
@@ -1766,7 +1782,7 @@
     };
     $$("[data-m]", s).forEach((i) => (i.oninput = () => { p.manual[i.dataset.m] = Math.max(0, parseInt(i.value, 10) || 0); save(); updNormCard(); }));
     $("#pc-t").onclick = () => { S.settings.carry = !S.settings.carry; save(); haptic("sel"); $("#pc-t .toggle").classList.toggle("on", S.settings.carry); lastVals.delete("wk"); };
-    $("#pr-key").onclick = keySheet;
+    if ($("#pr-key")) $("#pr-key").onclick = keySheet;
     $("#pr-home").onclick = addHome;
     $("#pr-plan").onclick = () => openGoal(renderProfile);
     $("#d-redo").onclick = () => startOnboarding();
@@ -1928,6 +1944,7 @@
       history.replaceState(null, "", location.pathname);
     } catch (e) { console.error(e); }
   }
+  if (/[?&]dev\b/.test(location.search)) { try { const d = JSON.parse(localStorage.getItem(KEY) || "{}"); d.settings = Object.assign(d.settings || {}, { dev: true }); localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
   init();
   window.__porsiya = { get state() { return S; }, show, openAdd };
 })();
