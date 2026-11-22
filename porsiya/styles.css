@@ -866,3 +866,20 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .k-carb .drow i.on { background: var(--carb-b); }
 .k-fat .drow i.on { background: var(--fat-b); }
 @media (max-width: 360px) { .mc { padding: 16px 14px 18px; } .mc-v .num { font-size: 34px; } .row2 .mc .chev { display: none; } }
+
+.screen.quiet * { transition: none !important; animation: none !important; }
+.screen.active { animation-name: screenFade; animation-duration: .28s; }
+@keyframes screenFade { from { opacity: 0; } }
+/* вода */
+.k-water .mc-i { background: color-mix(in srgb, #3FA7F5 18%, transparent); color: #2486D4; }
+.k-water .mc-bg { color: #3FA7F5; }
+.k-water .drow i.on { background: #3FA7F5; }
+.w-plus { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: var(--card-2); display: grid; place-items: center; color: var(--ink); transition: transform .35s var(--spring); }
+.w-plus svg { width: 15px; height: 15px; }
+.w-plus:active { transform: scale(.85); }
+.w-plus.pop { animation: wpop .5s var(--spring); }
+@keyframes wpop { 40% { transform: scale(1.2); background: color-mix(in srgb, #3FA7F5 25%, var(--card-2)); } }
+.w-dots { margin-top: 22px; }
+.w-dots i.on { background: #3FA7F5 !important; }
+.w-acts { display: flex; gap: 10px; margin-top: 26px; }
+.w-acts .btn:not(.icon-btn) { flex: 1; }

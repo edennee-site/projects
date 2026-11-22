@@ -243,8 +243,10 @@
 
   // ---------- numbers ----------
   const lastVals = new Map();
+  let quiet = false;
   function countUp(el, to, opts = {}) {
     if (!el) return;
+    if (quiet && !opts.force) { if (opts.key) lastVals.set(opts.key, to); el._cu = null; el.textContent = opts.dec ? dec(to) : (opts.sign ? fmtS(to) : fmt(to)); return; }
     const key = opts.key;
     const from = key && lastVals.has(key) ? lastVals.get(key) : (opts.from != null ? opts.from : 0);
     if (key) lastVals.set(key, to);
@@ -298,16 +300,20 @@
     if (prev) prev.classList.remove("active");
     window.scrollTo(0, 0);
     const next = $("#s-" + id);
+    quiet = seenScr.has(id) && !opts.force; seenScr.add(id);
+    next.classList.toggle("quiet", quiet);
     next.classList.remove("active"); void next.offsetWidth; next.classList.add("active");
     $("#tabbar").classList.toggle("hide", id === "onboard");
     $$(".tab").forEach((b) => b.classList.toggle("on", b.dataset.tab === id));
     const ti = TABS.indexOf(id); if (ti > -1) $("#navp").style.setProperty("--i", ti);
-    if (id === "today") buildToday();
+    if (id === "today") { if ($("#v-k") && builtDay === todayKey() && !opts.force) { renderWeek(); updateToday(); } else buildToday(); }
     if (id === "history") renderHistory();
     if (id === "calendar") renderCalendar();
     if (id === "profile") renderProfile();
+    if (quiet) raf2(() => { next.classList.remove("quiet"); quiet = false; }); else quiet = false;
     updateBack();
   }
+  const seenScr = new Set();
   function updateBack() { if (!inTg) return; try { if (sheetOpen || (cur !== "today" && cur !== "onboard")) tg.BackButton.show(); else tg.BackButton.hide(); } catch (e) {} }
   function goBack() { if (sheetOpen) { if (sheetBack) sheetBack(); else closeSheet(); return; } if (TABS.includes(cur) && cur !== "today") show("today"); }
 
@@ -526,7 +532,9 @@
   // TODAY
   // =====================================================================
   let weekAnchor = null;
+  let builtDay = null;
   function buildToday() {
+    builtDay = todayKey();
     const s = $("#s-today");
     const now = new Date();
     s.innerHTML = `
@@ -546,7 +554,15 @@
         ${macroCard("carb", "Углеводы", "carbs", "c")}
       </div>
       <div class="gap"></div>
-      ${macroCard("fat", "Жиры", "fat", "f", true)}
+      <div class="row2">
+        ${macroCard("fat", "Жиры", "fat", "f")}
+        <div class="mc k-water" id="c-w" role="button">
+          <span class="mc-bg">${icon("drop")}</span>
+          <span class="mc-h"><span class="mc-i">${icon("drop")}</span>Вода<button class="w-plus" id="w-plus" aria-label="Добавить стакан">${icon("plus")}</button></span>
+          <span class="mc-row"><span class="mc-v"><span class="num" id="v-w">0</span><span class="u">л</span></span><span class="mc-s" id="s-w"></span></span>
+          ${dotRow(12, "anim")}
+        </div>
+      </div>
       <div id="t-ins"></div>
       <div class="section-h"><h2 id="m-title">Приёмы пищи</h2><span class="muted" id="m-sum"></span></div>
       <div id="meals"></div>`;
@@ -558,6 +574,8 @@
     $("#c-p").onclick = () => openMacroDetail("p");
     $("#c-c").onclick = () => openMacroDetail("c");
     $("#c-f").onclick = () => openMacroDetail("f");
+    $("#c-w").onclick = (e) => { if (e.target.closest("#w-plus")) return; waterSheet(); };
+    $("#w-plus").onclick = (e) => { e.stopPropagation(); addWater(S.settings.glass || 250); };
     renderWeek();
     updateToday(true);
   }
@@ -594,6 +612,8 @@
       $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "закрыто";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
+    updWater();
+    const av = $("#t-ava"), ai = avatarInner(); if (av && av._ai !== ai) { av.innerHTML = ai; av._ai = ai; }
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
     $("#t-ins").innerHTML = insightHTML(t, Object.assign({}, nm, { k: kN }), isToday);
@@ -811,6 +831,39 @@
   // =====================================================================
   // DETAIL SHEETS
   // =====================================================================
+  // ---------- вода ----------
+  const waterNorm = () => Math.round((S.profile.weight * 30 + (S.profile.train.n ? 300 : 0)) / 50) * 50;
+  const waterOf = (k) => ((S.water || {})[k] || 0);
+  function updWater() {
+    if (!$("#v-w")) return;
+    const ml = waterOf(selDay), wn = waterNorm();
+    countUp($("#v-w"), ml / 1000, { key: "w", dec: true });
+    $("#s-w").textContent = ml >= wn ? "норма выпита" : `из ${dec(wn / 1000)} л`;
+    setDots($("#c-w .drow"), ml, wn);
+  }
+  function addWater(d) {
+    if (!S.water) S.water = {};
+    const v = Math.max(0, waterOf(selDay) + d); S.water[selDay] = v; save(); haptic(d > 0 ? "light" : "sel");
+    updWater();
+    const b = $("#w-plus"); if (b && d > 0) { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); }
+    if (sheetOpen && $("#ws-v")) { $("#ws-v").textContent = dec(v / 1000); setDots($("#ws-dots"), v, waterNorm()); }
+  }
+  function waterSheet() {
+    haptic("light");
+    const g = S.settings.glass || 250, wn = waterNorm();
+    openSheet("Вода", `<div class="portion" style="text-align:center;padding:28px 22px">
+        <div class="kbig" style="justify-content:center;margin-top:0"><span class="num" id="ws-v">${dec(waterOf(selDay) / 1000)}</span><span class="u">из ${dec(wn / 1000)} л</span></div>
+        ${dotRow(16, "ink w-dots")}
+        <div class="w-acts"><button class="btn ghost icon-btn" id="ws-m" aria-label="Убрать">${icon("minus")}</button><button class="btn" id="ws-p">${icon("plus")}<span id="ws-pl">${g} мл</span></button></div>
+      </div>
+      <div class="subh">Объём одного нажатия</div>
+      ${segHTML("glass", [["200", "200 мл"], ["250", "250 мл"], ["330", "330 мл"], ["500", "500 мл"]], String(g))}
+      <p class="note">Норма считается от веса: около 30 мл на килограмм, плюс немного в дни тренировок. Чай и кофе тоже считаются.</p>`);
+    $(".w-dots").id = "ws-dots"; setDots($("#ws-dots"), waterOf(selDay), wn);
+    bindSeg($("#sh-body"), "glass", (v) => { S.settings.glass = +v; save(); $("#ws-pl").textContent = v + " мл"; });
+    $("#ws-p").onclick = () => addWater(S.settings.glass || 250);
+    $("#ws-m").onclick = () => addWater(-(S.settings.glass || 250));
+  }
   function streakSheet() {
     haptic("light");
     const st = streakInfo(), g = gameStats(), L = levelOf(g.xp), A = achList(), now = new Date();
