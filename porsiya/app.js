@@ -167,6 +167,17 @@
   }
   // норма дня с переносом недобора/перебора прошлых дней недели (до 25%)
   function dayNorm(k) { const nm = norm().k; if (!S.settings.carry) return nm; const wb = weekBalance(k); return Math.round(nm + clamp(wb.bal, -nm * 0.25, nm * 0.25)); }
+  // серия: дни подряд, в которых есть хотя бы одна запись
+  function streakInfo() {
+    const tk = todayKey(), today = dayEntries(tk).length > 0;
+    let d = today ? new Date() : addDays(new Date(), -1), n = 0;
+    while (dayEntries(dkey(d)).length) { n++; d = addDays(d, -1); }
+    const keys = Object.keys(S.days).filter((k) => S.days[k].length).sort();
+    let best = 0, run = 0, prev = null;
+    keys.forEach((k) => { run = prev && dkey(addDays(fromKey(prev), 1)) === k ? run + 1 : 1; best = Math.max(best, run); prev = k; });
+    return { n, today, risk: !today && n > 0, best: Math.max(best, n) };
+  }
+  const MILES = [3, 7, 14, 30, 60, 100];
   const status = (k) => { const n = dayEntries(k).length; if (!n) return ""; const v = totals(k).k, nm = norm().k; if (v > nm * 1.1) return "ov"; if (v >= nm * 0.9) return "in"; return "un"; };
 
   // ---------- numbers ----------
@@ -207,9 +218,9 @@
 
   // ---------- toast ----------
   let toastT;
-  function toast(text, undo) {
+  function toast(text, undo, ic) {
     const t = $("#toast");
-    t.innerHTML = `<span class="tic">${icon("check")}</span><span class="tx">${esc(text)}</span>${undo ? '<button id="t-undo">Отменить</button>' : ""}`;
+    t.innerHTML = `<span class="tic ${ic ? "tic-" + ic : ""}">${icon(ic || "check")}</span><span class="tx">${esc(text)}</span>${undo ? '<button id="t-undo">Отменить</button>' : ""}`;
     t.classList.add("show"); clearTimeout(toastT);
     toastT = setTimeout(() => t.classList.remove("show"), undo ? 4500 : 2300);
     if (undo) $("#t-undo").onclick = () => { undo(); t.classList.remove("show"); haptic("light"); };
@@ -453,7 +464,7 @@
     const s = $("#s-today");
     const now = new Date();
     s.innerHTML = `
-      <div class="top"><div><div class="date">${cap(WDF[now.getDay()])}, ${now.getDate()} ${MON[now.getMonth()]}</div><h1>${esc(greet())}</h1></div><button class="avatar" id="t-ava" aria-label="Профиль">${avatarInner()}</button></div>
+      <div class="top"><div><div class="date">${cap(WDF[now.getDay()])}, ${now.getDate()} ${MON[now.getMonth()]}</div><h1>${esc(greet().split(",")[0])}</h1></div><div class="top-r"><button class="streak" id="t-streak" aria-label="Серия"></button><button class="avatar" id="t-ava" aria-label="Профиль">${avatarInner()}</button></div></div>
       <div class="wk-head"><button class="wk-month" id="wk-month"><span id="wk-mt"></span>${icon("right")}</button><button class="wk-today" id="wk-today">${icon("refresh")}Сегодня</button></div>
       <div class="week" id="week"></div>
       <div class="gap"></div>
@@ -478,6 +489,7 @@
       <div class="section-h"><h2 id="m-title">Приёмы пищи</h2><span class="muted" id="m-sum"></span></div>
       <div id="meals"></div>`;
     $("#t-ava").onclick = () => show("profile");
+    $("#t-streak").onclick = streakSheet;
     $("#wk-month").onclick = () => { haptic("light"); const d = weekAnchor || fromKey(selDay); calMonth = new Date(d.getFullYear(), d.getMonth(), 1); calSel = selDay; show("calendar"); };
     $("#wk-today").onclick = () => { haptic("light"); selectDay(todayKey()); };
     $("#c-cal").onclick = () => openCalDetail();
@@ -500,6 +512,9 @@
     const nm = norm(), t = totals(selDay), kN = dayNorm(selDay), left = kN - t.k, pct = kN ? Math.round((t.k / kN) * 100) : 0;
     const isToday = selDay === todayKey();
     setMonthLabel(weekAnchor || fromKey(selDay));
+    const st = streakInfo(), sp = $("#t-streak");
+    sp.className = "streak" + (st.today ? " on" : st.risk ? " risk" : "") + (sp.classList.contains("bump") ? " bump" : "");
+    sp.innerHTML = `${icon("bolt")}<span class="num">${st.n}</span>`;
     $("#wk-today").classList.toggle("show", !isToday);
     $("#cal-chip").textContent = t.k ? pct + "% нормы" : "Норма " + fmt(kN);
     $("#v-kn").textContent = "из " + fmt(kN) + " ккал";
@@ -658,7 +673,9 @@
 
   // ---------- entry ops ----------
   function mealHour(m) { return { breakfast: 8, lunch: 13, dinner: 19, snack: 16 }[m] || 12; }
+  let streakBump = 0;
   function addEntries(arr, m, dayK = selDay) {
+    if (dayK === todayKey() && !dayEntries(dayK).length && arr.length) streakBump = 1;
     if (!S.days[dayK]) S.days[dayK] = [];
     const base = dayK === todayKey() ? Date.now() : fromKey(dayK).setHours(mealHour(m), 0, 0, 0);
     arr.forEach((x, i) => {
@@ -731,6 +748,33 @@
   // =====================================================================
   // DETAIL SHEETS
   // =====================================================================
+  function streakSheet() {
+    haptic("light");
+    const st = streakInfo(), now = new Date();
+    const next = MILES.find((m) => m > st.n) || st.n + 50;
+    const prevM = [...MILES].reverse().find((m) => m <= st.n) || 0;
+    const days = Array.from({ length: 7 }, (_, i) => { const d = addDays(now, i - 6), k = dkey(d); return { d, k, on: dayEntries(k).length > 0, today: i === 6 }; });
+    const msg = st.today ? `Сегодня отмечено. Завтра серия вырастет до ${st.n + 1}.` : st.risk ? "Добавь хотя бы одну запись сегодня, иначе серия сгорит в полночь." : "Добавь еду сегодня, чтобы начать серию.";
+    const body = `
+      <div class="d-hero g-pro st-hero">
+        <span class="st-ic">${icon("bolt")}</span>
+        <div class="big"><span class="num">${st.n}</span><span class="of">${plural(st.n, "день", "дня", "дней")} подряд</span></div>
+        <p class="st-msg">${msg}</p>
+        <div class="st-week">${days.map((x) => `<div class="${x.on ? "on" : ""} ${x.today ? "today" : ""}"><span>${x.on ? icon("bolt") : ""}</span><em>${WD[x.d.getDay()]}</em></div>`).join("")}</div>
+      </div>
+      <div class="gap"></div>
+      <div class="card"><div class="c-head"><span class="card-t">Следующая цель</span><span class="muted">${st.n} из ${next}</span></div>
+        ${dotRow(24, "ink st-prog")}
+        <div class="card-s" style="margin-top:12px">Ещё ${next - st.n} ${plural(next - st.n, "день", "дня", "дней")} до достижения «${next} ${plural(next, "день", "дня", "дней")}». Рекорд: ${st.best} ${plural(st.best, "день", "дня", "дней")}.</div>
+      </div>
+      <div class="gap"></div>
+      <div class="card"><div class="card-t">Достижения</div>
+        <div class="ach">${MILES.map((m) => `<div class="${st.best >= m ? "got" : ""}"><span><b class="num">${m}</b></span><em>${m} ${plural(m, "день", "дня", "дней")}</em></div>`).join("")}</div>
+      </div>
+      <p class="note">День засчитывается, если в нём есть хотя бы одна запись еды. Пропущенный день обнуляет серию, достижения остаются.</p>`;
+    openSheet("Серия", body);
+    setDots($(".st-prog"), st.n, next);
+  }
   function openCalDetail() {
     haptic("light");
     const nm = Object.assign({}, norm(), { k: dayNorm(selDay) }), t = totals(selDay), list = dayEntries(selDay);
@@ -960,7 +1004,14 @@
     upd();
   }
   function commitPhoto() { const arr = add.items.map((x) => ({ n: x.n.trim() || "Блюдо", cat: x.cat, g: x.g, k: x.k, p: x.p, f: x.f, c: x.c, img: add.thumb, src: "photo" })); addEntries(arr, add.meal); afterAdd(arr.reduce((a, x) => a + x.k, 0)); }
-  function afterAdd(k) { closeSheet(); haptic("ok"); if (cur !== "today") show("today"); else { renderWeek(); updateToday(); } toast(`Добавлено · ${fmt(k)} ккал`); }
+  function afterAdd(k) {
+    closeSheet(); haptic("ok"); if (cur !== "today") show("today"); else { renderWeek(); updateToday(); }
+    if (streakBump) {
+      streakBump = 0; const st = streakInfo();
+      const mile = MILES.includes(st.n);
+      setTimeout(() => { toast(mile ? `Достижение: ${st.n} ${plural(st.n, "день", "дня", "дней")} подряд` : `Серия: ${st.n} ${plural(st.n, "день", "дня", "дней")} подряд`, null, "bolt"); const sp = $("#t-streak"); if (sp) { sp.classList.remove("bump"); void sp.offsetWidth; sp.classList.add("bump"); } haptic("ok"); }, 450);
+    } else toast(`Добавлено · ${fmt(k)} ккал`);
+  }
 
   // ----- search -----
   const allFoods = () => S.my.concat(window.FOODS);
@@ -1231,7 +1282,7 @@
     const trainTxt = t.n ? `${t.n} × ${t.min} мин` : "Нет";
     const allDays = Object.keys(S.days).filter((k) => S.days[k].length);
     const nEntries = allDays.reduce((a, k) => a + S.days[k].length, 0);
-    let streak = 0; { let d = new Date(); if (!dayEntries(dkey(d)).length) d = addDays(d, -1); while (dayEntries(dkey(d)).length) { streak++; d = addDays(d, -1); } }
+    const sti = streakInfo(), streak = sti.n;
     const goalAdj = GOALS[p.goal].adj;
     s.innerHTML = `<div class="top"><div><div class="date">Настройки и норма</div><h1>Профиль</h1></div></div>
       <div class="gap" style="height:24px"></div>
@@ -1243,7 +1294,7 @@
         </div>
         <div class="p-stats">
           <div><span>Серия</span><b class="num">${streak}<span class="u">${plural(streak, "день", "дня", "дней")}</span></b></div>
-          <div><span>Дней с едой</span><b class="num">${allDays.length}</b></div>
+          <div><span>Рекорд</span><b class="num">${sti.best}</b></div>
           <div><span>Записей</span><b class="num">${fmt(nEntries)}</b></div>
         </div>
       </div>
@@ -1394,7 +1445,7 @@
       } catch (e) {}
     }
     applyTheme();
-    cloudPull(() => { load(); applyTheme(); if (!S.onboarded) startOnboarding(); else show("today"); });
+    cloudPull(() => { load(); applyTheme(); if (!S.onboarded) startOnboarding(); else show("today"); raf2(() => setTimeout(() => document.documentElement.classList.remove("boot"), 60)); });
   }
   if (/[?&]demo/.test(location.search)) {
     try {

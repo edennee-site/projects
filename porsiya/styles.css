@@ -680,4 +680,45 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
   .navp { --aw: 46px; }
   .tab span, .tab.on span { max-width: 0; opacity: 0; margin-left: 0; }
 }
+
+/* ---------- Серия ---------- */
+.boot .tabbar, .boot .tabbar *, .boot .screen { transition: none !important; animation: none !important; }
+.top-r { display: flex; align-items: center; gap: 8px; flex: none; }
+.streak {
+  height: 46px; padding: 0 14px 0 11px; border-radius: 99px; display: flex; align-items: center; gap: 5px;
+  background: var(--card); box-shadow: var(--shadow); color: var(--g60); font-size: 16px; font-weight: 500;
+  transition: transform .35s var(--spring), background-color .4s, color .4s;
 }
+.streak svg { width: 18px; height: 18px; }
+.streak .num { letter-spacing: -0.03em; }
+.streak.on { background: var(--g-pro); color: #fff; box-shadow: 0 8px 20px color-mix(in srgb, var(--pro-b) 35%, transparent); }
+.streak.on svg { fill: currentColor; }
+.streak.risk { color: var(--pro-t); }
+.streak:active { transform: scale(.93); }
+.streak.bump { animation: bump .7s var(--spring); }
+@keyframes bump { 30% { transform: scale(1.14); } 60% { transform: scale(.97); } }
+.toast .tic.tic-bolt { background: var(--g-pro); }
+.toast .tic.tic-bolt svg { fill: currentColor; }
+.st-hero { position: relative; }
+.st-ic { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.22); display: grid; place-items: center; }
+.st-ic svg { width: 22px; height: 22px; fill: currentColor; }
+.st-hero .big { margin-top: 18px; }
+.st-msg { margin: 8px 0 0; font-size: 14px; line-height: 1.45; opacity: .9; }
+.st-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.2); }
+.st-week div { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.st-week span { width: 32px; height: 32px; border-radius: 50%; border: 1.5px dashed rgba(255,255,255,.45); display: grid; place-items: center; }
+.st-week .on span { background: #fff; border: 0; color: var(--pro-a); }
+.st-week span svg { width: 15px; height: 15px; fill: currentColor; }
+.st-week em { font-style: normal; font-size: 11.5px; opacity: .8; }
+.st-week .today em { opacity: 1; font-weight: 600; }
+.ach { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.ach div { background: var(--card-2); border-radius: 18px; padding: 14px 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--g40); }
+.ach span { width: 46px; height: 46px; border-radius: 50%; border: 1.5px dashed currentColor; display: grid; place-items: center; position: relative; }
+.ach span svg { width: 15px; height: 15px; position: absolute; top: 5px; opacity: .8; }
+.ach span b { font-size: 17px; font-weight: 500; }
+.ach em { font-style: normal; font-size: 12px; color: var(--g60); }
+.ach .got { color: #fff; }
+.ach .got span { background: var(--g-pro); border: 0; }
+.ach .got span svg { fill: currentColor; }
+.ach .got em { color: var(--ink); }
+@media (max-width: 360px) { .streak { padding: 0 11px 0 9px; height: 42px; } .avatar { width: 42px; height: 42px; } }
