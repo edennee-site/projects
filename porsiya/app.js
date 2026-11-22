@@ -10,7 +10,7 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
   const r0 = (n) => Math.round(n || 0);
   const r1 = (n) => Math.round((n || 0) * 10) / 10;
-  const fmt = (n) => { const v = r0(n); return (v < 0 ? "−" : "") + Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "); };
+  const fmt = (n) => { const v = r0(n); return (v < 0 ? "−" : "") + Math.abs(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0"); };
   const fmtS = (n) => (n > 0 ? "+" : "") + fmt(n);
   const dec = (n) => String(r1(n)).replace(".", ",");
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -138,7 +138,7 @@
     gain: { n: "Набрать массу", s: "Небольшой профицит для роста мышц", i: "up-trend", adj: 0.1, pk: 1.8 },
   };
   const TTYPES = { strength: { n: "Силовые", met: 5 }, cardio: { n: "Кардио", met: 7.5 }, mixed: { n: "Смешанные", met: 6 } };
-  function calcNorm(p = S.profile) {
+  function calcNorm(p = S.profile, plan = p === S.profile ? S.plan : null) {
     const bmr = 10 * p.weight + 6.25 * p.height - 5 * p.age + (p.sex === "f" ? -161 : 5);
     const base = bmr * 1.2;
     const t = p.train || { n: 0, min: 0, type: "strength" };
@@ -148,11 +148,32 @@
     const g = GOALS[p.goal];
     let k = tdee * (1 + g.adj);
     if (p.goal === "lose") k = Math.max(k, tdee - 600);
+    if (plan) { const adj = planAdj(plan); k = clamp(tdee + adj, tdee * 0.75, tdee * 1.2); }
     k = Math.round(k / 10) * 10;
     const pr = Math.round(p.weight * g.pk);
     const fa = Math.round(Math.max(p.weight * 0.9, (k * 0.25) / 9));
     const ca = Math.max(0, Math.round((k - pr * 4 - fa * 9) / 4));
     return { k, p: pr, f: fa, c: ca, tdee: Math.round(tdee), bmr: Math.round(bmr), train: Math.round(train), steps: Math.round(steps) };
+  }
+  // ---------- цель по весу ----------
+  const PACE = { lose: [0.35, 0.5, 0.75], gain: [0.15, 0.25, 0.4] };
+  const PACE_N = ["Спокойно", "Умеренно", "Быстрее"];
+  const planKgWeek = (pl) => (pl.start * PACE[pl.type][pl.pace]) / 100;
+  const planAdj = (pl) => (pl.type === "lose" ? -1 : 0.75) * (planKgWeek(pl) * 7700) / 7;
+  const curWeight = () => { const e = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0])); return e.length ? e[e.length - 1][1] : S.profile.weight; };
+  const weightAt = (k) => { const e = Object.entries(S.weights).filter(([d]) => d <= k).sort((a, b) => a[0].localeCompare(b[0])); return e.length ? e[e.length - 1][1] : null; };
+  const addMonths = (d, m) => { const x = new Date(d); x.setMonth(x.getMonth() + m); return x; };
+  function planInfo(pl = S.plan) {
+    if (!pl) return null;
+    const sign = pl.type === "lose" ? -1 : 1, total = Math.abs(pl.target - pl.start), kw = planKgWeek(pl);
+    const weeks = Math.max(1, total / kw), sd = fromKey(pl.startDate), end = addDays(sd, Math.round(weeks * 7));
+    const now = new Date(), wElapsed = Math.max(0, (now - sd) / 6048e5);
+    const expected = pl.start + sign * Math.min(total, kw * wElapsed), cur = curWeight();
+    const done = clamp((sign * (cur - pl.start)) / (total || 1), 0, 1);
+    const diff = sign * (cur - expected);
+    const months = Math.max(1, Math.ceil(weeks / 4.345));
+    const ms = Array.from({ length: months }, (_, i) => { const d = addMonths(sd, i + 1), exp = pl.start + sign * Math.min(total, kw * ((d - sd) / 6048e5)); const past = d <= now; const w = past ? weightAt(dkey(d)) : null; return { d, exp: r1(exp), past, cur: !past && (i === 0 || addMonths(sd, i) <= now), ok: past && w != null && sign * (w - exp) >= -0.3, w }; });
+    return { sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1 };
   }
   function norm() { const m = S.profile.manual; return m.on ? { k: m.k, p: m.p, f: m.f, c: m.c } : calcNorm(); }
   const dayEntries = (k) => S.days[k] || [];
@@ -215,34 +236,38 @@
       xp += dx; if (k === todayKey()) todayXp = dx;
     });
     const wN = Object.keys(S.weights).length; xp += wN * 3;
-    return { days: keys.length, photos, entries, inNorm, proDays, xp, todayXp, weights: wN, combos: S.combos.length, bfDays, fullDays, manual };
+    const pi = S.plan ? planInfo() : null;
+    return { days: keys.length, photos, entries, inNorm, proDays, xp, todayXp, weights: wN, combos: S.combos.length, bfDays, fullDays, manual, planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0 };
   }
   const LVL = [0, 60, 150, 300, 500, 750, 1050, 1400, 1800, 2300, 2900, 3600, 4400, 5300, 6300];
   function levelOf(xp) { let i = 0; while (i < LVL.length - 1 && xp >= LVL[i + 1]) i++; const from = LVL[i], to = LVL[i + 1] || from + 1000; return { lv: i + 1, from, to, cur: xp - from, need: to - from }; }
   function achList() {
     const g = gameStats(), best = streakInfo().best;
     const A = [
-      { id: "e1", ic: "plus", t: "Начало", d: "Первая запись еды", cur: g.entries, goal: 1 },
+      { id: "e1", ic: "sprout", t: "Начало", d: "Первая запись еды", cur: g.entries, goal: 1 },
       { id: "s3", ic: "bolt", t: "Разгон", d: "3 дня подряд", cur: best, goal: 3 },
-      { id: "s7", ic: "bolt", t: "Неделя", d: "7 дней подряд", cur: best, goal: 7 },
-      { id: "s14", ic: "bolt", t: "Две недели", d: "14 дней подряд", cur: best, goal: 14 },
-      { id: "s30", ic: "bolt", t: "Месяц", d: "30 дней подряд", cur: best, goal: 30 },
-      { id: "s60", ic: "bolt", t: "Привычка", d: "60 дней подряд", cur: best, goal: 60 },
-      { id: "s100", ic: "bolt", t: "Легенда", d: "100 дней подряд", cur: best, goal: 100 },
+      { id: "s7", ic: "flame", t: "Неделя", d: "7 дней подряд", cur: best, goal: 7 },
+      { id: "s14", ic: "rocket", t: "Две недели", d: "14 дней подряд", cur: best, goal: 14 },
+      { id: "s30", ic: "moon", t: "Месяц", d: "30 дней подряд", cur: best, goal: 30 },
+      { id: "s60", ic: "infinity", t: "Привычка", d: "60 дней подряд", cur: best, goal: 60 },
+      { id: "s100", ic: "crown", t: "Легенда", d: "100 дней подряд", cur: best, goal: 100 },
       { id: "ph1", ic: "cam", t: "Первый кадр", d: "Блюдо по фото", cur: g.photos, goal: 1 },
-      { id: "ph10", ic: "cam", t: "Фотограф", d: "10 блюд по фото", cur: g.photos, goal: 10 },
-      { id: "ph50", ic: "cam", t: "Фуд-блогер", d: "50 блюд по фото", cur: g.photos, goal: 50 },
-      { id: "n1", ic: "check", t: "В точку", d: "День в норме калорий", cur: g.inNorm, goal: 1 },
-      { id: "n7", ic: "check", t: "Снайпер", d: "7 дней в норме", cur: g.inNorm, goal: 7 },
+      { id: "ph10", ic: "aperture", t: "Фотограф", d: "10 блюд по фото", cur: g.photos, goal: 10 },
+      { id: "ph50", ic: "sparkles", t: "Фуд-блогер", d: "50 блюд по фото", cur: g.photos, goal: 50 },
+      { id: "n1", ic: "target", t: "В точку", d: "День в норме калорий", cur: g.inNorm, goal: 1 },
+      { id: "n7", ic: "crosshair", t: "Снайпер", d: "7 дней в норме", cur: g.inNorm, goal: 7 },
       { id: "p1", ic: "protein", t: "Белковый день", d: "Белок закрыт", cur: g.proDays, goal: 1 },
-      { id: "p7", ic: "protein", t: "Строитель", d: "7 дней с белком", cur: g.proDays, goal: 7 },
+      { id: "p7", ic: "dumbbell", t: "Строитель", d: "7 дней с белком", cur: g.proDays, goal: 7 },
       { id: "bf7", ic: "breakfast", t: "Ранняя пташка", d: "7 завтраков", cur: g.bfDays, goal: 7 },
-      { id: "fd1", ic: "dinner", t: "Полный день", d: "Завтрак, обед и ужин", cur: g.fullDays, goal: 1 },
+      { id: "fd1", ic: "clock", t: "Полный день", d: "Завтрак, обед и ужин", cur: g.fullDays, goal: 1 },
       { id: "w1", ic: "scale", t: "На старте", d: "Первая запись веса", cur: g.weights, goal: 1 },
-      { id: "w10", ic: "scale", t: "Наблюдатель", d: "10 записей веса", cur: g.weights, goal: 10 },
-      { id: "e100", ic: "star", t: "Сотня", d: "100 записей еды", cur: g.entries, goal: 100 },
-      { id: "c1", ic: "star", t: "Свой набор", d: "Сохрани набор блюд", cur: g.combos, goal: 1 },
-      { id: "d30", ic: "cal", t: "Месяц с нами", d: "30 дней с записями", cur: g.days, goal: 30 },
+      { id: "w10", ic: "eye", t: "Наблюдатель", d: "10 записей веса", cur: g.weights, goal: 10 },
+      { id: "e100", ic: "medal", t: "Сотня", d: "100 записей еды", cur: g.entries, goal: 100 },
+      { id: "c1", ic: "bookmark", t: "Свой набор", d: "Сохрани набор блюд", cur: g.combos, goal: 1 },
+      { id: "d30", ic: "heart", t: "Месяц с нами", d: "30 дней с записями", cur: g.days, goal: 30 },
+      { id: "pl0", ic: "flag", t: "Цель", d: "Поставь цель по весу", cur: S.plan ? 1 : 0, goal: 1 },
+      { id: "pl1", ic: "mountain", t: "Этап", d: "Месячный этап цели", cur: g.planMs, goal: 1 },
+      { id: "pl2", ic: "trophy", t: "Вершина", d: "Цель по весу достигнута", cur: g.planDone, goal: 1 },
     ];
     A.forEach((a) => (a.done = a.cur >= a.goal));
     return A;
@@ -662,7 +687,7 @@
     let html = `<span class="pill" id="wpill"></span>`;
     for (let i = 0; i < 7; i++) {
       const d = addDays(base, i), k = dkey(d), fut = d > now && k !== tk, st = status(k);
-      html += `<button class="day ${k === tk ? "today" : ""} ${k === selDay ? "sel" : ""} ${st ? "has" : ""} ${st === "ov" ? "over" : ""}" data-k="${k}" ${fut ? "disabled" : ""}><span class="wd">${WD[d.getDay()]}</span><span class="dn">${d.getDate()}</span><span class="mark"></span></button>`;
+      html += `<button class="day ${k === tk ? "today" : ""} ${k === selDay ? "sel" : ""} ${st ? "has st-" + st : ""}" data-k="${k}" ${fut ? "disabled" : ""}><span class="wd">${WD[d.getDay()]}</span><span class="dn">${d.getDate()}</span><span class="mark"></span></button>`;
     }
     w.innerHTML = html; placePill(false);
     w.onclick = (e) => { const b = e.target.closest(".day"); if (!b || b.disabled) return; haptic("sel"); selectDay(b.dataset.k); };
@@ -911,6 +936,96 @@
     $("#ws-p").onclick = () => addWater(S.settings.glass || 250);
     $("#ws-m").onclick = () => addWater(-(S.settings.glass || 250));
   }
+  const fmtD = (d) => d.getDate() + " " + MON[d.getMonth()];
+  function goalCardHTML() {
+    const pi = planInfo();
+    if (!pi) return `<button class="card goal-cta" id="goal-open"><span class="gc-ic">${icon("flag")}</span><span class="gc-t"><b>Поставь цель по весу</b><span>Посчитаю норму под цель и разобью путь на месячные этапы</span></span>${icon("right", "chev")}</button>`;
+    const pl = S.plan, st = goalStatus(pi), cm = pi.ms.find((m) => m.cur);
+    return `<button class="card goal-card" id="goal-open">
+      <div class="c-head"><span class="card-t">${pl.type === "lose" ? "Сбросить" : "Набрать"} ${dec(pi.total)} кг</span><span class="gs ${st.cls}">${st.t}</span></div>
+      <div class="gc-row"><span class="gc-pct num">${Math.round(pi.done * 100)}<small>%</small></span><span class="gc-sub">${dec(pi.cur)} кг сейчас<br>цель ${dec(pl.target)} кг к ${fmtD(pi.end)}</span></div>
+      ${dotRow(24, "ink gc-dots")}
+      ${cm && !pi.reached ? `<div class="gc-m">${icon("flag")}Этап до ${fmtD(cm.d)}: ${dec(cm.exp)} кг</div>` : ""}
+    </button>`;
+  }
+  function goalStatus(pi) {
+    if (pi.reached) return { t: "Достигнута", cls: "ok" };
+    if (pi.diff <= -0.6) return { t: "Отстаёшь на " + dec(-pi.diff) + " кг", cls: "warn" };
+    if (pi.diff >= 0.6) return { t: "Впереди на " + dec(pi.diff) + " кг", cls: "ok" };
+    return { t: "По плану", cls: "ok" };
+  }
+  function bindGoalCard(back) {
+    const b = $("#goal-open"); if (!b) return;
+    if (S.plan) setDots($(".gc-dots"), planInfo().done, 1);
+    b.onclick = () => { haptic("light"); if (S.plan) planDetail(back); else planEdit(back); };
+  }
+  function planDetail(back) {
+    const pi = planInfo(), pl = S.plan, st = goalStatus(pi), nm = norm();
+    const body = `
+      <div class="d-hero g-carb">
+        <div class="c-head"><span class="c-title"><span class="ic">${icon(pi.reached ? "trophy" : "flag")}</span>${pl.type === "lose" ? "Сбросить" : "Набрать"} ${dec(pi.total)} кг</span><span class="chip">${st.t}</span></div>
+        <div class="big"><span class="num" id="pd-p">0</span><span class="of">% пути</span></div>
+        ${dotRow(24)}
+        <div class="stats3"><div><span>Старт</span><b class="num">${dec(pl.start)} кг</b></div><div><span>Сейчас</span><b class="num">${dec(pi.cur)} кг</b></div><div><span>Цель</span><b class="num">${dec(pl.target)} кг</b></div></div>
+      </div>
+      <div class="gap"></div>
+      <div class="card"><div class="card-t">План</div>
+        <div class="card-s" style="margin-top:6px">Темп ${PACE_N[pl.pace].toLowerCase()}: около ${dec(pi.km)} кг в месяц. Финиш примерно ${fmtD(pi.end)} ${pi.end.getFullYear()}. Норма под план: ${fmt(nm.k)} ккал в день.</div>
+        <div class="msl">${pi.ms.map((m, i) => `<div class="${m.ok ? "ok" : m.past ? "miss" : m.cur ? "cur" : ""}"><span class="mk">${m.ok ? icon("check") : m.cur ? icon("target") : i + 1}</span><span class="ml"><b>${cap(MONN[m.d.getMonth()])}</b><em>до ${fmtD(m.d)}</em></span><span class="mv">${dec(m.exp)} кг${m.past && m.w != null ? `<em>было ${dec(m.w)}</em>` : ""}</span></div>`).join("")}</div>
+      </div>
+      <p class="note">${pi.diff <= -0.6 && !pi.reached ? "Небольшое отставание нормально: вес колеблется день ото дня. Если отстаёшь уже несколько недель, пересчитай план от текущего веса, этапы сдвинутся." : "Отмечай вес раз в несколько дней утром, чтобы прогресс считался точнее."}</p>
+      <div class="list">
+        <button class="prow" id="pd-edit"><span class="pi">${icon("edit")}</span><span class="pl"><b>Изменить цель</b></span><span class="pv">${icon("right")}</span></button>
+        <button class="prow" id="pd-re"><span class="pi">${icon("refresh")}</span><span class="pl"><b>Пересчитать от текущего веса</b><span>Старт сегодня, цель та же</span></span></button>
+        <button class="prow danger" id="pd-del"><span class="pi t-pro">${icon("trash")}</span><span class="pl"><b>Удалить цель</b></span></button>
+      </div>`;
+    setSheet("Цель по весу", body, "", back, 1);
+    countUp($("#pd-p"), Math.round(pi.done * 100), { from: 0, dur: 900, force: true });
+    setDots($(".d-hero .drow"), pi.done, 1);
+    $("#pd-edit").onclick = () => planEdit(() => planDetail(back));
+    $("#pd-re").onclick = () => { S.plan.start = curWeight(); S.plan.startDate = todayKey(); save(); haptic("ok"); toast("План пересчитан"); planDetail(back); };
+    $("#pd-del").onclick = () => { S.plan = null; save(); haptic("medium"); toast("Цель удалена"); back(); };
+  }
+  function planEdit(back) {
+    const cw = curWeight(), ex = S.plan;
+    const st = ex ? { type: ex.type, target: ex.target, pace: ex.pace } : { type: S.profile.goal === "lose" ? "lose" : "gain", target: 0, pace: 1 };
+    if (!ex) st.target = r1(cw + (st.type === "lose" ? -4 : 3));
+    const minW = r1(18.5 * Math.pow(S.profile.height / 100, 2));
+    const body = `
+      ${segHTML("ptype", [["lose", "Сбросить вес"], ["gain", "Набрать вес"]], st.type)}
+      <div class="portion" style="margin-top:8px;display:flex;flex-direction:column;align-items:center;padding:26px 22px">
+        <div class="card-s">Сейчас ${dec(cw)} кг · целевой вес</div>
+        <div style="margin-top:14px">${stepperHTML("target", st.target, "кг", 0.5, "big")}</div>
+      </div>
+      <div class="subh">Темп</div>
+      ${segHTML("pace", PACE_N.map((n, i) => [String(i), n]), String(st.pace))}
+      <div class="gap"></div>
+      <div class="card" id="pe-sum"></div>`;
+    setSheet(ex ? "Изменить цель" : "Новая цель", body, `<button class="btn" id="pe-save">${ex ? "Сохранить" : "Поставить цель"}</button>`, back, 1);
+    const root = $("#sh-body");
+    const upd = () => {
+      if (st.type === "lose" && st.target >= cw) st.target = r1(cw - 0.5); if (st.type === "gain" && st.target <= cw) st.target = r1(cw + 0.5);
+      $('[data-step="target"] [data-v]').textContent = dec(st.target);
+      const pl = { type: st.type, start: cw, startDate: todayKey(), target: st.target, pace: st.pace }, pi = planInfo(pl);
+      const k = calcNorm(S.profile, pl).k, months = Math.round(pi.weeks / 4.345 * 10) / 10;
+      let warn = "";
+      if (st.type === "lose" && st.target < minW) warn = `Это ниже здорового веса для твоего роста (около ${dec(minW)} кг). Лучше выбрать цель повыше.`;
+      else if (pi.total > cw * 0.2) warn = "Большая цель. Лучше разбить её на несколько этапов и начать с первого.";
+      else if (st.type === "gain" && st.pace === 2) warn = "Быстрый набор чаще идёт в жир. Для мышц обычно хватает умеренного темпа.";
+      $("#pe-sum").innerHTML = `<div class="ps-row"><span>В месяц</span><b>${st.type === "lose" ? "−" : "+"}${dec(pi.km)} кг</b></div><div class="ps-row"><span>Срок</span><b>${months < 1 ? "меньше месяца" : "≈ " + dec(months) + " " + plural(Math.ceil(months), "месяц", "месяца", "месяцев")}</b></div><div class="ps-row"><span>Финиш</span><b>${fmtD(pi.end)} ${pi.end.getFullYear()}</b></div><div class="ps-row"><span>Норма в день</span><b>${fmt(k)} ккал</b></div>${warn ? `<div class="ps-warn">${icon("info")}<span>${warn}</span></div>` : ""}`;
+    };
+    bindSeg(root, "ptype", (v) => { st.type = v; st.target = r1(cw + (v === "lose" ? -4 : 3)); upd(); });
+    bindSeg(root, "pace", (v) => { st.pace = +v; upd(); });
+    bindSteppers(root, st, { target: [30, 250] }, upd);
+    upd();
+    $("#pe-save").onclick = () => {
+      S.plan = { type: st.type, start: cw, startDate: ex && ex.start === cw ? ex.startDate : todayKey(), target: st.target, pace: st.pace };
+      if (ex && ex.type === st.type) { S.plan.start = ex.start; S.plan.startDate = ex.startDate; }
+      S.profile.goal = st.type; S.profile.manual.on = false; save(); haptic("ok"); toast("Цель поставлена");
+      const a = checkAch(); if (a) celebrate(a);
+      if (S.plan) planDetail(back);
+    };
+  }
   function streakSheet() {
     haptic("light");
     const st = streakInfo(), A = achList(), now = new Date();
@@ -925,14 +1040,17 @@
         <p class="st-msg">${msg}</p>
         <div class="st-week">${days.map((x, i) => `<div class="${x.on ? "on" : x.fz ? "fz" : ""} ${x.today ? "today" : ""}" style="animation-delay:${0.15 + i * 0.05}s"><span>${x.on ? icon("bolt") : x.fz ? icon("snow") : ""}</span><em>${WD[x.d.getDay()]}</em></div>`).join("")}</div>
       </div>
+      <div class="gap"></div>${goalCardHTML()}
       ${next ? `<div class="gap"></div><div class="card st-next"><span class="sn-ic">${icon(next.ic)}</span><div class="sn-t"><em>Ближайшая награда</em><b>${esc(next.t)}</b><span>${esc(next.d)} · ${Math.min(next.cur, next.goal)} из ${next.goal}</span></div></div>` : ""}
       <div class="gap"></div>
-      <div class="card"><div class="c-head"><span class="card-t">Награды</span><span class="muted">${got} из ${A.length}</span></div>
+      <div class="card"><div class="c-head"><span class="card-t">Награды</span><span class="muted">${got} из ${A.length} · ${Math.round((got / A.length) * 100)}%</span></div>${dotRow(A.length, "ink rw-dots")}
         <div class="ach3">${A.map((a, i) => `<div class="${a.done ? "got" : ""}" style="animation-delay:${0.1 + i * 0.025}s"><span class="ab">${icon(a.ic)}</span><b>${esc(a.t)}</b><em>${a.done ? esc(a.d) : `${Math.min(a.cur, a.goal)} из ${a.goal}`}</em></div>`).join("")}</div>
       </div>
       <p class="note">Каждые 7 дней подряд дают заморозку: она сама спасёт серию, если пропустишь день.</p>`;
-    openSheet("Серия и награды", body);
+    openSheet("Прогресс и награды", body);
     countUp($("#st-n"), st.n, { from: 0, dur: 900, force: true });
+    setDots($(".rw-dots"), got, A.length);
+    bindGoalCard(streakSheet);
     raf2(() => $(".st-hero").classList.add("go"));
   }
   function openCalDetail() {
@@ -1398,7 +1516,7 @@
     } else chart = `<p class="card-s" style="margin-top:16px">Отмечай вес раз в несколько дней утром натощак, и здесь появится график. Смотри на тренд, а не на отдельные дни.</p>`;
     box.innerHTML = `<div class="c-head"><span class="c-title"><span class="ins-ic t-fat sm">${icon("scale")}</span>Вес</span><button class="btn sm ghost" id="w-add">${icon("plus")}Записать</button></div>
       <div class="w-now"><div class="mid"><span class="num">${dec(last)}</span><span class="u muted">кг</span></div>
-      ${delta ? `<span class="mtag ${(delta > 0) === (S.profile.goal !== "lose") ? "c" : "p"}">${delta > 0 ? "+" : "−"}${dec(Math.abs(delta))} кг за 30 дней</span>` : ""}</div>${chart}`;
+      ${delta ? `<span class="mtag ${(delta > 0) === (S.profile.goal !== "lose") ? "c" : "p"}">${delta > 0 ? "+" : "−"}${dec(Math.abs(delta))} кг за 30 дней</span>` : ""}</div>${S.plan ? `<div class="w-goal">${icon("flag")}Цель ${dec(S.plan.target)} кг · ${Math.round(planInfo().done * 100)}% пути</div>` : ""}${chart}`;
     if ($("#wch")) raf2(() => { $("#wch").classList.add("go"); $("#wch .wline").style.strokeDashoffset = 0; });
     $("#w-add").onclick = weightSheet;
   }
@@ -1442,7 +1560,7 @@
     card.innerHTML = `<div class="cal-head"><b>${cap(MONN[m])} ${y}</b><div class="cal-nav"><button id="cal-p" aria-label="Предыдущий месяц">${icon("back")}</button><button id="cal-n" aria-label="Следующий месяц" ${canNext ? "" : "disabled"}>${icon("right")}</button></div></div>
       <div class="cal-wd">${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((w) => `<span>${w}</span>`).join("")}</div>
       <div class="cal-grid ${dir > 0 ? "anim" : dir < 0 ? "anim back" : ""}" id="cal-grid">${cells}</div>
-      <div class="legend"><span><i style="background:var(--cal-b)"></i>в норме</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span><span><i style="background:var(--g40)"></i>меньше нормы</span></div>`;
+      <div class="legend"><span><i style="background:var(--ok)"></i>в норме</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span><span><i style="background:var(--g40)"></i>меньше нормы</span></div>`;
     $("#cal-p").onclick = () => { calMonth = new Date(y, m - 1, 1); haptic("light"); drawCal(-1); };
     $("#cal-n").onclick = () => { calMonth = new Date(y, m + 1, 1); haptic("light"); drawCal(1); };
     $("#cal-grid").onclick = (e) => { const b = e.target.closest(".cd"); if (!b || b.classList.contains("fut")) return; calSel = b.dataset.k; haptic("sel"); if (b.classList.contains("out")) { const d = fromKey(calSel); calMonth = new Date(d.getFullYear(), d.getMonth(), 1); drawCal(d < first ? -1 : 1); return; } $$(".cd", card).forEach((x) => x.classList.toggle("sel", x === b)); drawCalDay(); };
@@ -1465,7 +1583,7 @@
     if (!calSel) { box.innerHTML = ""; return; }
     const k = calSel, t = totals(k), nm = norm(), n = dayEntries(k).length, d = fromKey(k);
     box.classList.remove("fade-sw"); void box.offsetWidth; box.classList.add("fade-sw");
-    box.innerHTML = `<div class="card"><div class="c-head"><div><div class="card-t">${cap(WDF[d.getDay()])}, ${d.getDate()} ${MON[d.getMonth()]}</div><div class="card-s" style="margin-top:2px">${n ? n + " " + plural(n, "запись", "записи", "записей") : "Записей нет"}</div></div>${n ? `<span class="mtag k">${Math.round((t.k / nm.k) * 100)}% нормы</span>` : ""}</div>
+    box.innerHTML = `<div class="card"><div class="c-head cd-head"><div><div class="cd-date">${d.getDate()} ${MON[d.getMonth()]}</div><div class="card-s" style="margin-top:3px">${cap(WDF[d.getDay()])} · ${n ? n + " " + plural(n, "запись", "записи", "записей") : "записей нет"}</div></div>${n ? `<span class="mtag k">${Math.round((t.k / nm.k) * 100)}% нормы</span>` : ""}</div>
       ${n ? `<div class="mid"><span class="num">${fmt(t.k)}</span><span class="u muted">ккал</span></div><div class="macros">${macroTags(t, true)}</div>${dotRow(24, "ink")}` : ""}
       <div class="btn-row" style="margin-top:20px"><button class="btn ${n ? "" : "ghost"}" id="cal-open">${n ? "Открыть день" : "Добавить еду в этот день"}</button></div></div>`;
     if (n) setDots($(".drow", box), t.k, nm.k);
@@ -1504,6 +1622,7 @@
         <div class="p-tdee" id="pr-tdee"></div>
       </div>
       <div class="ptitle">Цель</div>
+      <div class="list" style="margin-bottom:8px"><button class="prow" id="pr-plan"><span class="pi">${icon("flag")}</span><span class="pl"><b>Цель по весу</b><span>${S.plan ? (S.plan.type === "lose" ? "До " : "До ") + dec(S.plan.target) + " кг · " + Math.round(planInfo().done * 100) + "% пути" : "Не задана"}</span></span><span class="pv">${icon("right")}</span></button></div>
       ${segHTML("goal", [["lose", "Похудеть"], ["keep", "Форма"], ["gain", "Масса"]], p.goal)}
       <div class="ptitle">Параметры</div>
       <div class="list">
@@ -1532,7 +1651,7 @@
       </div>
       <p class="note" style="text-align:center;margin-top:20px">Порция · калории и КБЖУ ориентировочные</p>`;
     updNormCard();
-    bindSeg(s, "goal", (v) => { p.goal = v; if (p.manual.on) { p.manual.on = false; $("#pm-t .toggle").classList.remove("on"); $("#pm-f").classList.remove("open"); } save(); updNormCard(); });
+    bindSeg(s, "goal", (v) => { if (S.plan && S.plan.type !== v) { S.plan = null; toast("Цель по весу сброшена"); } p.goal = v; if (p.manual.on) { p.manual.on = false; $("#pm-t .toggle").classList.remove("on"); $("#pm-f").classList.remove("open"); } save(); updNormCard(); });
     bindSeg(s, "theme", (v) => { S.settings.theme = v; save(); applyTheme(true); });
     $$(".prow[data-ed]", s).forEach((b) => (b.onclick = () => editParam(b.dataset.ed)));
     $("#pr-ava").onclick = () => $("#f-ava").click();
@@ -1545,6 +1664,7 @@
     $$("[data-m]", s).forEach((i) => (i.oninput = () => { p.manual[i.dataset.m] = Math.max(0, parseInt(i.value, 10) || 0); save(); updNormCard(); }));
     $("#pc-t").onclick = () => { S.settings.carry = !S.settings.carry; save(); haptic("sel"); $("#pc-t .toggle").classList.toggle("on", S.settings.carry); lastVals.delete("wk"); };
     $("#pr-key").onclick = keySheet;
+    $("#pr-plan").onclick = () => { haptic("light"); openSheet("Цель по весу", ""); const back = () => { closeSheet(); renderProfile(); }; if (S.plan) planDetail(back); else planEdit(back); setBack(null); };
     $("#d-redo").onclick = () => startOnboarding();
     $("#d-reset").onclick = confirmReset;
   }
