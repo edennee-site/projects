@@ -511,3 +511,8 @@ input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 
   .top h1 { font-size: 25px; }
 }
 .alert .btn { display: flex; width: auto; }
+/* повторные перерисовки без каскадной анимации появления */
+.screen.static .fade-up { animation: none; }
+.week .pill, .seg .knob { will-change: transform; }
+.item.enter { animation: itemIn .5s var(--ease-out) both, flash 1.6s var(--ease) .2s; }
+@keyframes flash { 0% { background: color-mix(in srgb, var(--cal-b) 16%, transparent); } 100% { background: var(--card); } }

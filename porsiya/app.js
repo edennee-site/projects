@@ -486,6 +486,7 @@
   let weekAnchor = null;
   function renderToday(animate) {
     const s = $("#s-today");
+    s.classList.toggle("static", !animate);
     const now = new Date();
     const sd = fromKey(selDay);
     const isToday = selDay === todayKey();
@@ -673,8 +674,9 @@
       if (!items.length) return "";
       const sum = items.reduce((a, e) => a + e.k, 0);
       return `<div class="meal-group fade-up d6"><div class="mg-head"><b>${m.e} ${m.n}</b><span>${fmt(sum)} ккал</span></div>
-        ${items.map((e) => itemHTML(e)).join("")}</div>`;
+        ${items.map((e) => itemHTML(e, fresh.has(e.id))).join("")}</div>`;
     }).join("");
+    fresh.clear();
     $$(".item", box).forEach((el) => { el.onclick = () => { if (!el.dataset.sw) editEntry(el.dataset.id); }; bindSwipe(el); });
   }
   function bindSwipe(el) {
@@ -722,11 +724,13 @@
     if (!S.days[dayK]) S.days[dayK] = [];
     const base = dayK === todayKey() ? Date.now() : fromKey(dayK).setHours(mealHour(meal), 0, 0, 0);
     arr.forEach((x, i) => {
-      S.days[dayK].push({ id: uid(), n: x.n, e: x.e || "🍽️", g: r0(x.g), k: r0(x.k), p: r1(x.p), f: r1(x.f), c: r1(x.c), meal, t: base + i, img: x.img || undefined, src: x.src || "db" });
+      const nid = uid(); fresh.add(nid);
+      S.days[dayK].push({ id: nid, n: x.n, e: x.e || "🍽️", g: r0(x.g), k: r0(x.k), p: r1(x.p), f: r1(x.f), c: r1(x.c), meal, t: base + i, img: x.img || undefined, src: x.src || "db" });
       if (x.src !== "photo") { S.recent = [x.n].concat(S.recent.filter((r) => r !== x.n)).slice(0, 12); }
     });
     save();
   }
+  const fresh = new Set();
   function mealHour(m) { return { breakfast: 8, lunch: 13, dinner: 19, snack: 16 }[m] || 12; }
   function findEntry(id) { for (const k in S.days) { const i = S.days[k].findIndex((e) => e.id === id); if (i > -1) return { k, i, e: S.days[k][i] }; } return null; }
   function editEntry(id) {
