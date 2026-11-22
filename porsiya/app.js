@@ -172,7 +172,8 @@
     const done = clamp((sign * (cur - pl.start)) / (total || 1), 0, 1);
     const diff = sign * (cur - expected);
     const months = Math.max(1, Math.ceil(weeks / 4.345));
-    const ms = Array.from({ length: months }, (_, i) => { const d = addMonths(sd, i + 1), exp = pl.start + sign * Math.min(total, kw * ((d - sd) / 6048e5)); const past = d <= now; const w = past ? weightAt(dkey(d)) : null; return { d, exp: r1(exp), past, cur: !past && (i === 0 || addMonths(sd, i) <= now), ok: past && w != null && sign * (w - exp) >= -0.3, w }; });
+    const ms = Array.from({ length: months }, (_, i) => { const d = addMonths(sd, i + 1), exp = pl.start + sign * Math.min(total, kw * ((d - sd) / 6048e5)); const past = d <= now; const w = past ? weightAt(dkey(d)) : null; return { d, exp: r1(exp), past, cur: false, ok: (past && w != null && sign * (w - exp) >= -0.3) || sign * (cur - exp) >= 0, w }; });
+    const nx = ms.find((m) => !m.ok); if (nx) nx.cur = true;
     return { sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1 };
   }
   function norm() { const m = S.profile.manual; return m.on ? { k: m.k, p: m.p, f: m.f, c: m.c } : calcNorm(); }
@@ -298,7 +299,8 @@
     const up = A.find((t) => t.st > (S.game.seen2[t.id] || 0));
     A.forEach((t) => (S.game.seen2[t.id] = Math.max(t.st, S.game.seen2[t.id] || 0))); save();
     if (!up) return null;
-    return { ic: up.ic, t: `${up.t} · этап ${up.st}`, d: `Следующий этап: ${up.d.charAt(0).toLowerCase() + up.d.slice(1)}` };
+    S.game.fresh = Array.from(new Set((S.game.fresh || []).concat(A.filter((t) => t.st > 0 && t.st >= (S.game.seen2[t.id] || 0) && t.id === up.id).map((t) => t.id)))); save();
+    return { id: up.id, ic: up.ic, t: `${up.t} · этап ${up.st}`, d: `Следующий этап: ${up.d.charAt(0).toLowerCase() + up.d.slice(1)}` };
   }
   const status = (k) => { const n = dayEntries(k).length; if (!n) return ""; const v = totals(k).k, nm = norm().k; if (v > nm * 1.1) return "ov"; if (v >= nm * 0.9) return "in"; return "un"; };
 
@@ -979,7 +981,7 @@
         <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>до ${fmtD(pi.end)}</span></span>
         <span class="gk-p num">${Math.round(pi.done * 100)}<small>%</small></span></div>
       <div class="gk-w"><span><em>Сейчас</em><b class="num">${dec(pi.cur)} кг</b></span>${dotRow(14, "ink gc-dots")}<span style="text-align:right"><em>Цель</em><b class="num">${dec(pl.target)} кг</b></span></div>
-      ${weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : cm && !pi.reached ? `<div class="gc-m">${icon("flag")}<span>Этап к ${fmtD(cm.d)}: ${dec(cm.exp)} кг</span></div>` : ""}
+      ${pi.reached ? `<div class="gc-m gc-done">${icon("trophy")}<span>Цель достигнута</span><span class="gc-btn" data-next>Что дальше</span></div>` : weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : cm ? `<div class="gc-m">${icon("flag")}<span>Следующий этап: ${dec(cm.exp)} кг к ${fmtD(cm.d)}</span></div>` : ""}
     </button>`;
   }
   function goalStatus(pi) {
@@ -1064,7 +1066,7 @@
     const pi = planInfo(), pl = S.plan, lose = pl.type === "lose";
     let ic = "check", tone = "ok", t = "", txt = "", acts = "";
     if (pi.reached) { ic = "trophy"; t = "Цель достигнута"; txt = `Ты дошёл до ${dec(pl.target)} кг. Можно поставить новую цель или перейти на поддержание формы.`; acts = `<button class="btn ghost" data-pc="keep">Поддерживать вес</button><button class="btn" data-pc="new">Новая цель</button>`; }
-    else if (pi.diff <= -0.6) { ic = "info"; tone = "warn"; t = `Отстаёшь на ${dec(-pi.diff)} кг`; txt = `По плану сейчас должно быть ${dec(pi.expected)} кг. Это нормально: вес колеблется. Можно сдвинуть финиш, сохранив темп, или ${pl.pace < 2 ? "ускорить темп" : "оставить как есть"}.${lose ? " Проверь, что все приёмы пищи записаны, включая перекусы и напитки." : " Проверь, что добираешь калории каждый день."}`; acts = `<button class="btn ghost" data-pc="shift">Сдвинуть финиш</button>${pl.pace < 2 ? `<button class="btn" data-pc="faster">Ускорить темп</button>` : `<button class="btn" data-pc="ok">Оставить</button>`}`; }
+    else if (pi.diff <= -0.6) { ic = "info"; tone = "warn"; t = `Отстаёшь на ${dec(-pi.diff)} кг`; txt = `${pi.sign * (pi.cur - pl.start) < 0 ? `Вес ушёл в другую сторону: ${lose ? "+" : "−"}${dec(Math.abs(pi.cur - pl.start))} кг от старта. ` : ""}По плану сейчас должно быть ${dec(pi.expected)} кг. Небольшие колебания нормальны. Можно сдвинуть финиш, сохранив темп, или ${pl.pace < 2 ? "ускорить темп" : "оставить как есть"}.${lose ? " Проверь, что все приёмы пищи записаны, включая перекусы и напитки." : " Проверь, что добираешь калории каждый день."}`; acts = `<button class="btn ghost" data-pc="shift">Сдвинуть финиш</button>${pl.pace < 2 ? `<button class="btn" data-pc="faster">Ускорить темп</button>` : `<button class="btn" data-pc="ok">Оставить</button>`}`; }
     else if (pi.diff >= 0.6) { ic = "rocket"; t = `Впереди на ${dec(pi.diff)} кг`; txt = `Отличный темп. ${lose ? "Если чувствуешь сильный голод или упадок сил, лучше немного замедлиться." : "Если растёт живот, стоит немного замедлиться, чтобы набирать именно мышцы."}`; acts = `${pl.pace > 0 ? `<button class="btn ghost" data-pc="slower">Замедлить темп</button>` : ""}<button class="btn" data-pc="ok">Продолжать</button>`; }
     else { t = "Всё по плану"; txt = `Сейчас ${dec(pi.cur)} кг, по плану ${dec(pi.expected)} кг. Норма остаётся прежней, продолжай в том же духе.`; acts = `<button class="btn" data-pc="ok">Отлично</button>`; }
     setSheet("Сверка с целью", `<div class="pc-hero"><span class="pc-ic ${tone}">${icon(ic)}</span><b>${t}</b><p>${txt}</p></div>
@@ -1083,16 +1085,18 @@
     const box = $("#t-goal"); if (!box) return;
     const html = `${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}<div class="gap"></div>`;
     if (box._h !== html) { box._h = html; box.innerHTML = html; if (S.plan) setDots($(".gc-dots", box), planInfo().done, 1); }
-    if (!box._bound) { box._bound = true; box.addEventListener("click", (e) => { const c = e.target.closest("#goal-open"); if (!c || sheetOpen) return; if (e.target.closest("[data-weigh]")) { weightSheet(); return; } openGoal(); }); }
+    if (!box._bound) { box._bound = true; box.addEventListener("click", (e) => { const c = e.target.closest("#goal-open"); if (!c || sheetOpen) return; if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (S.plan && planInfo().reached) { openSheet("Цель по весу", ""); planCheck(); return; } openGoal(); }); }
   }
   function streakSheet() {
     haptic("light"); if (S.game && S.game.unread) { S.game.unread = 0; save(); updBadge(); }
+    const scrollNew = !!(S.game && S.game.fresh && S.game.fresh.length);
     const st = streakInfo(), A = achList(), now = new Date(), LV = gameLevel(A);
     const days = Array.from({ length: 7 }, (_, i) => { const d = addDays(now, i - 6), k = dkey(d); return { d, k, on: isLogged(k), fz: isFrozen(k), today: i === 6 }; });
     const msg = st.today ? `Сегодня отмечено. Завтра будет ${st.n + 1}.` : st.risk ? "Добавь еду сегодня, иначе серия сгорит в полночь." : "Добавь еду сегодня, чтобы начать серию.";
-    const card = (t, i) => `<div class="tr ${t.st ? "got" : ""} c-${t.col}" style="animation-delay:${0.08 + i * 0.03}s">
+    const fr = (S.game && S.game.fresh) || [];
+    const card = (t, i) => `<div class="tr ${t.st ? "got" : ""} ${fr.includes(t.id) ? "fresh" : ""} c-${t.col}" style="animation-delay:${0.08 + i * 0.03}s">
         <span class="tr-ic">${icon(t.ic)}</span>
-        <div class="tr-b"><div class="tr-h"><b>${t.t}</b><span class="tr-st">${t.st ? "Этап " + t.st : "Не начато"}</span></div>
+        <div class="tr-b"><div class="tr-h"><b>${t.t}</b>${fr.includes(t.id) ? `<span class="tr-new">Новое</span>` : ""}<span class="tr-st">${t.st ? "Этап " + t.st : "Не начато"}</span></div>
           <div class="tr-d">${esc(t.d)}</div>
           <div class="tr-bar"><i style="--w:${(t.pct * 100).toFixed(1)}%"></i></div>
           <div class="tr-n"><span>${t.unit === "кг" ? dec(t.val) : fmt(t.val)} из ${t.unit === "кг" ? dec(t.next) : fmt(t.next)}</span><span>этап ${t.st + 1}</span></div></div></div>`;
@@ -1116,6 +1120,7 @@
       <div class="trs">${A.goal.map((t, i) => card(t, i + A.common.length)).join("")}</div>
       <p class="note">Каждый пройденный этап открывает следующий, чуть сложнее. За этапы растёт твой уровень. Неделя без пропусков даёт заморозку: она сохранит серию, если однажды забудешь отметиться.</p>`;
     openSheet("Прогресс и награды", body);
+    if (scrollNew) { setTimeout(() => { const n = $("#sh-body .tr.fresh"); if (n) n.scrollIntoView({ behavior: "smooth", block: "center" }); }, 450); onSheetClose = () => { S.game.fresh = []; save(); }; }
     countUp($("#st-n"), st.n, { from: 0, dur: 900, force: true });
     bindGoalCard(streakSheet);
     raf2(() => { $(".st-hero").classList.add("go"); $$("#sh-body .tr-bar").forEach((b) => b.classList.add("go")); const lr = $("#lv-ring"); if (lr) lr.classList.add("go"); });

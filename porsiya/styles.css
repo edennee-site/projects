@@ -1144,3 +1144,8 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .w-meta em { display: block; font-style: normal; font-size: 12px; color: var(--g60); }
 .w-meta b { display: block; font-size: 15px; font-weight: 500; margin-top: 2px; }
 .w-meta b.good { color: var(--ok); } .w-meta b.bad { color: var(--pro-t); }
+
+.tr.fresh { box-shadow: 0 0 0 2px var(--pro-b) inset; }
+.tr-new { font-size: 11px; font-weight: 600; height: 22px; padding: 0 9px; border-radius: 99px; background: #F2545B; color: #fff; display: inline-flex; align-items: center; margin-left: auto; margin-right: 6px; }
+.tr-h b { margin-right: auto; }
+.gc-done svg { color: var(--ok) !important; }
