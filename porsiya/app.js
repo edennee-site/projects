@@ -604,6 +604,7 @@
     $("#ob-done").onclick = () => {
       const first = !S.onboarded;
       S.profile = Object.assign(S.profile, ob.d);
+      if (S.plan && S.plan.type !== S.profile.goal) S.plan = null;
       if (first) S.weights[todayKey()] = ob.d.weight;
       S.onboarded = true; save(); gameInit(); haptic("ok"); lastVals.clear(); show("today", { force: true });
     };
@@ -1868,10 +1869,15 @@
     if (id === "calendar" && cur !== "calendar") { calMonth = null; calSel = null; }
     show(id);
   }));
-  let hiddenAt = 0;
+  let hiddenAt = 0, lastToday = todayKey();
+  setInterval(() => { if (document.visibilityState === "visible" && lastToday !== todayKey()) document.dispatchEvent(new Event("visibilitychange")); }, 60000);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") hiddenAt = Date.now();
-    else if (cur === "today" && !sheetOpen && Date.now() - hiddenAt > 10 * 60 * 1000) buildToday();
+    else {
+      const tk = todayKey();
+      if (lastToday !== tk) { if (selDay === lastToday) { selDay = tk; weekAnchor = null; } lastToday = tk; if (cur === "today" && !sheetOpen) { buildToday(); return; } }
+      if (cur === "today" && !sheetOpen && Date.now() - hiddenAt > 10 * 60 * 1000) buildToday();
+    }
   });
 
   // ---------- init ----------
