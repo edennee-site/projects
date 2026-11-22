@@ -1079,7 +1079,8 @@
   function renderTodayGoal() {
     const box = $("#t-goal"); if (!box) return;
     const html = `${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}<div class="gap"></div>`;
-    if (box._h === html) return; box._h = html; box.innerHTML = html; bindGoalCard(null);
+    if (box._h !== html) { box._h = html; box.innerHTML = html; if (S.plan) setDots($(".gc-dots", box), planInfo().done, 1); }
+    if (!box._bound) { box._bound = true; box.addEventListener("click", (e) => { const c = e.target.closest("#goal-open"); if (!c || sheetOpen) return; if (e.target.closest("[data-weigh]")) { weightSheet(); return; } openGoal(); }); }
   }
   function streakSheet() {
     haptic("light"); if (S.game && S.game.unread) { S.game.unread = 0; save(); updBadge(); }
@@ -1583,8 +1584,8 @@
         <div class="axis" style="padding-left:${(PL / W) * 100}%;padding-right:${(PR / W) * 100}%"><span>${fromKey(pts[0][0]).getDate()} ${MONS[fromKey(pts[0][0]).getMonth()]}</span><span>${fromKey(pts[pts.length - 1][0]).getDate()} ${MONS[fromKey(pts[pts.length - 1][0]).getMonth()]}</span></div>`;
     } else chart = `<p class="card-s" style="margin-top:16px">Отмечай вес раз в несколько дней утром натощак, и здесь появится график. Смотри на тренд, а не на отдельные дни.</p>`;
     box.innerHTML = `<div class="c-head"><span class="c-title"><span class="ins-ic t-fat sm">${icon("scale")}</span>Вес</span><button class="btn sm ghost" id="w-add">${icon("plus")}Записать</button></div>
-      <div class="w-now"><div class="mid"><span class="num">${dec(last)}</span><span class="u muted">кг</span></div>
-      ${delta ? `<span class="mtag ${(delta > 0) === (S.profile.goal !== "lose") ? "c" : "p"}">${delta > 0 ? "+" : "−"}${dec(Math.abs(delta))} кг за 30 дней</span>` : ""}</div>${S.plan ? `<div class="w-goal">${icon("flag")}Цель ${dec(S.plan.target)} кг · ${Math.round(planInfo().done * 100)}% пути</div>` : ""}${chart}`;
+      <div class="mid" style="margin-top:14px"><span class="num">${dec(last)}</span><span class="u muted">кг</span></div>
+      <div class="w-meta">${delta ? `<div><em>За 30 дней</em><b class="${(delta > 0) === (S.profile.goal !== "lose") ? "good" : "bad"}">${delta > 0 ? "+" : "−"}${dec(Math.abs(delta))} кг</b></div>` : ""}${S.plan ? `<div><em>Цель</em><b>${dec(S.plan.target)} кг</b></div><div><em>Пройдено</em><b>${Math.round(planInfo().done * 100)}%</b></div>` : ""}</div>${chart}`;
     if ($("#wch")) raf2(() => { $("#wch").classList.add("go"); $("#wch .wline").style.strokeDashoffset = 0; });
     $("#w-add").onclick = weightSheet;
   }
@@ -1718,7 +1719,7 @@
       <div class="ptitle">Оформление</div>
       ${segHTML("theme", [["auto", "Авто"], ["light", "Светлая"], ["dark", "Тёмная"]], S.settings.theme)}
       <div class="ptitle">Приложение</div>
-      <button class="home-card" id="pr-home"><img src="logo.png?v=3" alt="Nomi"><span class="hc-t"><b>На рабочий стол</b><span>Открывай Nomi в одно касание</span></span><span class="hc-btn">${icon("plus")}</span></button>
+      <button class="home-card" id="pr-home"><img src="logo.png?v=3" alt="Nomi"><span class="hc-t"><b>На рабочий стол</b><span>Nomi в одно касание</span></span><span class="hc-btn">${icon("plus")}</span></button>
       <div class="list">
         <button class="prow" id="pr-key"><span class="pi">${icon("key")}</span><span class="pl"><b>Распознавание фото</b><span>${S.settings.key ? "Ключ Gemini добавлен" : "Нужен бесплатный ключ Gemini"}</span></span><span class="pv">${S.settings.key ? `<span class="mtag c">Вкл</span>` : ""}${icon("right")}</span></button>
         <button class="prow" id="d-redo"><span class="pi">${icon("refresh")}</span><span class="pl"><b>Пройти анкету заново</b><span>Пересчитать норму с нуля</span></span><span class="pv">${icon("right")}</span></button>

@@ -1138,3 +1138,9 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .hc-t span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hc-btn { width: 40px; height: 40px; padding: 0; border-radius: 50%; justify-content: center; }
 .hc-btn svg { width: 18px; height: 18px; }
+
+.w-meta { display: flex; gap: 24px; margin-top: 12px; }
+.w-meta:empty { display: none; }
+.w-meta em { display: block; font-style: normal; font-size: 12px; color: var(--g60); }
+.w-meta b { display: block; font-size: 15px; font-weight: 500; margin-top: 2px; }
+.w-meta b.good { color: var(--ok); } .w-meta b.bad { color: var(--pro-t); }
