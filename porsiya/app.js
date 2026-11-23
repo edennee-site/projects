@@ -1058,8 +1058,8 @@
     return { t: "По плану", cls: "ok" };
   }
   function bindGoalCard(back) {
-    const b = $("#goal-open"); if (!b) return;
-    if (S.plan) setDots($(".gc-dots"), planInfo().done, 1);
+    const b = document.querySelector(back ? "#sheet #goal-open" : "#goal-open:not([data-home])"); if (!b) return;
+    if (S.plan) setDots(b.querySelector(".gc-dots"), planInfo().done, 1);
     b.onclick = (e) => { if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (!back) { openGoal(); return; } haptic("light"); if (S.plan) planDetail(back); else planEdit(back); };
   }
   function planDetail(back) {
