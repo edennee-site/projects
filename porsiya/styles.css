@@ -257,7 +257,7 @@ svg.i { width: 20px; height: 20px; flex: none; }
 .tab svg { width: 21px; height: 21px; flex: none; transition: transform .4s var(--spring); }
 .tab span { max-width: 0; opacity: 0; margin-left: 0; overflow: hidden; transition: max-width .55s cubic-bezier(.32,.72,0,1), opacity .25s, margin-left .55s cubic-bezier(.32,.72,0,1); }
 .tab.on { width: var(--aw); color: var(--ink-inv); }
-.tab.on span { max-width: 80px; opacity: 1; margin-left: 7px; transition-delay: 0s, .15s, 0s; }
+.tab.on span { max-width: 80px; opacity: 1; margin-left: 6px; transition-delay: 0s, .15s, 0s; }
 .tab:active svg { transform: scale(.86); }
 .fab {
   width: 58px; height: 58px; border-radius: 50%; background: var(--g-pro); color: #fff; display: grid; place-items: center; flex: none;
