@@ -397,7 +397,7 @@
     const next = $("#s-" + id);
     quiet = seenScr.has(id) && !opts.force; seenScr.add(id);
     next.classList.toggle("quiet", quiet);
-    next.classList.remove("active"); void next.offsetWidth; next.classList.add("active");
+    next.classList.remove("active"); next.style.animation = ""; void next.offsetWidth; next.classList.add("active");
     $("#tabbar").classList.toggle("hide", id === "onboard");
     $$(".tab").forEach((b) => b.classList.toggle("on", b.dataset.tab === id));
     const ti = TABS.indexOf(id); if (ti > -1) $("#navp").style.setProperty("--i", ti);
@@ -2042,7 +2042,7 @@
       fonts.then(() => {
         const wait = Math.max(0, 650 - performance.now());
         setTimeout(() => {
-          setTimeout(() => document.documentElement.classList.remove("boot"), 480);
+          setTimeout(() => { document.querySelectorAll(".screen").forEach((x) => (x.style.animation = "none")); document.documentElement.classList.remove("boot"); }, 480); // без повторной анимации появления экрана
         }, wait);
       });
     });
