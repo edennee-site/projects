@@ -435,12 +435,14 @@
   window.addEventListener("resize", measureHead);
   function sheetFoot(html) { const f = $("#sh-foot"); f.innerHTML = html || ""; f.style.display = html ? "" : "none"; }
   function setBack(fn) { sheetBack = fn || null; $("#sheet").classList.toggle("has-back", !!fn); }
+  // новое содержимое окна появляется сразу, без переходов цвета (Safari иначе проявлял текст с задержкой)
+  function freshSheet() { const sh = $("#sheet"); sh.classList.add("fresh"); requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.remove("fresh"))); }
   function openSheet(title, body, foot = "", opts = {}) {
     $("#sh-title").textContent = title;
     const b = $("#sh-body"); b.className = "sh-body"; b.innerHTML = body; b.scrollTop = 0;
     sheetFoot(foot); setBack(opts.back);
     onSheetClose = opts.onClose || null;
-    measureHead();
+    measureHead(); freshSheet();
     if (!sheetOpen) {
       sheetOpen = true;
       $("#scrim").classList.add("open"); $("#sheet").classList.add("open");
@@ -455,7 +457,7 @@
     $("#sh-title").textContent = title;
     b.className = "sh-body"; void b.offsetWidth; b.classList.add(dir > 0 ? "swap" : "swap-back");
     b.innerHTML = body; b.scrollTop = 0;
-    sheetFoot(foot); setBack(back);
+    sheetFoot(foot); setBack(back); freshSheet();
   }
   function closeSheet() {
     if (!sheetOpen) return;
@@ -510,7 +512,7 @@
   }
   function bindSeg(root, name, cb) {
     const seg = $(`[data-seg="${name}"]`, root); if (!seg) return;
-    placeKnob(seg, false); requestAnimationFrame(() => placeKnob(seg, false));
+    placeKnob(seg, false); requestAnimationFrame(() => { placeKnob(seg, false); requestAnimationFrame(() => seg.classList.add("ready")); });
     seg.addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b || b.classList.contains("on")) return;
       $$("button", seg).forEach((x) => x.classList.toggle("on", x === b)); placeKnob(seg); haptic("sel"); cb(b.dataset.v);

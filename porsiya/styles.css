@@ -1269,3 +1269,10 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .trw-r svg { width: 16px; height: 16px; }
 
 .week .day.trd .mark svg, .cal-grid .cd.trd i svg { flex: none; }
+
+/* переключатели: при появлении без анимаций (в Safari текст выбранной кнопки проявлялся с задержкой),
+   пилюля без отдельного слоя, чтобы не перекрывать подписи */
+.seg { isolation: isolate; }
+.seg:not(.ready) button, .seg:not(.ready) .knob { transition: none !important; }
+.seg .knob, .week .pill { will-change: auto; }
+.sheet.fresh .sh-body *, .sheet.fresh .sh-foot * { transition: none !important; }
