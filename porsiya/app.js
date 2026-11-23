@@ -1326,10 +1326,10 @@
         <div class="wbal mw k-${M.kind}" id="mw">${days.map((x, i) => { const on = Math.min(rows, Math.round(x.v / unit)); let c = ""; for (let r = 0; r < rows; r++) c += `<i class="${r < on ? (r >= nRow ? "ov" : "on") : r < nRow ? "" : "x"}" style="transition-delay:${(i * 0.05 + r * 0.02).toFixed(3)}s"></i>`; return `<div class="wb ${x.kk === selDay ? "today" : ""}"><div class="dcol">${c}</div><span>${WD[x.d.getDay()]}</span></div>`; }).join("")}</div>
       </div>
       <div class="gap"></div>
-      ${srcs.length ? `<div class="card"><div class="card-t">Из чего ${k === "p" ? "белок" : k === "c" ? "углеводы" : "жиры"} ${selDay === todayKey() ? "сегодня" : "в этот день"}</div>
+      ${srcs.length ? `<div class="card"><div class="card-t">${selDay === todayKey() ? "Источники сегодня" : "Источники за день"}</div><div class="card-s" style="margin-top:2px">По количеству ${M.g}, доля от съеденного</div>
         ${srcs.map((e) => `<div class="src"><span class="st">${esc(e.n)}</span><span class="sv">${r0(e[k])} г<span>${t[k] ? Math.round((e[k] / t[k]) * 100) : 0}%</span></span></div>`).join("")}
       </div><div class="gap"></div>` : ""}
-      ${top.length >= 2 ? `<div class="card"><div class="card-t">Твои главные источники</div><div class="card-s" style="margin-top:2px">За 30 дней, по количеству ${M.g}</div>
+      ${top.length >= 2 ? `<div class="card"><div class="card-t">Главные источники</div><div class="card-s" style="margin-top:2px">За 30 дней, по количеству ${M.g}</div>
         ${top.map((x) => `<div class="src"><span class="st">${esc(x.n)}<em>${x.times} ${plural(x.times, "раз", "раза", "раз")}</em></span><span class="sv">${fmt(x.v)} г<span>${Math.round((x.v / tot30) * 100)}%</span></span></div>`).join("")}
       </div>` : ""}
       <div class="tip-line">${icon("bulb")}<span>${M.tip(nm)}</span></div>`;
