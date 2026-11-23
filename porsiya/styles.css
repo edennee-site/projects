@@ -1226,7 +1226,7 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 /* цифра в красном кружке по центру */
 .sbadge { display: flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 5px; line-height: 1; font-feature-settings: "tnum" 1; letter-spacing: 0; box-sizing: border-box; }
 /* день тренировки в ленте недели: маленькая гантель вместо точки, цвет по статусу дня */
-.week .day.trd .mark { width: 14px; height: 9px; background: none; color: var(--g40); display: grid; place-items: center; }
+.week .day.trd .mark { width: 14px; height: 5px; background: none; color: var(--g40); display: flex; align-items: center; justify-content: center; overflow: visible; }
 .week .day.trd .mark svg { width: 14px; height: 14px; stroke-width: 2.3; }
 .week .day.trd.st-in .mark { color: var(--ok); }
 .week .day.trd.st-ov .mark { color: var(--pro-b); }
@@ -1240,7 +1240,7 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .tchip[hidden] { display: none; }
 
 /* календарь: гантель в дни тренировок */
-.cal-grid .cd.trd i { width: 14px; height: 9px; border-radius: 0; background: none !important; display: grid; place-items: center; color: var(--g40); }
+.cal-grid .cd.trd i { width: 14px; height: 6px; border-radius: 0; background: none !important; display: flex; align-items: center; justify-content: center; overflow: visible; color: var(--g40); }
 .cal-grid .cd.trd i svg { width: 14px; height: 14px; }
 .cal-grid .cd.trd.in i { color: var(--ok); } .cal-grid .cd.trd.ov i { color: var(--pro-b); } .cal-grid .cd.trd.un i { color: var(--g60); }
 .cal-grid .cd.trd.sel i { color: var(--ink-inv); }
@@ -1267,3 +1267,5 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .trw-b.on svg { opacity: 1; }
 .trw-r { width: 32px; height: 32px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: var(--card-2); color: var(--g60); }
 .trw-r svg { width: 16px; height: 16px; }
+
+.week .day.trd .mark svg, .cal-grid .cd.trd i svg { flex: none; }

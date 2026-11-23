@@ -708,7 +708,7 @@
     $("#t-ava").onclick = () => show("profile");
     $("#t-streak").onclick = streakSheet;
     $("#wk-month").onclick = () => { haptic("light"); const d = weekAnchor || fromKey(selDay); calMonth = new Date(d.getFullYear(), d.getMonth(), 1); calSel = selDay; show("calendar"); };
-    $("#wk-today").onclick = () => { haptic("light"); selectDay(todayKey()); };
+    $("#wk-today").onclick = () => { haptic("light"); const tk = todayKey(); if (selDay === tk) { weekAnchor = fromKey(tk); renderWeek(); updateToday(); } else selectDay(tk); };
     $("#c-cal").onclick = () => openCalDetail();
     $("#c-p").onclick = () => openMacroDetail("p");
     $("#c-c").onclick = () => openMacroDetail("c");
