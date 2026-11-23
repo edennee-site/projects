@@ -516,8 +516,8 @@
     updateBack();
   }
   const seenScr = new Set();
-  function updateBack() { if (!inTg) return; try { const ob = cur === "onboard" && ($("#ob-back") || S.onboarded); if (sheetOpen || ob || (cur !== "today" && cur !== "onboard")) tg.BackButton.show(); else tg.BackButton.hide(); } catch (e) {} }
-  function goBack() { if (sheetOpen) { if (sheetBack) sheetBack(); else closeSheet(); return; } if (cur === "onboard") { const b = $("#ob-back"); if (b) b.click(); else if (S.onboarded) show("profile"); setTimeout(updateBack, 50); return; } if (TABS.includes(cur) && cur !== "today") show("today"); }
+  function updateBack() { if (!inTg) return; try { const ob = cur === "onboard" && ($("#ob-back") || S.onboarded); if (stageClose || sheetOpen || ob || (cur !== "today" && cur !== "onboard")) tg.BackButton.show(); else tg.BackButton.hide(); } catch (e) {} }
+  function goBack() { if (stageClose) { stageClose(); return; } if (sheetOpen) { if (sheetBack) sheetBack(); else closeSheet(); return; } if (cur === "onboard") { const b = $("#ob-back"); if (b) b.click(); else if (S.onboarded) show("profile"); setTimeout(updateBack, 50); return; } if (TABS.includes(cur) && cur !== "today") show("today"); }
 
   // ---------- sheet ----------
   let sheetOpen = false, sheetBack = null, onSheetClose = null, sheetY = 0;
@@ -873,10 +873,14 @@
     const pl = isToday && !ad && !(st.platSkip && st.platSkip > tk) ? plateauInfo() : null;
     if (ad) {
       const down = ad.real < ad.cur, goal = S.plan ? S.plan.type : S.profile.goal, step = Math.abs(ad.real - ad.cur) > ad.cur * 0.1 + 10;
-      const why = goal === "lose" ? (down ? (ad.dW > -0.3 ? "Поэтому вес стоит." : "Поэтому вес уходит медленнее плана.") : "Поэтому вес уходит быстрее плана, можно есть больше.") : goal === "gain" ? (down ? "Поэтому вес растёт быстрее плана, а лишний темп идёт в жир." : (ad.dW < 0.3 ? "Поэтому вес не растёт." : "Поэтому вес растёт медленнее плана.")) : (down ? "Поэтому вес понемногу растёт." : "Поэтому вес понемногу снижается.");
+      const flat = Math.abs(ad.dW) < 0.3, kgs = `${dec(Math.abs(r1(ad.dW)))} кг`;
+      const moved = flat ? "а вес почти не изменился" : ad.dW < 0 ? `а вес снизился на ${kgs}` : `а вес вырос на ${kgs}`;
+      const why = goal === "lose" ? (down ? (flat ? "Расход оказался ниже расчётного, поэтому вес стоит." : "Вес уходит медленнее плана: расход ниже расчётного.") : "Вес уходит быстрее плана: расход выше расчётного, можно есть больше.")
+        : goal === "gain" ? (down ? "Это быстрее плана, а лишний темп обычно идёт в жир." : flat ? "Расход оказался выше расчётного, поэтому вес не растёт." : "Вес растёт медленнее плана: расход выше расчётного.")
+        : (down ? "Расход оказался ниже расчётного, вес понемногу растёт." : "Расход оказался выше расчётного, вес понемногу снижается.");
       const nk = (() => { const save = S.profile.adapt; S.profile.adapt = { r: ad.r }; const k = calcNorm().k; S.profile.adapt = save; return k; })();
       html = `<div class="gap"></div><div class="card tip c-cal smart"><div class="tip-h"><span class="tip-ic">${icon("target")}</span><b>Норму можно уточнить</b></div>
-        <p>За ${ad.days} ${plural(ad.days, "день", "дня", "дней")} с записями в среднем ${fmt(ad.avg)} ккал в день, а тренд веса за 3 недели ${ad.dW >= 0 ? "+" : "−"}${dec(Math.abs(r1(ad.dW)))} кг. Значит, реальный расход около ${fmt(ad.real)} ккал, а не ${fmt(ad.cur)}. ${why} Норма станет ${fmt(nk)} ккал${step ? ", дальше уточним ещё, если понадобится" : ""}.</p>
+        <p>Последние 3 недели ты ел в среднем ${fmt(ad.avg)} ккал в день, ${moved}. ${why} Новая норма: ${fmt(nk)} ккал${step ? ". Меняем постепенно, дальше подстроим ещё" : ""}.</p>
         <div class="tip-acts"><button class="btn sm" id="sm-ok">Уточнить норму</button><button class="btn sm ghost" id="sm-no">Не сейчас</button></div></div>`;
     } else if (pl) {
       const lose = pl.goal === "lose", few = pl.logged < 17;
@@ -1359,19 +1363,39 @@
     if (ok <= pl.ms.n || pi.reached) { if (pi.reached && ok > pl.ms.n) { pl.ms.n = ok; save(); } return; }
     const passed = pi.ms[ok - 1], from = ok > 1 ? pi.ms[ok - 2].exp : pl.start, dw = Math.abs(passed.exp - from);
     pl.ms.n = ok; save();
-    stageBanner(`Этап ${ok} пройден`, `${pl.type === "lose" ? "−" : "+"}${dec(r1(dw))} кг по плану${pi.stage ? `, дальше ${dec(pi.stage.to)} кг` : ""}`);
+    stageCeleb(pi, ok);
   }
-  function stageBanner(t, d) {
+  // пройденный этап — отдельный экран, а не плашка: этап идёт около месяца
+  let stageClose = null, stageBusy = false; const afterStage = [];
+  function stageCeleb(pi, ok) {
+    const pl = S.plan, lose = pl.type === "lose", sg = lose ? "−" : "+", total = pi.ms.length, nx = pi.stage;
+    const done = Math.max(0, r1((lose ? -1 : 1) * (pi.cur - pl.start))), days = Math.max(1, Math.round((Date.now() - +fromKey(pl.startDate)) / 864e5));
+    const seg = pi.ms.map((m, i) => `<i class="${i < ok - 1 ? "on" : i === ok - 1 ? "now" : ""}"></i>`).join("");
+    const burst = Array.from({ length: 14 }, (_, i) => `<i style="--a:${i * 360 / 14}deg"></i>`).join("");
+    if (stageBusy) return; stageBusy = true;
     setTimeout(() => {
       haptic("ok");
-      const old = $(".ach-ban"); if (old) old.remove();
-      const el = document.createElement("button"); el.className = "ach-ban";
-      el.innerHTML = `<span class="ab-ic">${icon("flag")}</span><span class="ab-t"><em>${esc(d)}</em><b>${esc(t)}</b></span>${icon("right", "chev")}`;
+      const el = document.createElement("div"); el.className = `celeb stg ${lose ? "lose" : "gain"}`;
+      el.innerHTML = `<div class="cb-card" role="dialog" aria-modal="true">
+        <span class="cb-burst">${burst}</span>
+        <span class="cb-ic">${icon("flag")}</span>
+        <em>${lose ? "Похудение" : "Набор массы"} · этап ${ok} из ${total}</em>
+        <b>Этап пройден</b>
+        <p>${sg}${dec(r1(Math.abs(pi.ms[ok - 1].exp - (ok > 1 ? pi.ms[ok - 2].exp : pl.start))))} кг за этап. ${nx ? `Следующий этап: ${dec(nx.to)} кг к\u00a0${fmtDY(nx.d)}.` : `Остался последний шаг до цели ${dec(pl.target)} кг.`}</p>
+        <div class="stg-seg">${seg}</div>
+        <div class="stg-st"><div><em>В пути</em><b>${days} ${plural(days, "день", "дня", "дней")}</b></div><div><em>${lose ? "Сброшено" : "Набрано"}</em><b>${dec(done)} кг</b></div><div><em>До цели</em><b>${dec(Math.max(0, r1(Math.abs(pl.target - pi.cur))))} кг</b></div></div>
+        <button class="btn" id="stg-ok">Продолжить</button>
+        <button class="lnk" id="stg-goal">Открыть цель</button>
+      </div>`;
       document.body.appendChild(el); raf2(() => el.classList.add("on"));
-      const close = () => { el.classList.remove("on"); setTimeout(() => el.remove(), 500); };
-      const tm = setTimeout(close, 4500);
-      el.onclick = () => { clearTimeout(tm); close(); if (sheetOpen) closeSheet(); setTimeout(() => openGoal(), sheetOpen ? 300 : 0); };
-    }, 600);
+      const close = (then) => { if (!stageClose) return; stageClose = null; el.classList.remove("on"); setTimeout(() => el.remove(), 400); updateBack(); if (then) setTimeout(then, 250);
+        setTimeout(() => { stageBusy = false; afterStage.splice(0).forEach((f) => f()); }, then ? 900 : 450); };
+      stageClose = () => close();
+      el.onclick = (e) => { if (e.target === el) close(); };
+      $("#stg-ok", el).onclick = () => close();
+      $("#stg-goal", el).onclick = () => close(() => { if (sheetOpen) closeSheet(); setTimeout(openGoal, sheetOpen ? 300 : 0); });
+      updateBack();
+    }, 700);
   }
   function renderTodayGoal() {
     const box = $("#t-goal"); if (!box) return;
@@ -1748,7 +1772,8 @@
   function bumpStreak() { const sp = $("#t-streak"); if (sp) { sp.classList.remove("bump"); void sp.offsetWidth; sp.classList.add("bump"); } }
   function celebrate(a) {
     S.game.unread = (S.game.unread || 0) + 1; save(); updBadge();
-    setTimeout(() => {
+    const later = (f) => setTimeout(() => (stageBusy ? afterStage.push(f) : f()), 500); // после экрана этапа
+    later(() => {
       haptic("ok"); bumpStreak();
       const old = $(".ach-ban"); if (old) old.remove();
       const el = document.createElement("button"); el.className = "ach-ban";
@@ -1757,7 +1782,7 @@
       const close = () => { el.classList.remove("on"); setTimeout(() => el.remove(), 500); };
       const t = setTimeout(close, 4200);
       el.onclick = () => { clearTimeout(t); close(); if (sheetOpen) closeSheet(); setTimeout(streakSheet, sheetOpen ? 300 : 0); };
-    }, 500);
+    });
   }
   function updBadge() { const sp = $("#t-streak"); if (!sp) return; let b = $(".sbadge", sp); const n = (S.game && S.game.unread) || 0; if (!n) { if (b) b.remove(); return; } if (!b) { b = document.createElement("i"); b.className = "sbadge"; sp.appendChild(b); } b.textContent = n; }
 
@@ -2317,5 +2342,5 @@
   }
   if (/[?&]dev\b/.test(location.search)) { try { const d = JSON.parse(localStorage.getItem(KEY) || "{}"); d.settings = Object.assign(d.settings || {}, { dev: true }); localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
   init();
-  window.__porsiya = { get state() { return S; }, show, openAdd, calcNorm, planInfo, achList, streakInfo, gameStats, adaptInfo, plateauInfo, weightTrend, remindHour };
+  window.__porsiya = { get state() { return S; }, show, weightSheet, openAdd, calcNorm, planInfo, achList, streakInfo, gameStats, adaptInfo, plateauInfo, weightTrend, remindHour };
 })();

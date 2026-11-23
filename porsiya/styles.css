@@ -1288,3 +1288,27 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .tip-acts { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .tip-acts .btn { flex: none; }
 .lnk { color: inherit; text-decoration: underline; text-underline-offset: 2px; font: inherit; padding: 0; opacity: .9; }
+/* этап цели пройден */
+.celeb.stg { z-index: 95; }
+.celeb.stg.lose .cb-card { background: var(--g-carb); }
+.celeb.stg.gain .cb-card { background: var(--g-pro); }
+.celeb.stg .cb-card { max-width: 340px; padding: 30px 22px 14px; }
+.celeb.stg.lose .cb-ic { color: var(--carb-a); }
+.celeb.stg .cb-ic { box-shadow: 0 0 0 10px rgba(255,255,255,.14), 0 0 0 22px rgba(255,255,255,.07); transform: scale(.6); transition: transform .7s var(--spring) .15s; }
+.celeb.stg.on .cb-ic { transform: none; }
+.celeb.stg .cb-card em { margin-top: 26px; }
+.celeb.stg .cb-card b { font-size: 28px; }
+.celeb.stg .cb-card p { margin: 8px 0 0; line-height: 1.45; }
+.stg-seg { display: flex; gap: 4px; width: 100%; margin: 20px 0 0; position: relative; }
+.stg-seg i { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.25); position: relative; overflow: hidden; }
+.stg-seg i.on { background: #fff; }
+.stg-seg i.now::after { content: ""; position: absolute; inset: 0; background: #fff; border-radius: inherit; transform: scaleX(0); transform-origin: left; }
+.celeb.on .stg-seg i.now::after { animation: stgFill .9s var(--ease-out) .5s forwards; }
+@keyframes stgFill { to { transform: none; } }
+.stg-st { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; margin: 18px 0 22px; padding: 14px 0 0; border-top: 1px solid rgba(255,255,255,.2); position: relative; text-align: left; }
+.stg-st > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.stg-st > div + div { padding-left: 12px; }
+.celeb.stg .stg-st em { margin: 0; font-size: 12px; opacity: .8; }
+.celeb.stg .stg-st b { margin: 0; font-size: 17px; letter-spacing: -0.01em; white-space: nowrap; font-feature-settings: "tnum" 1; }
+.celeb.stg .btn { width: 100%; background: #fff; color: #121216; }
+.celeb.stg .lnk { margin-top: 6px; padding: 12px; text-decoration: none; font-size: 15px; position: relative; }
