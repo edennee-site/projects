@@ -682,7 +682,7 @@
       <div class="week" id="week"></div>
       <div class="gap"></div>
       <div class="grad g-cal tap" id="c-cal" role="button">
-        <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span>Калории</span><span class="chip" id="cal-chip"></span></div>
+        <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span><span class="c-lbl">Калории</span><button class="chip tchip" id="cal-tr" hidden></button></span><span class="chip" id="cal-chip"></span></div>
         <div class="big"><span class="num" id="v-k">0</span><span class="of" id="v-kn"></span></div>
         ${dotRow(24, "anim")}
         <div class="stats3 two"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Запас недели</span><b class="num" id="v-week">0</b></div></div>
@@ -745,7 +745,7 @@
       $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
-    updWater(); renderTodayGoal(); renderTrainDay();
+    updWater(); renderTodayGoal(); renderTrainChip(); renderTrainDay();
     const av = $("#t-ava"), ai = avatarInner(); if (av && av._ai !== ai) { av.innerHTML = ai; av._ai = ai; }
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
@@ -754,7 +754,16 @@
     $("#m-sum").textContent = dayEntries(selDay).length ? fmt(t.k) + " ккал" : "";
     renderMeals();
   }
+  function renderTrainChip() {
+    const c = $("#cal-tr"); if (!c) return;
+    const lbl = $("#c-cal .c-lbl");
+    if (!trainSet()) { c.hidden = true; if (lbl) lbl.hidden = false; return; }
+    const on = isTrainDay(selDay); c.hidden = false; if (lbl) lbl.hidden = true; c.classList.toggle("off", !on);
+    c.innerHTML = `${icon(on ? "dumbbell" : "sofa")}${on ? "Тренировка" : "Отдых"}`;
+    if (!c._b) { c._b = true; c.onclick = (e) => { e.stopPropagation(); toggleTrain(); }; }
+  }
   function renderTrainDay() {
+    renderTrainChip();
     const box = $("#t-train"); if (!box) return;
     if (!trainSet()) { if (box.innerHTML) box.innerHTML = ""; return; }
     const k = selDay, on = isTrainDay(k), plan = S.profile.train.days.includes(wdIdx(k)), d = Math.abs(trainDelta(k));
@@ -2003,9 +2012,12 @@
     bindSeg(root, "sx", (v) => (st.sex = v));
     bindTrain(root, st);
     $("#ep-save").onclick = () => {
+      const before = JSON.stringify([p.age, p.height, p.weight, p.sex, p.train, p.steps]), k0 = norm().k;
       Object.assign(p, { age: st.age, height: st.height, weight: st.weight, sex: st.sex, train: st.train, steps: st.steps });
+      closeSheet();
+      if (JSON.stringify([p.age, p.height, p.weight, p.sex, p.train, p.steps]) === before) return;
       if (which === "pw") S.weights[todayKey()] = st.weight;
-      save(); closeSheet(); haptic("ok"); renderProfile(); toast("Норма пересчитана");
+      save(); haptic("ok"); renderProfile(); renderWeek(); toast(norm().k !== k0 ? "Норма пересчитана" : "Сохранено");
     };
   }
   function keySheet() {

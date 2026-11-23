@@ -1232,3 +1232,9 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .week .day.trd.st-ov .mark { color: var(--pro-b); }
 .week .day.trd.st-un .mark { color: var(--g60); }
 .d-hero + #t-train .tday { margin-top: 10px; }
+.c-lbl[hidden] { display: none; }
+.tchip { margin-left: 2px; gap: 5px; height: 30px; font-size: 13px; padding: 0 10px 0 8px; background: rgba(255,255,255,.28); color: #fff; transition: background-color .25s var(--ease), transform .25s var(--spring); }
+.tchip svg { width: 14px; height: 14px; }
+.tchip.off { background: rgba(255,255,255,.12); color: rgba(255,255,255,.85); }
+.tchip:active { transform: scale(.94); }
+.tchip[hidden] { display: none; }
