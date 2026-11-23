@@ -460,6 +460,8 @@
   // остаются сдвинутыми относительно места касания (не нажимаются). Возвращаем прокрутку на место.
   const fixKb = () => { if (!sheetOpen) return; const a = document.activeElement; if (a && /^(INPUT|TEXTAREA)$/.test(a.tagName)) return; if (Math.abs(window.scrollY - sheetY) > 1) window.scrollTo(0, sheetY); };
   document.addEventListener("focusout", () => setTimeout(fixKb, 60));
+  // поле в окне не прячется под клавиатурой: после её появления прокручиваем поле в центр
+  document.addEventListener("focusin", (e) => { const t = e.target; if (!sheetOpen || !t.matches || !t.matches("input:not([type=file]):not([type=range]),textarea") || !t.closest("#sh-body")) return; setTimeout(() => { const b = $("#sh-body"), vh = window.visualViewport ? window.visualViewport.height : innerHeight, r = t.getBoundingClientRect(); if (r.bottom > vh - 24 || r.top < 80) b.scrollTo({ top: b.scrollTop + r.top - Math.max(100, (vh - r.height) / 2), behavior: "smooth" }); }, 320); });
   if (window.visualViewport) window.visualViewport.addEventListener("resize", () => setTimeout(fixKb, 60));
   function measureHead() { const h = $("#sheet .sh-head"); if (h) $("#sheet").style.setProperty("--hh", h.offsetHeight + "px"); }
   window.addEventListener("resize", measureHead);
