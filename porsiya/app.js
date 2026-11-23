@@ -873,7 +873,7 @@
     const pl = isToday && !ad && !(st.platSkip && st.platSkip > tk) ? plateauInfo() : null;
     if (ad) {
       const down = ad.real < ad.cur, goal = S.plan ? S.plan.type : S.profile.goal, step = Math.abs(ad.real - ad.cur) > ad.cur * 0.1 + 10;
-      const why = goal === "lose" ? (down ? "Поэтому вес стоит." : "Поэтому вес уходит быстрее плана, можно есть больше.") : goal === "gain" ? (down ? "Поэтому вес растёт быстрее плана, а лишний темп идёт в жир." : "Поэтому вес не растёт.") : (down ? "Поэтому вес понемногу растёт." : "Поэтому вес понемногу снижается.");
+      const why = goal === "lose" ? (down ? (ad.dW > -0.3 ? "Поэтому вес стоит." : "Поэтому вес уходит медленнее плана.") : "Поэтому вес уходит быстрее плана, можно есть больше.") : goal === "gain" ? (down ? "Поэтому вес растёт быстрее плана, а лишний темп идёт в жир." : (ad.dW < 0.3 ? "Поэтому вес не растёт." : "Поэтому вес растёт медленнее плана.")) : (down ? "Поэтому вес понемногу растёт." : "Поэтому вес понемногу снижается.");
       const nk = (() => { const save = S.profile.adapt; S.profile.adapt = { r: ad.r }; const k = calcNorm().k; S.profile.adapt = save; return k; })();
       html = `<div class="gap"></div><div class="card tip c-cal smart"><div class="tip-h"><span class="tip-ic">${icon("target")}</span><b>Норму можно уточнить</b></div>
         <p>За ${ad.days} ${plural(ad.days, "день", "дня", "дней")} с записями в среднем ${fmt(ad.avg)} ккал в день, а тренд веса за 3 недели ${ad.dW >= 0 ? "+" : "−"}${dec(Math.abs(r1(ad.dW)))} кг. Значит, реальный расход около ${fmt(ad.real)} ккал, а не ${fmt(ad.cur)}. ${why} Норма станет ${fmt(nk)} ккал${step ? ", дальше уточним ещё, если понадобится" : ""}.</p>
@@ -2264,7 +2264,35 @@
       });
     });
   }
-  if (/[?&]demo/.test(location.search)) {
+  // сценарии для показа умных подсказок: ?demo=adapt | gain | plateau | stage
+  const dsc = (location.search.match(/[?&]demo=(\w+)/) || [])[1];
+  const SCN = {
+    adapt: { p: { sex: "m", age: 30, height: 178, goal: "lose", train: { n: 3, min: 60, type: "strength" }, steps: 6000 }, w0: 84, w1: 84, plan: { type: "lose", target: 78, pace: 1 } },
+    gain: { p: { sex: "m", age: 24, height: 180, goal: "gain", train: { n: 4, min: 60, type: "strength" }, steps: 5000 }, w0: 66, w1: 68.2, plan: { type: "gain", target: 74, pace: 1 } },
+    plateau: { p: { sex: "f", age: 28, height: 165, goal: "lose", train: { n: 2, min: 45, type: "mixed" }, steps: 7000 }, w0: 70, w1: 70.1, plan: { type: "lose", target: 64, pace: 1 }, skip: (i) => i % 5 === 2 || i % 5 === 4 },
+    stage: { p: { sex: "m", age: 30, height: 180, goal: "lose", train: { n: 2, min: 45, type: "mixed" }, steps: 6000 }, w0: 80, w1: 77.8, last: 77.5, days: 40, plan: { type: "lose", target: 72, pace: 1 } },
+  };
+  if (dsc && SCN[dsc]) {
+    try {
+      const sc = SCN[dsc], days = sc.days || 35, d = defaults(), now = new Date(), sd = addDays(now, -days);
+      d.onboarded = true; Object.assign(d.profile, sc.p, { name: "Эдем", weight: sc.w0 });
+      d.plan = Object.assign({ start: sc.w0, startDate: dkey(sd) }, sc.plan);
+      let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      const meals = [["breakfast", 0.25, 8, "Овсянка с бананом"], ["lunch", 0.35, 13, "Плов"], ["snack", 0.1, 16, "Творог 5%"], ["dinner", 0.3, 19, "Курица с рисом"]];
+      for (let i = 0; i <= days; i++) {
+        const day = addDays(sd, i), k = dkey(day);
+        if (i % 3 === 0 || i === days) { const w = i === days && sc.last ? sc.last : r1(sc.w0 + (sc.w1 - sc.w0) * (i / days) + (rnd() - 0.5) * 0.6); d.weights[k] = w; d.profile.weight = w; }
+        if (sc.skip && sc.skip(i)) continue;
+        const n = calcNorm(d.profile, d.plan), target = n.k * (1 + (rnd() - 0.5) * 0.06);
+        const arr = meals.filter((m) => i < days || now.getHours() > m[2]).map(([meal, f, h, nm]) => { const t = new Date(day); t.setHours(h, 5, 0, 0);
+          return { id: uid(), n: nm, cat: "dish", g: 250, k: r0(target * f), p: r1(n.p * f), f: r1(n.f * f), c: r1(n.c * f), meal, t: +t }; });
+        if (arr.length) d.days[k] = arr;
+      }
+      if (dsc === "stage") { const pl = d.plan; pl.ms = { sig: [pl.type, pl.start, pl.startDate, pl.target, pl.pace].join("|"), n: 0 }; }
+      localStorage.setItem(KEY, JSON.stringify(d));
+      history.replaceState(null, "", location.pathname);
+    } catch (e) { console.error(e); }
+  } else if (/[?&]demo/.test(location.search)) {
     try {
       const d = defaults(); d.onboarded = true; d.profile.name = "Эдем"; d.profile.steps = 7000;
       d.my = [{ n: "Домашний суп мамы", g: 350, k: 52, p: 3.1, f: 2.2, c: 5, t: [] }, { n: "Сырники", g: 150, k: 220, p: 14, f: 9, c: 20, t: [] }];
