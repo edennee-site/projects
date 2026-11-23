@@ -190,7 +190,9 @@
     const months = Math.max(1, Math.ceil(weeks / 4.345));
     const ms = Array.from({ length: months }, (_, i) => { const d = addMonths(sd, i + 1), exp = pl.start + sign * Math.min(total, kw * ((d - sd) / 6048e5)); const past = d <= now; const w = past ? weightAt(dkey(d)) : null; return { d, exp: r1(exp), past, cur: false, ok: (past && w != null && sign * (w - exp) >= -0.3) || sign * (cur - exp) >= 0, w }; });
     const nx = ms.find((m) => !m.ok && !m.past) || ms.find((m) => !m.ok); if (nx) nx.cur = true;
-    return { sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wk: wElapsed, wrong: wElapsed >= 2 && sign * (cur - pl.start) <= -0.5 };
+    let stage = null;
+    if (nx) { const i = ms.indexOf(nx), from = i ? ms[i - 1].exp : pl.start; stage = { n: i + 1, from, to: nx.exp, d: nx.d, last: i === ms.length - 1, frac: clamp((sign * (cur - from)) / (Math.abs(nx.exp - from) || 1), 0, 1) }; }
+    return { stage, sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wk: wElapsed, wrong: wElapsed >= 2 && sign * (cur - pl.start) <= -0.5 };
   }
   function norm() { const m = S.profile.manual; return m.on ? { k: m.k, p: m.p, f: m.f, c: m.c } : calcNorm(); }
   const dayEntries = (k) => S.days[k] || [];
@@ -1032,6 +1034,7 @@
     $("#ws-m").onclick = () => addWater(-(S.settings.glass || 250));
   }
   const fmtD = (d) => d.getDate() + " " + MON[d.getMonth()];
+  const fmtDY = (d) => fmtD(d) + (d.getFullYear() !== new Date().getFullYear() ? " " + d.getFullYear() : "");
   let planTop = false;
   function openGoal(after) {
     haptic("light"); openSheet("Цель по весу", "");
@@ -1042,13 +1045,13 @@
   function goalCardHTML() {
     const pi = planInfo();
     if (!pi) return `<button class="card goal-cta" id="goal-open"><span class="gc-ic">${icon("flag")}</span><span class="gc-t"><b>Поставь цель по весу</b><span>Посчитаю норму под цель и разобью путь на месячные этапы</span></span>${icon("right", "chev")}</button>`;
-    const pl = S.plan, cm = pi.ms.find((m) => m.cur);
+    const pl = S.plan, st = pi.reached ? null : pi.stage;
     return `<button class="card goal-card" id="goal-open">
       <div class="gk-row"><span class="gk-ic">${icon(pl.type === "lose" ? "down-trend" : "muscle")}</span>
-        <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>до ${fmtD(pi.end)}</span></span>
-        <span class="gk-p num">${Math.round(pi.done * 100)}<small>%</small></span></div>
-      <div class="gk-w"><span><em>Сейчас</em><b class="num">${dec(pi.cur)} кг</b></span>${dotRow(14, "ink gc-dots")}<span style="text-align:right"><em>Цель</em><b class="num">${dec(pl.target)} кг</b></span></div>
-      ${pi.reached ? `<div class="gc-m gc-done">${icon("trophy")}<span>Цель достигнута</span><span class="gc-btn" data-next>Что дальше</span></div>` : weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : pi.wrong ? `<div class="gc-m gc-due">${icon("info")}<span>Вес ${pi.sign < 0 ? "выше" : "ниже"} старта на ${dec(Math.abs(pi.cur - pl.start))} кг</span><span class="gc-btn" data-check>Что делать</span></div>` : cm ? `<div class="gc-m">${icon("flag")}<span>Следующий этап: ${dec(cm.exp)} кг к ${fmtD(cm.d)}</span></div>` : ""}
+        <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>${st ? `Этап ${st.n} · до ${fmtDY(st.d)}` : `до ${fmtDY(pi.end)}`}</span></span>
+        <span class="gk-p num">${Math.round((st ? st.frac : pi.done) * 100)}<small>%</small></span></div>
+      <div class="gk-w"><span><em>Сейчас</em><b class="num">${dec(pi.cur)} кг</b></span>${dotRow(14, "ink gc-dots")}<span style="text-align:right"><em>${st && !st.last ? "Этап" : "Цель"}</em><b class="num">${dec(st ? st.to : pl.target)} кг</b></span></div>
+      ${pi.reached ? `<div class="gc-m gc-done">${icon("trophy")}<span>Цель достигнута</span><span class="gc-btn" data-next>Что дальше</span></div>` : weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : pi.wrong ? `<div class="gc-m gc-due">${icon("info")}<span>Вес ${pi.sign < 0 ? "выше" : "ниже"} старта на ${dec(Math.abs(pi.cur - pl.start))} кг</span><span class="gc-btn" data-check>Что делать</span></div>` : `<div class="gc-m">${icon("flag")}<span>${st && st.last ? `Последний этап, финиш к ${fmtDY(pi.end)}` : `Вся цель: ${dec(pl.target)} кг к ${fmtDY(pi.end)}`}</span></div>`}
     </button>`;
   }
   function goalStatus(pi) {
@@ -1059,7 +1062,7 @@
   }
   function bindGoalCard(back) {
     const b = document.querySelector(back ? "#sheet #goal-open" : "#goal-open:not([data-home])"); if (!b) return;
-    if (S.plan) setDots(b.querySelector(".gc-dots"), planInfo().done, 1);
+    if (S.plan) { const pi = planInfo(); setDots(b.querySelector(".gc-dots"), pi.stage && !pi.reached ? pi.stage.frac : pi.done, 1); }
     b.onclick = (e) => { if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (!back) { openGoal(); return; } haptic("light"); if (S.plan) planDetail(back); else planEdit(back); };
   }
   function planDetail(back) {
@@ -1073,8 +1076,8 @@
       </div>
       <div class="gap"></div>
       <div class="card"><div class="card-t">План</div>
-        <div class="card-s" style="margin-top:6px">Темп ${PACE_N[pl.pace].toLowerCase()}: около ${dec(pi.km)} кг в месяц. Финиш примерно ${fmtD(pi.end)} ${pi.end.getFullYear()}. Норма под план: ${fmt(nm.k)} ккал в день.</div>
-        <div class="msl">${pi.ms.map((m, i) => `<div class="${m.ok ? "ok" : m.past ? "miss" : m.cur ? "cur" : ""}"><span class="mk">${m.ok ? icon("check") : m.cur ? icon("target") : i + 1}</span><span class="ml"><b>${cap(MONN[m.d.getMonth()])}</b><em>до ${fmtD(m.d)}</em></span><span class="mv">${dec(m.exp)} кг${m.past && m.w != null ? `<em>было ${dec(m.w)}</em>` : ""}</span></div>`).join("")}</div>
+        <div class="card-s" style="margin-top:6px">Темп ${PACE_N[pl.pace].toLowerCase()}: около ${dec(pi.km)} кг в месяц. Финиш примерно ${fmtDY(pi.end)} ${pi.end.getFullYear()}. Норма под план: ${fmt(nm.k)} ккал в день.</div>
+        <div class="msl">${pi.ms.map((m, i) => `<div class="${m.ok ? "ok" : m.past ? "miss" : m.cur ? "cur" : ""}"><span class="mk">${m.ok ? icon("check") : m.cur ? icon("target") : i + 1}</span><span class="ml"><b>${cap(MONN[m.d.getMonth()])}</b><em>до ${fmtDY(m.d)}</em></span><span class="mv">${dec(m.exp)} кг${m.past && m.w != null ? `<em>было ${dec(m.w)}</em>` : ""}</span></div>`).join("")}</div>
       </div>
       <p class="note">${planNote(pi)}</p>
       <div class="list">
@@ -1118,7 +1121,7 @@
       else if (st.type === "lose" && st.target < minW) warn = `Это ниже здорового веса для твоего роста (около ${dec(minW)} кг). Лучше выбрать цель повыше.`;
       else if (pi.total > cw * 0.2) warn = "Большая цель. Лучше разбить её на несколько этапов и начать с первого.";
       else if (st.type === "gain" && st.pace === 2) warn = "Быстрый набор чаще идёт в жир. Для мышц обычно хватает умеренного темпа.";
-      $("#pe-sum").innerHTML = `<div class="ps-row"><span>В месяц</span><b>${st.type === "lose" ? "−" : "+"}${dec(pi.km)} кг</b></div><div class="ps-row"><span>Срок</span><b>${months < 1 ? "меньше месяца" : "≈ " + dec(months) + " " + plural(Math.ceil(months), "месяц", "месяца", "месяцев")}</b></div><div class="ps-row"><span>Финиш</span><b>${fmtD(pi.end)} ${pi.end.getFullYear()}</b></div><div class="ps-row"><span>Норма в день</span><b>${fmt(k)} ккал</b></div>${warn ? `<div class="ps-warn">${icon("info")}<span>${warn}</span></div>` : ""}`;
+      $("#pe-sum").innerHTML = `<div class="ps-row"><span>В месяц</span><b>${st.type === "lose" ? "−" : "+"}${dec(pi.km)} кг</b></div><div class="ps-row"><span>Срок</span><b>${months < 1 ? "меньше месяца" : "≈ " + dec(months) + " " + plural(Math.ceil(months), "месяц", "месяца", "месяцев")}</b></div><div class="ps-row"><span>Финиш</span><b>${fmtDY(pi.end)} ${pi.end.getFullYear()}</b></div><div class="ps-row"><span>Норма в день</span><b>${fmt(k)} ккал</b></div>${warn ? `<div class="ps-warn">${icon("info")}<span>${warn}</span></div>` : ""}`;
     };
     bindSeg(root, "ptype", (v) => { st.type = v; st.target = r1(cw + (v === "lose" ? -4 : 3)); upd(); });
     bindSeg(root, "pace", (v) => { st.pace = +v; upd(); });
@@ -1172,7 +1175,7 @@
   function renderTodayGoal() {
     const box = $("#t-goal"); if (!box) return;
     const html = `${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}<div class="gap"></div>`;
-    if (box._h !== html) { box._h = html; box.innerHTML = html; if (S.plan) setDots($(".gc-dots", box), planInfo().done, 1); }
+    if (box._h !== html) { box._h = html; box.innerHTML = html; if (S.plan) { const pi = planInfo(); setDots($(".gc-dots", box), pi.stage && !pi.reached ? pi.stage.frac : pi.done, 1); } }
     if (!box._bound) { box._bound = true; box.addEventListener("click", (e) => { const c = e.target.closest("#goal-open"); if (!c || sheetOpen) return; if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (S.plan && (planInfo().reached || e.target.closest("[data-check]"))) { openSheet("Цель по весу", ""); planCheck(); return; } openGoal(); }); }
   }
   function streakSheet() {
