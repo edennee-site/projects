@@ -1437,7 +1437,10 @@
     if (!API || !inTg || !tg.initData || !S.onboarded) return;
     const tk = todayKey(), t = totals(tk), nm = normFor(tk), st = streakInfo(), wk = Object.keys(S.weights).sort();
     const body = JSON.stringify({ tz: -new Date().getTimezoneOffset(), day: tk, logged: isLogged(tk), k: r0(t.k), p: r0(t.p), nk: nm.k, np: nm.p, streak: st.n, best: st.best,
-      goal: S.profile.goal, plan: S.plan ? { type: S.plan.type, start: S.plan.start, target: S.plan.target } : null, weight: curWeight(), lastWeigh: wk[wk.length - 1] || null, week: weekSum() });
+      goal: S.profile.goal, plan: S.plan ? { type: S.plan.type, start: S.plan.start, target: S.plan.target } : null, weight: curWeight(), lastWeigh: wk[wk.length - 1] || null, week: weekSum(),
+      last: Object.keys(S.days).filter(isLogged).sort().pop() || null, name: S.profile.name || "",
+      pf: (() => { const f = myProteinFoods()[0]; return f ? { n: f.n, g: f.g ? r0(f.g) : 0, p: r0(f.p) } : null; })(),
+      stage: (() => { const pi = S.plan ? planInfo() : null; return pi && pi.stage && !pi.reached ? { n: pi.stage.n, to: pi.stage.to, d: dkey(pi.stage.d) } : null; })() });
     if (body === lastSync) return;
     lastSync = body;
     fetch(API.replace(/\/$/, "") + "/sync", { method: "POST", headers: { "Content-Type": "application/json", "X-Init-Data": tg.initData }, body, keepalive: true }).catch(() => { lastSync = ""; });
