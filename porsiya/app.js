@@ -1653,7 +1653,7 @@
       if (S.combos.length) html += `<div class="subh">Мои наборы</div>` + S.combos.map((c) => { const k = c.items.reduce((a, e) => a + e.k, 0); return `<button class="fitem" data-combo="${c.id}"><span class="fic t-cal">${icon("star")}</span><span class="ft"><b>${esc(c.n)}</b><span>${c.items.length} ${plural(c.items.length, "продукт", "продукта", "продуктов")} · ${fmt(k)} ккал</span></span><span class="plus">${icon("right")}</span></button>`; }).join("");
       const rec = S.recent.map((n) => allFoods().find((f) => f.n === n)).filter(Boolean);
       if (rec.length) html += `<div class="subh">Недавние</div>` + rec.slice(0, 6).map(foodRow).join("");
-      if (S.my.length) html += `<div class="subh">Мои продукты</div>` + S.my.slice(0, 8).map(foodRow).join("");
+      if (S.my.length) html += `<div class="subh">Мои блюда</div>` + S.my.slice(0, 8).map(foodRow).join("");
       html += `<div class="subh">Популярное</div>` + window.FOODS.slice(0, 16).map(foodRow).join("");
     } else {
       const res = allFoods().filter((f) => normS(f.n).includes(q) || (f.t || []).some((t) => normS(t).includes(q)));
@@ -1725,7 +1725,7 @@
         <label class="field"><span>Жиры, г</span><input id="m-f" inputmode="decimal" placeholder="0" value="${esc(m.f)}"></label>
         <label class="field"><span>Углев., г</span><input id="m-c" inputmode="decimal" placeholder="0" value="${esc(m.c)}"></label>
       </div>
-      <div class="list" style="margin-top:12px"><button class="prow" id="m-save"><span class="pl"><b>Сохранить в «Мои продукты»</b><span>Чтобы потом добавлять в один тап</span></span><span class="toggle ${m.save ? "on" : ""}"></span></button></div>
+      <div class="list" style="margin-top:12px"><button class="prow" id="m-save"><span class="pl"><b>Сохранить в «Мои блюда»</b><span>Чтобы потом добавлять в одно касание</span></span><span class="toggle ${m.save ? "on" : ""}"></span></button></div>
       <p class="note">Если знаешь только белки, жиры и углеводы, калории посчитаются сами. Данные можно взять с упаковки.</p>`;
     const num = (v) => parseFloat(String(v).replace(",", ".")) || 0;
     const upd = () => {
