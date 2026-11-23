@@ -373,6 +373,7 @@
   }
 
   // ---------- theme ----------
+  let themeT = 0;
   function applyTheme(animate) {
     let t = S.settings.theme;
     if (t === "auto") t = (inTg && tg.colorScheme) || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
@@ -1939,7 +1940,7 @@
       <p class="note" style="text-align:center;margin-top:20px">Nomi · версия 1.0</p>`;
     updNormCard();
     bindSeg(s, "goal", (v) => { if (S.plan && S.plan.type !== v) { S.plan = null; toast("Цель по весу сброшена"); } p.goal = v; if (p.manual.on) { p.manual.on = false; $("#pm-t .toggle").classList.remove("on"); $("#pm-f").classList.remove("open"); } save(); updNormCard(); });
-    bindSeg(s, "theme", (v) => { S.settings.theme = v; save(); applyTheme(true); });
+    bindSeg(s, "theme", (v) => { S.settings.theme = v; save(); clearTimeout(themeT); themeT = setTimeout(() => applyTheme(true), 280); }); // сначала доезжает пилюля, потом мягко меняется тема
     $$(".prow[data-ed]", s).forEach((b) => (b.onclick = () => editParam(b.dataset.ed)));
     $("#pr-ava").onclick = () => $("#f-ava").click();
     $("#pr-name").onclick = nameSheet;

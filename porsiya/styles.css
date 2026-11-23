@@ -1254,3 +1254,9 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .trw-b.on svg { opacity: 1; }
 .trw-b.now span { font-weight: 600; }
 .trw-b:active { transform: scale(.93); }
+
+/* переключатель темы: пилюля едет быстрее, тема меняется после неё короткой сменой кадра */
+[data-seg="theme"] .knob { transition: transform .26s cubic-bezier(.32,.72,0,1), width .26s cubic-bezier(.32,.72,0,1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
+/* подпись в меню на пиксель ниже, ровно по центру иконки */
+.tab span { position: relative; top: 1px; }
