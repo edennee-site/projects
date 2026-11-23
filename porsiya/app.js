@@ -436,7 +436,7 @@
   function sheetFoot(html) { const f = $("#sh-foot"); f.innerHTML = html || ""; f.style.display = html ? "" : "none"; }
   function setBack(fn) { sheetBack = fn || null; $("#sheet").classList.toggle("has-back", !!fn); }
   // новое содержимое окна появляется сразу, без переходов цвета (Safari иначе проявлял текст с задержкой)
-  function freshSheet() { const sh = $("#sheet"); sh.classList.add("fresh"); requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.remove("fresh"))); }
+  function freshSheet() { const sh = $("#sheet"); sh.classList.remove("scrolled", "more"); sh.classList.add("fresh"); requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.remove("fresh"))); }
   function openSheet(title, body, foot = "", opts = {}) {
     $("#sh-title").textContent = title;
     const b = $("#sh-body"); b.className = "sh-body"; b.innerHTML = body; b.scrollTop = 0;
