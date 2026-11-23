@@ -687,7 +687,6 @@
         ${dotRow(24, "anim")}
         <div class="stats3 two"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Запас недели</span><b class="num" id="v-week">0</b></div></div>
       </div>
-      <div id="t-train"></div>
       <div class="gap"></div>
       <div id="t-goal"></div>
       <div class="row2">
@@ -772,10 +771,10 @@
   function toggleTrain() {
     const k = selDay, on = isTrainDay(k), days = S.profile.train.days, plan = days.includes(wdIdx(k));
     const setOv = (key, v) => { S.trainOv = S.trainOv || {}; if (v === days.includes(wdIdx(key))) delete S.trainOv[key]; else S.trainOv[key] = v; };
-    haptic("sel"); setOv(k, !on); save(); updateToday();
+    haptic("sel"); setOv(k, !on); save(); renderWeek(); updateToday(); if (sheetOpen && $("#t-train")) { const sc = $("#sh-body").scrollTop; openCalDetail(); $("#sh-body").scrollTop = sc; }
     // пропустил тренировку по плану: предложить перенести на следующий день
     const nx = dkey(addDays(fromKey(k), 1));
-    if (on && plan && k >= todayKey() && !isTrainDay(nx)) toast("Тренировка снята", () => { setOv(nx, true); save(); updateToday(); toast("Тренировка перенесена на завтра", null, "dumbbell"); }, "dumbbell", "На завтра");
+    if (on && plan && k >= todayKey() && !isTrainDay(nx)) toast("Тренировка снята", () => { setOv(nx, true); save(); updateToday(); renderWeek(); toast("Тренировка перенесена на завтра", null, "dumbbell"); }, "dumbbell", "На завтра");
   }
   function setMonthLabel(d) { const el = $("#wk-mt"); if (el) { const m = addDays(monday(d), 3); el.textContent = cap(MONN[m.getMonth()]) + " " + m.getFullYear(); } }
   function selectDay(k) {
@@ -792,7 +791,8 @@
     let html = `<span class="pill" id="wpill"></span>`;
     for (let i = 0; i < 7; i++) {
       const d = addDays(base, i), k = dkey(d), fut = d > now && k !== tk, st = status(k);
-      html += `<button class="day ${k === tk ? "today" : ""} ${k === selDay ? "sel" : ""} ${st ? "has st-" + st : ""}" data-k="${k}" ${fut ? "disabled" : ""}><span class="wd">${WD[d.getDay()]}</span><span class="dn">${d.getDate()}</span><span class="mark"></span></button>`;
+      const tr = trainSet() && isTrainDay(k);
+      html += `<button class="day ${k === tk ? "today" : ""} ${k === selDay ? "sel" : ""} ${st ? "has st-" + st : ""} ${tr ? "trd" : ""}" data-k="${k}" ${fut ? "disabled" : ""}><span class="wd">${WD[d.getDay()]}</span><span class="dn">${d.getDate()}</span><span class="mark">${tr ? icon("dumbbell") : ""}</span></button>`;
     }
     w.innerHTML = html; placePill(false);
     w.onclick = (e) => { const b = e.target.closest(".day"); if (!b || b.disabled) return; haptic("sel"); selectDay(b.dataset.k); };
@@ -1281,6 +1281,7 @@
         <div class="big"><span class="num">${fmt(t.k)}</span><span class="of">из ${fmt(nm.k)} ккал</span></div>
         ${dotRow(24)}
       </div>
+      ${trainSet() ? `<div id="t-train"></div>` : ""}
       <div class="gap"></div>
       <div class="card"><div class="card-t">По приёмам пищи</div>
         ${byMeal.map((x) => `<div class="mbar"><span class="ml">${icon(x.m.i)}${x.m.n}</span>${dotRow(14, "ink")}<span class="mv">${x.k ? fmt(x.k) : "—"}</span></div>`).join("")}
@@ -1292,7 +1293,7 @@
       </div>
       <div class="gap"></div>
       <div class="card"><div class="card-t">Баланс недели</div>
-        <div class="card-s">${wb.days ? (wb.bal >= 0 ? `В прошлые дни этой недели ты недобрал ${fmt(wb.bal)} ккал. Их можно добавить к сегодняшней норме, недельная сумма не изменится.` : `В прошлые дни этой недели ты съел на ${fmt(-wb.bal)} ккал больше нормы. Можно немного уменьшить порции в оставшиеся дни.`) : logged.length ? "Это первый день недели с записями, баланс появится со следующего дня." : "На этой неделе пока нет записей."}</div>
+        <div class="card-s">${wb.days ? (wb.bal >= 0 ? `В прошлые дни этой недели недобор ${fmt(wb.bal)} ккал. Их можно добавить к сегодняшней норме, недельная сумма не изменится.` : `В прошлые дни этой недели ты съел на ${fmt(-wb.bal)} ккал больше нормы. Можно немного уменьшить порции в оставшиеся дни.`) : logged.length ? "Это первый день недели с записями, баланс появится со следующего дня." : "На этой неделе пока нет записей."}</div>
         <div class="wbal" id="d-wbal">${wk.map((x, i) => { const on = Math.round(Math.min(x.v, nb * 1.3) / wUnit); const ovFrom = Math.round(nb / wUnit); let c = ""; for (let r = 0; r < rows; r++) c += `<i class="${r < on ? (r >= ovFrom ? "ov" : "on") : r < ovFrom ? "" : "x"}" style="transition-delay:${(i * 0.05 + r * 0.025).toFixed(3)}s"></i>`; return `<div class="wb ${x.k === selDay ? "today" : ""}"><div class="dcol">${c}</div><span>${WD[x.d.getDay()]}</span></div>`; }).join("")}</div>
         <div class="legend"><span><i style="background:var(--cal-b)"></i>съедено</span><span><i style="background:var(--g20)"></i>до нормы</span><span><i style="background:var(--pro-b)"></i>сверх нормы</span></div>
       </div>
@@ -1301,6 +1302,7 @@
     setDots($(".d-hero .drow"), t.k, nm.k, { over: true });
     $$(".mbar .drow").forEach((r, i) => setDots(r, byMeal[i].k, maxM));
     raf2(() => { $("#d-hours").classList.add("go"); $("#d-wbal").classList.add("go"); });
+    renderTrainDay();
   }
   const MACRO = {
     p: { n: "Белки", g: "белка", i: "protein", kind: "pro", tip: (nm) => `Раздели белок на 3–4 приёма примерно по ${Math.round(nm.p / 4 / 5) * 5} г: так он лучше идёт в мышцы, чем одна большая порция вечером.` },

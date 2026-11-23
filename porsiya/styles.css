@@ -1225,3 +1225,10 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .tr-h b + .tr-new { margin-left: auto; }
 /* цифра в красном кружке по центру */
 .sbadge { display: flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 5px; line-height: 1; font-feature-settings: "tnum" 1; letter-spacing: 0; box-sizing: border-box; }
+/* день тренировки в ленте недели: маленькая гантель вместо точки, цвет по статусу дня */
+.week .day.trd .mark { width: 12px; height: 8px; background: none; color: var(--g40); display: grid; place-items: center; }
+.week .day.trd .mark svg { width: 12px; height: 12px; }
+.week .day.trd.st-in .mark { color: var(--ok); }
+.week .day.trd.st-ov .mark { color: var(--pro-b); }
+.week .day.trd.st-un .mark { color: var(--g60); }
+.d-hero + #t-train .tday { margin-top: 10px; }
