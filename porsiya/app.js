@@ -451,8 +451,8 @@
     updateBack();
   }
   const seenScr = new Set();
-  function updateBack() { if (!inTg) return; try { if (sheetOpen || (cur !== "today" && cur !== "onboard")) tg.BackButton.show(); else tg.BackButton.hide(); } catch (e) {} }
-  function goBack() { if (sheetOpen) { if (sheetBack) sheetBack(); else closeSheet(); return; } if (TABS.includes(cur) && cur !== "today") show("today"); }
+  function updateBack() { if (!inTg) return; try { const ob = cur === "onboard" && ($("#ob-back") || S.onboarded); if (sheetOpen || ob || (cur !== "today" && cur !== "onboard")) tg.BackButton.show(); else tg.BackButton.hide(); } catch (e) {} }
+  function goBack() { if (sheetOpen) { if (sheetBack) sheetBack(); else closeSheet(); return; } if (cur === "onboard") { const b = $("#ob-back"); if (b) b.click(); else if (S.onboarded) show("profile"); setTimeout(updateBack, 50); return; } if (TABS.includes(cur) && cur !== "today") show("today"); }
 
   // ---------- sheet ----------
   let sheetOpen = false, sheetBack = null, onSheetClose = null, sheetY = 0;
@@ -647,6 +647,7 @@
     bindSteppers(s, d, { age: [14, 90], height: [130, 220], weight: [35, 200] });
     const nm = $("#ob-name", s); if (nm) nm.oninput = () => (d.name = nm.value.trim());
     if ($("#ob-back", s)) $("#ob-back", s).onclick = () => { ob.step--; haptic("light"); renderOb(); };
+    updateBack();
     if ($("#ob-next", s)) $("#ob-next", s).onclick = () => { haptic("light"); if (ob.step < OB_STEPS - 1) { ob.step++; renderOb(); window.scrollTo({ top: 0, behavior: "smooth" }); } else showObResult(); };
   }
   function trainFields(d) {
@@ -693,6 +694,7 @@
     setTimeout(() => countUp($("#ob-kc"), n.k, { from: 0, dur: 1400, force: true }), 250);
     haptic("ok");
     $("#ob-back").onclick = () => { ob.step = OB_STEPS - 1; renderOb(); };
+    updateBack();
     $("#ob-done").onclick = () => {
       const first = !S.onboarded;
       S.profile = Object.assign(S.profile, ob.d);
