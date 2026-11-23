@@ -1149,7 +1149,7 @@
       </div>
       <div class="gap"></div>
       <div class="card"><div class="card-t">План</div>
-        <div class="card-s" style="margin-top:6px">Темп ${PACE_N[pl.pace].toLowerCase()}: около ${dec(pi.km)} кг в месяц. Финиш примерно ${fmtDY(pi.end)} ${pi.end.getFullYear()}. Норма под план: ${fmt(nm.k)} ккал в день.</div>
+        <div class="card-s" style="margin-top:6px">Темп ${PACE_N[pl.pace].toLowerCase()}: около ${dec(pi.km)} кг в месяц. Финиш примерно ${fmtD(pi.end)} ${pi.end.getFullYear()}. Норма под план: ${fmt(nm.k)} ккал в день.</div>
         <div class="msl">${pi.ms.map((m, i) => `<div class="${m.ok ? "ok" : m.past ? "miss" : m.cur ? "cur" : ""}"><span class="mk">${m.ok ? icon("check") : m.cur ? icon("target") : i + 1}</span><span class="ml"><b>${cap(MONN[m.d.getMonth()])}</b><em>до ${fmtDY(m.d)}</em></span><span class="mv">${dec(m.exp)} кг${m.past && m.w != null ? `<em>было ${dec(m.w)}</em>` : ""}</span></div>`).join("")}</div>
       </div>
       <p class="note">${planNote(pi)}</p>
@@ -1194,7 +1194,7 @@
       else if (st.type === "lose" && st.target < minW) warn = `Это ниже здорового веса для твоего роста (около ${dec(minW)} кг). Лучше выбрать цель повыше.`;
       else if (pi.total > cw * 0.2) warn = "Большая цель. Лучше разбить её на несколько этапов и начать с первого.";
       else if (st.type === "gain" && st.pace === 2) warn = "Быстрый набор чаще идёт в жир. Для мышц обычно хватает умеренного темпа.";
-      $("#pe-sum").innerHTML = `<div class="ps-row"><span>В месяц</span><b>${st.type === "lose" ? "−" : "+"}${dec(pi.km)} кг</b></div><div class="ps-row"><span>Срок</span><b>${months < 1 ? "меньше месяца" : "≈ " + dec(months) + " " + plural(Math.ceil(months), "месяц", "месяца", "месяцев")}</b></div><div class="ps-row"><span>Финиш</span><b>${fmtDY(pi.end)} ${pi.end.getFullYear()}</b></div><div class="ps-row"><span>Норма в день</span><b>${fmt(k)} ккал</b></div>${warn ? `<div class="ps-warn">${icon("info")}<span>${warn}</span></div>` : ""}`;
+      $("#pe-sum").innerHTML = `<div class="ps-row"><span>В месяц</span><b>${st.type === "lose" ? "−" : "+"}${dec(pi.km)} кг</b></div><div class="ps-row"><span>Срок</span><b>${months < 1 ? "меньше месяца" : "≈ " + dec(months) + " " + plural(Math.ceil(months), "месяц", "месяца", "месяцев")}</b></div><div class="ps-row"><span>Финиш</span><b>${fmtD(pi.end)} ${pi.end.getFullYear()}</b></div><div class="ps-row"><span>Норма в день</span><b>${fmt(k)} ккал</b></div>${warn ? `<div class="ps-warn">${icon("info")}<span>${warn}</span></div>` : ""}`;
     };
     bindSeg(root, "ptype", (v) => { st.type = v; st.target = r1(cw + (v === "lose" ? -4 : 3)); upd(); });
     bindSeg(root, "pace", (v) => { st.pace = +v; upd(); });
@@ -1309,7 +1309,7 @@
         ${dotRow(24)}
       </div>
       <div class="gap"></div>
-      <div class="card"><div class="card-t">По приёмам пищи</div>
+      <div class="card"><div class="card-t">По приёмам пищи</div><div class="card-s" style="margin-top:2px">Сколько калорий в каждом приёме</div>
         ${byMeal.map((x) => `<div class="mbar"><span class="ml">${icon(x.m.i)}${x.m.n}</span>${dotRow(14, "ink")}<span class="mv">${x.k ? fmt(x.k) : "—"}</span></div>`).join("")}
       </div>
       <div class="gap"></div>
