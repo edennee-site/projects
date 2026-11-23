@@ -1201,4 +1201,18 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 /* шапка окна: размытие только когда контент прокручен под неё. В покое шапка сплошная,
    иначе при перетаскивании и возврате окна iOS отрисовывает слой blur с запаздыванием и сверху «пробивает» полоса */
 .sheet:not(.scrolled) .sh-head { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
-.sheet .sh-head, .sheet .grab, .scrim { touch-action: none; }
+.scrim { touch-action: none; }
+/* дни тренировок */
+.wdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; width: 100%; }
+.wdc { height: 40px; border-radius: 12px; background: var(--card-2); font-size: 13.5px; font-weight: 500; color: var(--g70); transition: background-color .2s var(--ease), color .2s var(--ease), transform .25s var(--spring); }
+.wdc:active { transform: scale(.94); }
+.wdc.on { background: var(--ink); color: var(--bg); }
+.tday { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: var(--card); border-radius: var(--r-lg, 22px); padding: 12px 12px 12px 14px; margin-top: 10px; box-shadow: var(--shadow); transition: transform .3s var(--spring); }
+.tday:active { transform: scale(.98); }
+.td-ic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--card-2); color: var(--g70); }
+.tday.on .td-ic { background: color-mix(in srgb, var(--carb-b) 18%, transparent); color: var(--carb-t); }
+.td-ic svg { width: 18px; height: 18px; }
+.td-t { flex: 1; min-width: 0; }
+.td-t b { display: block; font-size: 15px; font-weight: 500; }
+.td-t span { display: block; font-size: 12.5px; color: var(--g60); margin-top: 1px; }
+.td-sw { flex: none; font-size: 13px; font-weight: 500; height: 32px; padding: 0 12px; border-radius: 99px; display: inline-flex; align-items: center; background: var(--card-2); color: var(--ink); }

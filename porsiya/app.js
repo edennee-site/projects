@@ -195,18 +195,28 @@
     return { stage, sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wk: wElapsed, wrong: wElapsed >= 2 && sign * (cur - pl.start) <= -0.5 };
   }
   function norm() { const m = S.profile.manual; return m.on ? { k: m.k, p: m.p, f: m.f, c: m.c } : calcNorm(); }
+  // тренировочные дни: норма выше в день тренировки и ниже в день отдыха, недельная сумма та же. Разница идёт в углеводы
+  const wdIdx = (k) => (fromKey(k).getDay() + 6) % 7; // 0 = понедельник
+  function trainSet() { const t = S.profile.train || {}; return !S.profile.manual.on && t.n > 0 && Array.isArray(t.days) && t.days.length > 0; }
+  function isTrainDay(k) { const ov = (S.trainOv || {})[k]; if (ov != null) return ov; const t = S.profile.train; return !!(t.days && t.days.includes(wdIdx(k))); }
+  function trainDelta(k) {
+    if (!trainSet()) return 0;
+    const avg = calcNorm().train, sess = (avg * 7) / S.profile.train.n;
+    return Math.round(isTrainDay(k) ? sess - avg : -avg);
+  }
+  function normFor(k) { const b = norm(), d = trainDelta(k); return d ? Object.assign({}, b, { k: b.k + d, c: Math.max(0, Math.round(b.c + d / 4)) }) : b; }
   const dayEntries = (k) => S.days[k] || [];
   const totals = (k) => dayEntries(k).reduce((a, e) => { a.k += e.k; a.p += e.p; a.f += e.f; a.c += e.c; return a; }, { k: 0, p: 0, f: 0, c: 0 });
   const scaleFood = (f, g) => ({ k: (f.k * g) / 100, p: (f.p * g) / 100, f: (f.f * g) / 100, c: (f.c * g) / 100 });
   // баланс недели: сумма (норма − съедено) за прошедшие дни недели с записями
   function weekBalance(k) {
-    const d = fromKey(k), mon = monday(d), nm = norm().k;
+    const d = fromKey(k), mon = monday(d);
     let bal = 0, days = 0;
-    for (let x = new Date(mon); dkey(x) !== k; x = addDays(x, 1)) { const kk = dkey(x); if (dayEntries(kk).length) { bal += nm - totals(kk).k; days++; } }
+    for (let x = new Date(mon); dkey(x) !== k; x = addDays(x, 1)) { const kk = dkey(x); if (dayEntries(kk).length) { bal += normFor(kk).k - totals(kk).k; days++; } }
     return { bal, days };
   }
   // норма дня с переносом недобора/перебора прошлых дней недели (до 25%)
-  function dayNorm(k) { const nm = norm().k; if (!S.settings.carry) return nm; const wb = weekBalance(k); return Math.round(nm + clamp(wb.bal, -nm * 0.25, nm * 0.25)); }
+  function dayNorm(k) { const nm = normFor(k).k; if (!S.settings.carry) return nm; const wb = weekBalance(k); return Math.round(nm + clamp(wb.bal, -nm * 0.25, nm * 0.25)); }
   // серия: дни подряд, в которых есть хотя бы одна запись
   // ---------- серия, заморозки, очки, достижения ----------
   const isLogged = (k) => dayEntries(k).length > 0;
@@ -248,7 +258,7 @@
     keys.forEach((k) => {
       const t = T[k], arr = S.days[k];
       entries += arr.length; photos += arr.filter((e) => e.src === "photo").length;
-      if (Math.abs(t.k - nm.k) <= nm.k * 0.1) inNorm++; if (t.p >= nm.p * 0.95) proDays++;
+      const nk = trainSet() ? normFor(k).k : nm.k; if (Math.abs(t.k - nk) <= nk * 0.1) inNorm++; if (t.p >= nm.p * 0.95) proDays++;
       if (arr.some((e) => e.meal === "breakfast")) bfDays++;
       if (["breakfast", "lunch", "dinner"].every((m) => arr.some((e) => e.meal === m))) fullDays++;
     });
@@ -334,7 +344,7 @@
     S.game.unread = (S.game.unread || 0) + ups.length - 1; save();
     return { id: up.id, n: ups.length, ic: up.ic, t: `${up.t} · этап ${up.st}`, d: `Следующий этап: ${up.d.charAt(0).toLowerCase() + up.d.slice(1)}` };
   }
-  const status = (k) => { const n = dayEntries(k).length; if (!n) return ""; const v = totals(k).k, nm = norm().k; if (v > nm * 1.1) return "ov"; if (v >= nm * 0.9) return "in"; return "un"; };
+  const status = (k) => { const n = dayEntries(k).length; if (!n) return ""; const v = totals(k).k, nm = normFor(k).k; if (v > nm * 1.1) return "ov"; if (v >= nm * 0.9) return "in"; return "un"; };
 
   // ---------- numbers ----------
   const lastVals = new Map();
@@ -413,7 +423,12 @@
   function goBack() { if (sheetOpen) { if (sheetBack) sheetBack(); else closeSheet(); return; } if (TABS.includes(cur) && cur !== "today") show("today"); }
 
   // ---------- sheet ----------
-  let sheetOpen = false, sheetBack = null, onSheetClose = null;
+  let sheetOpen = false, sheetBack = null, onSheetClose = null, sheetY = 0;
+  // iOS: при открытой клавиатуре Safari прокручивает страницу, и после её закрытия кнопки окна
+  // остаются сдвинутыми относительно места касания (не нажимаются). Возвращаем прокрутку на место.
+  const fixKb = () => { if (!sheetOpen) return; const a = document.activeElement; if (a && /^(INPUT|TEXTAREA)$/.test(a.tagName)) return; if (Math.abs(window.scrollY - sheetY) > 1) window.scrollTo(0, sheetY); };
+  document.addEventListener("focusout", () => setTimeout(fixKb, 60));
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", () => setTimeout(fixKb, 60));
   function measureHead() { const h = $("#sheet .sh-head"); if (h) $("#sheet").style.setProperty("--hh", h.offsetHeight + "px"); }
   window.addEventListener("resize", measureHead);
   function sheetFoot(html) { const f = $("#sh-foot"); f.innerHTML = html || ""; f.style.display = html ? "" : "none"; }
@@ -428,7 +443,7 @@
       sheetOpen = true;
       $("#scrim").classList.add("open"); $("#sheet").classList.add("open");
       $("#tabbar").classList.add("hide");
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = "hidden"; sheetY = window.scrollY;
       haptic("light");
     }
     updateBack();
@@ -466,7 +481,6 @@
     }, { passive: true });
     sh.addEventListener("touchmove", (e) => {
       if (y0 == null) return;
-      if (!body.contains(e.target) && e.cancelable) e.preventDefault(); // фон под окном не прокручивается
       const y = e.touches[0].clientY, now = performance.now(); dy = y - y0;
       if (!decided) { if (Math.abs(dy) < 6) return; decided = true; drag = dy > 0 && (!body.contains(e.target) || body.scrollTop <= 0); if (drag) { sh.style.transition = "none"; scrim.style.transition = "none"; y0 = y; dy = 0; } }
       if (!drag) return;
@@ -603,7 +617,8 @@
     return `<div class="nrow"><span><b>Тренировки</b><span class="ns">раз в неделю</span></span>${stepperHTML("tn", t.n, "")}</div>
       <div class="collapse ${t.n ? "open" : ""}" id="tr-x"><div>
       <div class="nrow" id="tr-more" style="margin-top:10px"><span><b>Длительность</b><span class="ns">одной тренировки</span></span>${stepperHTML("tmin", t.min, "мин", 15)}</div>
-      <div class="nrow col" id="tr-type" style="margin-top:10px"><span><b>Тип тренировок</b></span>${segHTML("ttype", [["strength", "Силовые"], ["cardio", "Кардио"], ["mixed", "Смешанные"]], t.type)}</div></div></div>
+      <div class="nrow col" id="tr-type" style="margin-top:10px"><span><b>Тип тренировок</b></span>${segHTML("ttype", [["strength", "Силовые"], ["cardio", "Кардио"], ["mixed", "Смешанные"]], t.type)}</div>
+      <div class="nrow col" style="margin-top:10px"><span><b>Дни тренировок</b><span class="ns">по желанию: в эти дни норма выше, в остальные ниже</span></span><div class="wdays">${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((n, i) => `<button class="wdc${(t.days || []).includes(i) ? " on" : ""}" data-wd="${i}">${n}</button>`).join("")}</div></div></div></div>
 
       <div class="nrow"><span><b>Шаги</b><span class="ns">в день, по желанию</span></span>${stepperHTML("steps", d.steps, "", 1000)}</div>`;
   }
@@ -611,9 +626,16 @@
     if (!$('[data-step="tn"]', root)) return;
     const proxy = { get tn() { return d.train.n; }, set tn(v) { d.train.n = v; }, get tmin() { return d.train.min; }, set tmin(v) { d.train.min = v; }, get steps() { return d.steps; }, set steps(v) { d.steps = v; } };
     bindSteppers(root, proxy, { tn: [0, 14], tmin: [15, 180], steps: [0, 30000] }, (f) => {
-      if (f === "tn") { $("#tr-x", root).classList.toggle("open", d.train.n > 0); const sg = $('[data-seg="ttype"]', root); if (sg) requestAnimationFrame(() => placeKnob(sg, false)); }
+      if (f === "tn") { if (d.train.days && d.train.days.length && d.train.days.length !== d.train.n) { d.train.days = []; $$(".wdc", root).forEach((b) => b.classList.remove("on")); } $("#tr-x", root).classList.toggle("open", d.train.n > 0); const sg = $('[data-seg="ttype"]', root); if (sg) requestAnimationFrame(() => placeKnob(sg, false)); }
     });
     bindSeg(root, "ttype", (v) => (d.train.type = v));
+    const syncN = () => { const v = $('[data-step="tn"] [data-v]', root); if (v) v.textContent = d.train.n; };
+    $$(".wdc", root).forEach((b) => (b.onclick = () => {
+      haptic("sel"); const i = +b.dataset.wd, days = new Set(d.train.days || []);
+      days.has(i) ? days.delete(i) : days.add(i);
+      d.train.days = [...days].sort(); b.classList.toggle("on", days.has(i));
+      if (days.size) { d.train.n = days.size; syncN(); }
+    }));
   }
   function showObResult() {
     const n = calcNorm(ob.d), s = $("#s-onboard"), g = GOALS[ob.d.goal || "keep"];
@@ -665,6 +687,7 @@
         ${dotRow(24, "anim")}
         <div class="stats3 two"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Запас недели</span><b class="num" id="v-week">0</b></div></div>
       </div>
+      <div id="t-train"></div>
       <div class="gap"></div>
       <div id="t-goal"></div>
       <div class="row2">
@@ -701,7 +724,7 @@
   }
   function updateToday(first) {
     if (cur !== "today" || !$("#v-k")) return;
-    const nm = norm(), t = totals(selDay), kN = dayNorm(selDay), left = kN - t.k, pct = kN ? Math.round((t.k / kN) * 100) : 0;
+    const nm = normFor(selDay), t = totals(selDay), kN = dayNorm(selDay), left = kN - t.k, pct = kN ? Math.round((t.k / kN) * 100) : 0;
     const isToday = selDay === todayKey();
     setMonthLabel(weekAnchor || fromKey(selDay));
     const st = streakInfo(), sp = $("#t-streak");
@@ -723,7 +746,7 @@
       $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
-    updWater(); renderTodayGoal();
+    updWater(); renderTodayGoal(); renderTrainDay();
     const av = $("#t-ava"), ai = avatarInner(); if (av && av._ai !== ai) { av.innerHTML = ai; av._ai = ai; }
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
@@ -731,6 +754,19 @@
     $("#m-title").textContent = isToday ? "Приёмы пищи" : "Приёмы пищи · " + dayLabel(selDay).toLowerCase();
     $("#m-sum").textContent = dayEntries(selDay).length ? fmt(t.k) + " ккал" : "";
     renderMeals();
+  }
+  function renderTrainDay() {
+    const box = $("#t-train"); if (!box) return;
+    if (!trainSet()) { if (box._h !== "") { box._h = ""; box.innerHTML = ""; } return; }
+    const on = isTrainDay(selDay), d = trainDelta(selDay);
+    const html = `<button class="tday${on ? " on" : ""}" id="t-tday"><span class="td-ic">${icon(on ? "dumbbell" : "sofa")}</span><span class="td-t"><b>${on ? "День тренировки" : "День отдыха"}</b><span>${d >= 0 ? "+" : "−"}${fmt(Math.abs(d))} ккал к средней норме</span></span><span class="td-sw">${on ? "Отдыхаю" : "Тренируюсь"}</span></button>`;
+    if (box._h === html) return; box._h = html; box.innerHTML = html;
+    $("#t-tday").onclick = () => {
+      haptic("sel"); S.trainOv = S.trainOv || {};
+      const plan = S.profile.train.days.includes(wdIdx(selDay));
+      if (!on === plan) delete S.trainOv[selDay]; else S.trainOv[selDay] = !on;
+      save(); updateToday();
+    };
   }
   function setMonthLabel(d) { const el = $("#wk-mt"); if (el) { const m = addDays(monday(d), 3); el.textContent = cap(MONN[m.getMonth()]) + " " + m.getFullYear(); } }
   function selectDay(k) {
@@ -1219,7 +1255,7 @@
   }
   function openCalDetail() {
     haptic("light");
-    const nm = Object.assign({}, norm(), { k: dayNorm(selDay) }), t = totals(selDay), list = dayEntries(selDay);
+    const nm = Object.assign({}, normFor(selDay), { k: dayNorm(selDay) }), t = totals(selDay), list = dayEntries(selDay);
     const byMeal = MEALS.map((m) => ({ m, k: list.filter((e) => e.meal === m.id).reduce((a, e) => a + e.k, 0) }));
     const maxM = Math.max(nm.k / 2.5, ...byMeal.map((x) => x.k));
     const hours = new Array(18).fill(0);
@@ -1264,7 +1300,7 @@
   };
   function openMacroDetail(k) {
     haptic("light");
-    const M = MACRO[k], nm = norm(), t = totals(selDay), list = dayEntries(selDay);
+    const M = MACRO[k], nm = normFor(selDay), t = totals(selDay), list = dayEntries(selDay);
     const srcs = list.filter((e) => e[k] > 0.5).sort((a, b) => b[k] - a[k]).slice(0, 5);
     const rest = Math.max(0, nm[k] - t[k]);
     // 7 дней
@@ -1363,7 +1399,7 @@
   }
   function serverSync() {
     if (!API || !inTg || !tg.initData || !S.onboarded) return;
-    const tk = todayKey(), t = totals(tk), nm = norm(), st = streakInfo(), wk = Object.keys(S.weights).sort();
+    const tk = todayKey(), t = totals(tk), nm = normFor(tk), st = streakInfo(), wk = Object.keys(S.weights).sort();
     const body = JSON.stringify({ tz: -new Date().getTimezoneOffset(), day: tk, logged: isLogged(tk), k: r0(t.k), p: r0(t.p), nk: nm.k, np: nm.p, streak: st.n, best: st.best,
       goal: S.profile.goal, plan: S.plan ? { type: S.plan.type, start: S.plan.start, target: S.plan.target } : null, weight: curWeight(), lastWeigh: wk[wk.length - 1] || null, week: weekSum() });
     if (body === lastSync) return;
@@ -1825,7 +1861,7 @@
   function drawCalDay() {
     const box = $("#cal-day");
     if (!calSel) { box.innerHTML = ""; return; }
-    const k = calSel, t = totals(k), nm = norm(), n = dayEntries(k).length, d = fromKey(k);
+    const k = calSel, t = totals(k), nm = normFor(k), n = dayEntries(k).length, d = fromKey(k);
     box.classList.remove("fade-sw"); void box.offsetWidth; box.classList.add("fade-sw");
     box.innerHTML = `<div class="card"><div class="c-head cd-head"><div><div class="cd-date">${d.getDate()} ${MON[d.getMonth()]}</div><div class="card-s" style="margin-top:3px">${cap(WDF[d.getDay()])} · ${n ? n + " " + plural(n, "запись", "записи", "записей") : "записей нет"}</div></div>${n ? `<span class="mtag k">${Math.round((t.k / nm.k) * 100)}% нормы</span>` : ""}</div>
       ${n ? `<div class="mid"><span class="num">${fmt(t.k)}</span><span class="u muted">ккал</span></div><div class="macros">${macroTags(t, true)}</div>${dotRow(24, "ink")}` : ""}
@@ -1840,7 +1876,7 @@
   function renderProfile() {
     const s = $("#s-profile"), p = S.profile, nm = norm(), auto = calcNorm(), t = p.train;
     const u = inTg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-    const trainTxt = t.n ? `${t.n} × ${t.min} мин` : "Нет";
+    const trainTxt = t.n ? (t.days && t.days.length ? t.days.map((i) => ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][i]).join(", ") : `${t.n} × ${t.min} мин`) : "Нет";
     const allDays = Object.keys(S.days).filter((k) => S.days[k].length);
     const nEntries = allDays.reduce((a, k) => a + S.days[k].length, 0);
     const sti = streakInfo(), streak = sti.n;
@@ -1944,7 +1980,7 @@
   }
   function editParam(which) {
     const p = S.profile;
-    const st = { age: p.age, height: p.height, weight: p.weight, sex: p.sex, train: Object.assign({}, p.train), steps: p.steps };
+    const st = { age: p.age, height: p.height, weight: p.weight, sex: p.sex, train: Object.assign({}, p.train, { days: (p.train.days || []).slice() }), steps: p.steps };
     let body = "";
     if (which === "pa") body = `<div class="nrow"><span><b>Пол</b></span>${segHTML("sx", [["m", "Мужской"], ["f", "Женский"]], st.sex)}</div><div class="nrow"><span><b>Возраст</b></span>${stepperHTML("age", st.age, "")}</div>`;
     if (which === "ph") body = `<div class="nrow"><span><b>Рост</b></span>${stepperHTML("height", st.height, "см")}</div>`;
