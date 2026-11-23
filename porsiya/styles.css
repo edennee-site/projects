@@ -1305,10 +1305,11 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .stg-seg i.now::after { content: ""; position: absolute; inset: 0; background: #fff; border-radius: inherit; transform: scaleX(0); transform-origin: left; }
 .celeb.on .stg-seg i.now::after { animation: stgFill .9s var(--ease-out) .5s forwards; }
 @keyframes stgFill { to { transform: none; } }
-.stg-st { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; margin: 18px 0 22px; padding: 14px 0 0; border-top: 1px solid rgba(255,255,255,.2); position: relative; text-align: left; }
-.stg-st > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.stg-st > div + div { padding-left: 12px; }
+.stg-st { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; margin: 20px 0 22px; padding: 16px 0 0; border-top: 1px solid rgba(255,255,255,.2); position: relative; text-align: center; }
+.stg-st > div { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.stg-st > div + div { border-left: 1px solid rgba(255,255,255,.2); }
 .celeb.stg .stg-st em { margin: 0; font-size: 12px; opacity: .8; }
 .celeb.stg .stg-st b { margin: 0; font-size: 17px; letter-spacing: -0.01em; white-space: nowrap; font-feature-settings: "tnum" 1; }
 .celeb.stg .btn { width: 100%; background: #fff; color: #121216; }
 .celeb.stg .lnk { margin-top: 6px; padding: 12px; text-decoration: none; font-size: 15px; position: relative; }
+@media (max-width: 360px) { .celeb.stg .stg-st b { font-size: 15px; } .celeb.stg .stg-st em { font-size: 11.5px; } }

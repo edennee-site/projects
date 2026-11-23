@@ -873,14 +873,13 @@
     const pl = isToday && !ad && !(st.platSkip && st.platSkip > tk) ? plateauInfo() : null;
     if (ad) {
       const down = ad.real < ad.cur, goal = S.plan ? S.plan.type : S.profile.goal, step = Math.abs(ad.real - ad.cur) > ad.cur * 0.1 + 10;
-      const flat = Math.abs(ad.dW) < 0.3, kgs = `${dec(Math.abs(r1(ad.dW)))} кг`;
-      const moved = flat ? "а вес почти не изменился" : ad.dW < 0 ? `а вес снизился на ${kgs}` : `а вес вырос на ${kgs}`;
-      const why = goal === "lose" ? (down ? (flat ? "Расход оказался ниже расчётного, поэтому вес стоит." : "Вес уходит медленнее плана: расход ниже расчётного.") : "Вес уходит быстрее плана: расход выше расчётного, можно есть больше.")
-        : goal === "gain" ? (down ? "Это быстрее плана, а лишний темп обычно идёт в жир." : flat ? "Расход оказался выше расчётного, поэтому вес не растёт." : "Вес растёт медленнее плана: расход выше расчётного.")
-        : (down ? "Расход оказался ниже расчётного, вес понемногу растёт." : "Расход оказался выше расчётного, вес понемногу снижается.");
+      const flat = Math.abs(ad.dW) < 0.3, kgs = `${dec(Math.abs(r1(ad.dW)))} кг`, fast = goal === "lose" ? !down : goal === "gain" ? down : false;
+      const moved = flat ? "а вес не меняется" : `а вес ${ad.dW < 0 ? "снизился" : "вырос"} ${fast || goal === "keep" ? "на" : "всего на"} ${kgs}${goal === "keep" ? "" : fast ? ", быстрее плана" : ", медленнее плана"}`;
+      const cause = down ? "Значит, твой расход ниже, чем показала формула." : "Значит, ты тратишь больше, чем показала формула.";
+      const aim = goal === "lose" ? (down ? (flat ? "Чтобы вес пошёл вниз" : "Чтобы идти по плану") : "Темп сохранится, если") : goal === "gain" ? (down ? "При таком темпе растёт в основном жир. Чтобы набирать по плану" : flat ? "Чтобы вес пошёл вверх" : "Чтобы идти по плану") : "Чтобы вес держался";
       const nk = (() => { const save = S.profile.adapt; S.profile.adapt = { r: ad.r }; const k = calcNorm().k; S.profile.adapt = save; return k; })();
       html = `<div class="gap"></div><div class="card tip c-cal smart"><div class="tip-h"><span class="tip-ic">${icon("target")}</span><b>Норму можно уточнить</b></div>
-        <p>Последние 3 недели ты ел в среднем ${fmt(ad.avg)} ккал в день, ${moved}. ${why} Новая норма: ${fmt(nk)} ккал${step ? ". Меняем постепенно, дальше подстроим ещё" : ""}.</p>
+        <p>Последние 3 недели ты ешь в среднем ${fmt(ad.avg)} ккал в день, ${moved}. ${down && goal === "gain" ? "" : cause + " "}${aim === "Темп сохранится, если" ? `Норму можно поднять до ${fmt(nk)} ккал без потери темпа.` : `${aim}, ${down ? "снизим" : "поднимем"} норму до ${fmt(nk)} ккал.`}${step ? " Меняем плавно, через пару недель проверим снова." : ""}</p>
         <div class="tip-acts"><button class="btn sm" id="sm-ok">Уточнить норму</button><button class="btn sm ghost" id="sm-no">Не сейчас</button></div></div>`;
     } else if (pl) {
       const lose = pl.goal === "lose", few = pl.logged < 17;
