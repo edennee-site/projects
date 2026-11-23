@@ -1260,3 +1260,10 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
 /* подпись в меню на пиксель ниже, ровно по центру иконки */
 .tab span { position: relative; top: 1px; }
+
+/* тренировки: мягкая отметка вместо чёрной, сброс иконкой */
+.trw-b { background: var(--card-2); color: var(--g60); }
+.trw-b.on { background: color-mix(in srgb, var(--carb-b) 16%, transparent); color: var(--carb-t); }
+.trw-b.on svg { opacity: 1; }
+.trw-r { width: 32px; height: 32px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: var(--card-2); color: var(--g60); }
+.trw-r svg { width: 16px; height: 16px; }

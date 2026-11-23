@@ -767,7 +767,7 @@
     const n = days.filter((x) => x.on).length, up = Math.abs(trainDelta(days.find((x) => x.on) ? days.find((x) => x.on).k : tk));
     const moved = days.some((x) => x.on !== x.plan);
     const html = `<div class="gap"></div><div class="card trw">
-      <div class="trw-h"><div><div class="card-t">Тренировки на неделе</div><div class="card-s">${n} ${plural(n, "тренировка", "тренировки", "тренировок")}${n ? ` · +${fmt(up)} ккал в эти дни` : ""}</div></div>${moved ? `<button class="trw-r" id="trw-r">Как в плане</button>` : ""}</div>
+      <div class="trw-h"><div><div class="card-t">Тренировки на неделе</div><div class="card-s">${n} ${plural(n, "тренировка", "тренировки", "тренировок")}${n ? ` · +${fmt(up)} ккал в эти дни` : ""}</div></div>${moved ? `<button class="trw-r" id="trw-r" aria-label="Вернуть дни из плана">${icon("refresh")}</button>` : ""}</div>
       <div class="trw-d">${days.map((x, i) => `<button class="trw-b${x.on ? " on" : ""}${x.today ? " now" : ""}" data-tk="${x.k}"><span>${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][i]}</span>${icon("dumbbell")}</button>`).join("")}</div>
     </div>`;
     if (box._h === html) return; box._h = html; box.innerHTML = html;
