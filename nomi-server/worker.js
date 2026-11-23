@@ -105,7 +105,9 @@ function pick(s, L, name) {
   // 21:00: серия под угрозой
   if (L.h === RH && !logged && s.streak > 0) return P(`серия ${s.streak} ${plural(s.streak, "день", "дня", "дней")} сгорит в полночь. Добавь хотя бы один приём пищи, это займёт полминуты.`);
   // 21:00: белок не добран
-  if (L.h === RH && logged && s.np && s.p < s.np * 0.8) {
+  // белок: не чаще раза в неделю, чтобы не надоедать
+  if (L.h === RH && logged && s.np && s.p < s.np * 0.8 && (!s._lp || (Date.parse(L.day) - Date.parse(s._lp)) / 864e5 >= 7)) {
+    s._kind = "prot";
     const left = Math.round(s.np - s.p);
     const tip = s.pf ? ` Из того, что ты обычно ешь, подойдёт ${s.pf.n.toLowerCase()}${s.pf.g ? `: ${s.pf.g} г дают ${s.pf.p} г белка` : ""}.` : "";
     return P(`до нормы белка сегодня ${left} г.${tip}`);
@@ -127,13 +129,14 @@ async function remind(env) {
   for (const r of results) {
     let s; try { s = JSON.parse(r.summary); } catch (e) { continue; }
     if (!s.day) continue;
-    const L = localNow(r.tz), key = L.day + ":" + L.h;
-    if (r.sent === key) continue;
+    const L = localNow(r.tz), key = L.day + ":" + L.h, [last, lp] = String(r.sent || "").split("|");
+    if (last === key) continue;
+    s._lp = lp || null;
     const text = pick(s, L, (s.name || r.name || "").trim().split(" ")[0]);
     if (!text) continue;
     const res = await tg(env, "sendMessage", { chat_id: r.uid, text, reply_markup: openBtn(env) });
     if (res.status === 403) await env.DB.prepare("UPDATE users SET muted = 1 WHERE uid = ?").bind(r.uid).run(); // бот заблокирован
-    else await env.DB.prepare("UPDATE users SET sent = ? WHERE uid = ?").bind(key, r.uid).run();
+    else await env.DB.prepare("UPDATE users SET sent = ? WHERE uid = ?").bind(key + "|" + (s._kind === "prot" ? L.day : lp || ""), r.uid).run();
   }
 }
 

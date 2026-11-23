@@ -920,15 +920,15 @@
     if (box._h === html) return; box._h = html; box.innerHTML = html;
     const later = (key, days) => { S.settings[key] = dkey(addDays(new Date(), days)); save(); renderSmart(); };
     if ($("#sm-ok")) $("#sm-ok").onclick = () => { haptic("ok"); S.profile.adapt = { r: ad.r, date: tk }; S.settings.adaptSkip = dkey(addDays(new Date(), 14)); S.settings.platSkip = dkey(addDays(new Date(), 21)); save(); lastVals.clear(); refreshAll(); toast(`Норма уточнена: ${fmt(norm().k)} ккал`); };
-    if ($("#sm-no")) $("#sm-no").onclick = () => { haptic("light"); later("adaptSkip", 7); };
+    if ($("#sm-no")) $("#sm-no").onclick = () => { haptic("light"); later("adaptSkip", 21); };
     if ($("#sm-brk")) $("#sm-brk").onclick = () => { haptic("ok"); S.plan.brk = { from: tk, to: dkey(addDays(new Date(), 7)) }; save(); lastVals.clear(); refreshAll(); toast(`Неделя на поддержании: ${fmt(norm().k)} ккал`); };
-    if ($("#sm-brk-no")) $("#sm-brk-no").onclick = () => { haptic("light"); later("brkSkip", 21); };
+    if ($("#sm-brk-no")) $("#sm-brk-no").onclick = () => { haptic("light"); later("brkSkip", 60); };
     if ($("#sm-brk-end")) $("#sm-brk-end").onclick = () => { haptic("light"); S.plan.brk.to = tk; save(); lastVals.clear(); refreshAll(); toast(`Дефицит возвращён: ${fmt(norm().k)} ккал`); };
-    if ($("#sm-hide")) $("#sm-hide").onclick = () => { haptic("light"); later("platSkip", 14); };
+    if ($("#sm-hide")) $("#sm-hide").onclick = () => { haptic("light"); later("platSkip", 60); };
     if ($("#sm-re")) $("#sm-re").onclick = () => { haptic("ok"); const pi = planInfo(); S.plan.start = r1(pi.tw); S.plan.startDate = tk; save(); later("platSkip", 21); toast("План пересчитан от текущего веса"); refreshAll(); };
   }
   // ---------- тренер: совет дня по данным человека ----------
-  // правила по порядку важности; один совет в день, у каждого свой перерыв, чтобы не повторялся
+  // правила по порядку важности; не больше одного совета в день, каждый показывается один раз
   function recentDays(n) {
     const out = []; for (let i = 1; i <= n; i++) { const k = dkey(addDays(new Date(), -i)); if (isLogged(k)) out.push({ k, t: totals(k), nm: normFor(k) }); }
     return out;
@@ -937,63 +937,63 @@
     const tk = todayKey(), now = new Date(), h = now.getHours(), L = [];
     const goal = S.plan ? S.plan.type : S.profile.goal, nm = normFor(tk), pi = S.plan ? planInfo() : null, brk = brkOn();
     const r7 = recentDays(7), r14 = recentDays(14), avg = (a, f) => a.reduce((x, d) => x + f(d), 0) / Math.max(1, a.length);
-    const add = (m) => L.push(m);
+    const add = (m) => L.push(m), pid = S.plan ? `${S.plan.startDate}${S.plan.target}` : ""; // каждый совет показываем один раз
     // возвращение после перерыва
     const lastK = Object.keys(S.days).filter((k) => k < tk && isLogged(k)).sort().pop();
     const gap = lastK ? Math.round((fromKey(tk) - fromKey(lastK)) / 864e5) - 1 : 0;
-    if (gap >= 3) add({ key: "back", cd: 7, ic: "refresh", col: "cal", t: "С возвращением", x: `Перерыв в ${gap} ${plural(gap, "день", "дня", "дней")} на результат почти не влияет. Начни с одного приёма пищи сегодня, дальше ритм быстро вернётся.` });
+    if (gap >= 3) add({ key: "back", cd: 36500, ic: "refresh", col: "cal", t: "С возвращением", x: `Перерыв в ${gap} ${plural(gap, "день", "дня", "дней")} на результат почти не влияет. Начни с одного приёма пищи сегодня, дальше ритм быстро вернётся.` });
     // у самой цели
-    if (pi && !pi.reached && Math.abs(S.plan.target - pi.tw) <= 1) add({ key: "near", cd: 10, ic: "flag", col: "carb", t: "До цели меньше килограмма", x: `Осталось ${dec(r1(Math.abs(S.plan.target - pi.tw)))} кг. Темп оставь прежним. Когда цель будет достигнута, бот предложит перейти на поддержание, чтобы закрепить результат.` });
+    if (pi && !pi.reached && Math.abs(S.plan.target - pi.tw) <= 1) add({ key: "near" + pid, cd: 36500, ic: "flag", col: "carb", t: "До цели меньше килограмма", x: `Осталось ${dec(r1(Math.abs(S.plan.target - pi.tw)))} кг. Темп оставь прежним. Когда цель будет достигнута, бот предложит перейти на поддержание, чтобы закрепить результат.` });
     // три дня подряд выше нормы
     const l3 = [1, 2, 3].map((i) => dkey(addDays(now, -i)));
     if (!brk && goal !== "gain" && gap < 3 && l3.every((k) => isLogged(k) && totals(k).k > normFor(k).k * 1.1)) {
       const ov = l3.reduce((a, k) => a + totals(k).k - normFor(k).k, 0) / 3;
-      add({ key: "over", cd: 7, ic: "flame", col: "pro", t: "Три дня выше нормы", x: `В среднем на ${fmt(Math.round(ov / 10) * 10)} ккал в день. Урезать еду сегодня не нужно, просто вернись к своей норме. На результат влияет средняя неделя, а не отдельные дни.` });
+      add({ key: "over", cd: 36500, ic: "flame", col: "pro", t: "Три дня выше нормы", x: `В среднем на ${fmt(Math.round(ov / 10) * 10)} ккал в день. Урезать еду сегодня не нужно, просто вернись к своей норме. На результат влияет средняя неделя, а не отдельные дни.` });
     }
     // слишком жёсткий дефицит или недобор на наборе
     if (!brk && r7.length >= 5) {
       const a = avg(r7, (d) => d.t.k), n = avg(r7, (d) => d.nm.k);
-      if (goal === "lose" && a < n * 0.8) add({ key: "low", cd: 7, ic: "cal", col: "cal", t: "Ешь заметно меньше нормы", x: `За неделю в среднем ${fmt(Math.round(a / 10) * 10)} ккал при норме ${fmt(Math.round(n / 10) * 10)}. Слишком большой дефицит быстрее приводит к срывам и потере мышц. Держись ближе к норме: вес пойдёт так же, а держать режим будет легче.` });
-      if (goal === "gain" && a < n * 0.9) add({ key: "lowg", cd: 7, ic: "cal", col: "cal", t: "Калорий не хватает для набора", x: `За неделю в среднем ${fmt(Math.round(a / 10) * 10)} ккал при норме ${fmt(Math.round(n / 10) * 10)}. Без запаса калорий мышцы растут медленно. Проще всего добрать перекусом: творог, орехи, банан или стакан молока.` });
+      if (goal === "lose" && a < n * 0.8) add({ key: "low", cd: 36500, ic: "cal", col: "cal", t: "Ешь заметно меньше нормы", x: `За неделю в среднем ${fmt(Math.round(a / 10) * 10)} ккал при норме ${fmt(Math.round(n / 10) * 10)}. Слишком большой дефицит быстрее приводит к срывам и потере мышц. Держись ближе к норме: вес пойдёт так же, а держать режим будет легче.` });
+      if (goal === "gain" && a < n * 0.9) add({ key: "lowg", cd: 36500, ic: "cal", col: "cal", t: "Калорий не хватает для набора", x: `За неделю в среднем ${fmt(Math.round(a / 10) * 10)} ккал при норме ${fmt(Math.round(n / 10) * 10)}. Без запаса калорий мышцы растут медленно. Проще всего добрать перекусом: творог, орехи, банан или стакан молока.` });
     }
     // день тренировки: объясняем один раз для выбранных дней, дальше норма видна в карточке калорий
     if (trainSet() && isTrainDay(tk) && h < 18) {
       const d = trainDelta(tk);
-      add({ key: "train" + (S.profile.train.days || []).join(""), cd: 3650, ic: "dumbbell", col: "carb", t: "Сегодня тренировка", x: `Норма на сегодня ${fmt(nm.k)} ккал, на ${fmt(d)} больше обычного. Добавку лучше отдать углеводам: поесть за час или два до зала, а после добрать белок.` });
+      add({ key: "train" + (S.profile.train.days || []).join(""), cd: 36500, ic: "dumbbell", col: "carb", t: "Сегодня тренировка", x: `Норма на сегодня ${fmt(nm.k)} ккал, на ${fmt(d)} больше обычного. Добавку лучше отдать углеводам: поесть за час или два до зала, а после добрать белок.` });
     }
     // давно не взвешивался
     if (S.plan) {
       const lw = Object.keys(S.weights).sort().pop(), dd = lw ? Math.round((fromKey(tk) - fromKey(lw)) / 864e5) : 99;
-      if (dd >= 8) add({ key: "weigh", cd: 4, ic: "scale", col: "fat", t: "Пора взвеситься", x: `${lw ? `Последнее взвешивание ${dd} ${plural(dd, "день", "дня", "дней")} назад. ` : ""}Взвесься утром натощак: так бот точнее видит темп и вовремя подстроит норму.`, act: "Записать вес", fn: () => weightSheet() });
+      if (dd >= 8) add({ key: "weigh", cd: 36500, ic: "scale", col: "fat", t: "Пора взвеситься", x: `${lw ? `Последнее взвешивание ${dd} ${plural(dd, "день", "дня", "дней")} назад. ` : ""}Взвесься утром натощак: так бот точнее видит темп и вовремя подстроит норму.`, act: "Записать вес", fn: () => weightSheet() });
     }
     // темп относительно плана
     const card = !!($("#t-smart") && $("#t-smart").textContent.trim()); // карточка на главной уже объясняет темп
     if (pi && !pi.reached && !brk && !card && pi.wk >= 2 && pi.trend && !pi.wrong) {
       const lose = S.plan.type === "lose", wk = Math.floor(pi.wk), kg = dec(r1(Math.abs(pi.tw - S.plan.start)));
-      if (Math.abs(pi.diff) <= 0.5) add({ key: "pace", cd: 7, ic: "check", col: "carb", t: "Идёшь по плану", x: `За ${wk} ${plural(wk, "неделю", "недели", "недель")} ${lose ? "−" : "+"}${kg} кг, точно по графику. Продолжай в том же ритме.` });
-      else if (pi.diff > 0.5) add({ key: "pace", cd: 10, ic: lose ? "down-trend" : "up-trend", col: "carb", t: "Опережаешь план", x: lose ? `Ты на ${dec(r1(pi.diff))} кг впереди графика. Хороший результат, но следи за самочувствием: если норму держать тяжело или падают силы на тренировках, лучше снизить темп.` : `Ты на ${dec(r1(pi.diff))} кг впереди графика. При слишком быстром наборе растёт доля жира, поэтому лучше не выходить за норму.` });
+      if (Math.abs(pi.diff) <= 0.5) add({ key: "pace-ok" + pid, cd: 36500, ic: "check", col: "carb", t: "Идёшь по плану", x: `За ${wk} ${plural(wk, "неделю", "недели", "недель")} ${lose ? "−" : "+"}${kg} кг, точно по графику. Продолжай в том же ритме.` });
+      else if (pi.diff > 0.5) add({ key: "pace-up" + pid, cd: 36500, ic: lose ? "down-trend" : "up-trend", col: "carb", t: "Опережаешь план", x: lose ? `Ты на ${dec(r1(pi.diff))} кг впереди графика. Хороший результат, но следи за самочувствием: если норму держать тяжело или падают силы на тренировках, лучше снизить темп.` : `Ты на ${dec(r1(pi.diff))} кг впереди графика. При слишком быстром наборе растёт доля жира, поэтому лучше не выходить за норму.` });
       else {
         const lg = r14.length, over = avg(r14, (d) => d.t.k - d.nm.k), eat = lose ? over > 100 : over < -100;
         const why = lg < 10 ? `За 2 недели записано ${lg} ${plural(lg, "день", "дня", "дней")} из 14, часть еды могла остаться без учёта.` : eat ? `За 2 недели ты ешь в среднем на ${fmt(Math.round(Math.abs(over) / 10) * 10)} ккал ${lose ? "больше" : "меньше"} нормы.` : "Калории при этом в норме, так что скорее всего это колебания воды.";
         const fix = lg < 10 ? "Записывай всё, включая напитки и перекусы, и через неделю картина станет точнее." : eat ? "Неделя в пределах нормы обычно закрывает такое отставание." : "Продолжай в том же режиме. Если отставание сохранится, бот предложит уточнить норму.";
-        add({ key: "pace", cd: 7, ic: "clock", col: "pro", t: `Отстаёшь от плана на ${dec(r1(-pi.diff))} кг`, x: `${why} ${fix}` });
+        add({ key: "pace-down" + pid, cd: 36500, ic: "clock", col: "pro", t: `Отстаёшь от плана на ${dec(r1(-pi.diff))} кг`, x: `${why} ${fix}` });
       }
     }
     // половина этапа
     if (pi && pi.stage && !brk && pi.stage.frac >= 0.5 && pi.stage.frac < 1 && pi.diff > -0.5)
-      add({ key: `half${pi.stage.n}`, cd: 60, ic: "flag", col: "carb", t: "Половина этапа позади", x: `До отметки ${dec(pi.stage.to)} кг осталось ${dec(r1(Math.abs(pi.stage.to - pi.cur)))} кг, срок ${fmtDY(pi.stage.d)}. Ты идёшь хорошо.` });
+      add({ key: "half" + pid, cd: 36500, ic: "flag", col: "carb", t: "Половина этапа позади", x: `До отметки ${dec(pi.stage.to)} кг осталось ${dec(r1(Math.abs(pi.stage.to - pi.cur)))} кг, срок ${fmtDY(pi.stage.d)}. Ты идёшь хорошо.` });
     // белок за неделю
     if ((goal === "lose" || goal === "gain") && r7.length >= 5) {
       const p = avg(r7, (d) => d.t.p), np = avg(r7, (d) => d.nm.p);
       if (p < np * 0.8) {
         const f = myProteinFoods()[0];
-        add({ key: "prot", cd: 7, ic: "protein", col: "pro", t: "Белка не хватает", x: `За неделю в среднем ${r0(p)} г в день при норме ${r0(np)} г. ${goal === "lose" ? "На дефиците белок сохраняет мышцы и дольше держит сытость." : "Без белка набор идёт в основном в жир."} ${f ? `Из того, что ты ешь, больше всего белка даёт ${f.n.toLowerCase()}: добавь его ещё раз в течение дня.` : "Проще всего добавить его в завтрак: творог, яйца или йогурт."}` });
+        add({ key: "prot", cd: 36500, ic: "protein", col: "pro", t: "Белка не хватает", x: `За неделю в среднем ${r0(p)} г в день при норме ${r0(np)} г. ${goal === "lose" ? "На дефиците белок сохраняет мышцы и дольше держит сытость." : "Без белка набор идёт в основном в жир."} ${f ? `Из того, что ты ешь, больше всего белка даёт ${f.n.toLowerCase()}: добавь его ещё раз в течение дня.` : "Проще всего добавить его в завтрак: творог, яйца или йогурт."}` });
       }
     }
     // хорошая неделя
-    if (r7.length >= 6) { const inN = r7.filter((d) => Math.abs(d.t.k - d.nm.k) <= d.nm.k * 0.1).length; if (inN >= 5) add({ key: "week", cd: 7, ic: "check", col: "carb", t: `${inN} из 7 дней в норме`, x: "Отличная неделя. Результат даёт именно такая регулярность, а не идеальные отдельные дни." }); }
+    if (r7.length >= 6) { const inN = r7.filter((d) => Math.abs(d.t.k - d.nm.k) <= d.nm.k * 0.1).length; if (inN >= 5) add({ key: "week", cd: 36500, ic: "check", col: "carb", t: `${inN} из 7 дней в норме`, x: "Отличная неделя. Результат даёт именно такая регулярность, а не идеальные отдельные дни." }); }
     // цели нет
-    if (!S.plan && (goal === "lose" || goal === "gain")) add({ key: "noplan", cd: 14, ic: "target", col: "cal", t: "Поставь цель по весу", x: "С целью бот разобьёт путь на этапы, рассчитает норму под нужный темп и подскажет, если что-то пойдёт не так.", act: "Поставить цель", fn: () => openGoal() });
+    if (!S.plan && (goal === "lose" || goal === "gain")) add({ key: "noplan", cd: 36500, ic: "target", col: "cal", t: "Поставь цель по весу", x: "С целью бот разобьёт путь на этапы, рассчитает норму под нужный темп и подскажет, если что-то пойдёт не так.", act: "Поставить цель", fn: () => openGoal() });
     return L;
   }
   function coachPick() { const tk = todayKey(), cd = S.settings.coach || {}; return coachList().find((m) => !(cd[m.key] && cd[m.key] > tk)) || null; }
@@ -1115,7 +1115,10 @@
     const h = new Date().getHours(), kLeft = nm.k - t.k, pLeft = nm.p - t.p;
     const wb = weekBalance(selDay);
     let ic = "bulb", col = "cal", title = "", text = "";
-    const pat = () => { const p = isToday ? patternInsight(nm) : null; if (!p) return false; ic = p.ic; col = p.col; title = p.t; text = p.x; return true; };
+    const pat = () => { const p = isToday ? patternInsight(nm) : null; if (!p) return false;
+      // наблюдение показываем только в тот день, когда оно появилось впервые
+      const seen = (S.settings.patSeen = S.settings.patSeen || {}), tk = todayKey(), key = p.ic + p.col;
+      if (seen[key] && seen[key] !== tk) return false; if (!seen[key]) { seen[key] = tk; save(); } ic = p.ic; col = p.col; title = p.t; text = p.x; return true; };
     if (!dayEntries(selDay).length) { if (!pat()) return ""; }
     else if (t.k > nm.k * 1.1) {
       col = "pro"; ic = "flame"; title = "Сверх нормы на " + fmt(t.k - nm.k) + " ккал";
