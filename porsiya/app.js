@@ -198,7 +198,8 @@
   // тренировочные дни: норма выше в день тренировки и ниже в день отдыха, недельная сумма та же. Разница идёт в углеводы
   const wdIdx = (k) => (fromKey(k).getDay() + 6) % 7; // 0 = понедельник
   function trainSet() { const t = S.profile.train || {}; return !S.profile.manual.on && t.n > 0 && Array.isArray(t.days) && t.days.length > 0; }
-  function isTrainDay(k) { const ov = (S.trainOv || {})[k]; if (ov != null) return ov; const t = S.profile.train; return !!(t.days && t.days.includes(wdIdx(k))); }
+  function planTrain(k) { const t = S.profile.train; return !!(t.days && t.days.includes(wdIdx(k)) && (!t.since || k >= t.since)); }
+  function isTrainDay(k) { const ov = (S.trainOv || {})[k]; return ov != null ? ov : planTrain(k); }
   function trainDelta(k) {
     if (!trainSet()) return 0;
     const avg = calcNorm().train, sess = (avg * 7) / S.profile.train.n;
@@ -633,7 +634,7 @@
     $$(".wdc", root).forEach((b) => (b.onclick = () => {
       haptic("sel"); const i = +b.dataset.wd, days = new Set(d.train.days || []);
       days.has(i) ? days.delete(i) : days.add(i);
-      d.train.days = [...days].sort(); b.classList.toggle("on", days.has(i));
+      d.train.days = [...days].sort(); if (!d.train.since) d.train.since = dkey(monday(new Date())); b.classList.toggle("on", days.has(i));
       if (days.size) { d.train.n = days.size; syncN(); }
     }));
   }
@@ -682,7 +683,7 @@
       <div class="week" id="week"></div>
       <div class="gap"></div>
       <div class="grad g-cal tap" id="c-cal" role="button">
-        <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span><span class="c-lbl">Калории</span><button class="chip tchip" id="cal-tr" hidden></button></span><span class="chip" id="cal-chip"></span></div>
+        <div class="c-head"><span class="c-title"><span class="ic">${icon("flame")}</span>Калории</span><span class="chip" id="cal-chip"></span></div>
         <div class="big"><span class="num" id="v-k">0</span><span class="of" id="v-kn"></span></div>
         ${dotRow(24, "anim")}
         <div class="stats3 two"><div><span>Осталось</span><b class="num" id="v-left">0</b></div><div><span>Запас недели</span><b class="num" id="v-week">0</b></div></div>
@@ -699,6 +700,7 @@
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><div class="mid"><span class="num" id="v-f">0</span><span class="u">г</span></div><div class="sub" id="s-f"></div></div>
         ${dotRow(24, "anim")}
       </div>
+      <div id="t-trw"></div>
       <div id="t-ins"></div>
       <div class="section-h"><h2 id="m-title">Приёмы пищи</h2><span class="muted" id="m-sum"></span></div>
       <div id="meals"></div>`;
@@ -745,7 +747,7 @@
       $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
-    updWater(); renderTodayGoal(); renderTrainChip(); renderTrainDay();
+    updWater(); renderTodayGoal(); renderTrainWeek();
     const av = $("#t-ava"), ai = avatarInner(); if (av && av._ai !== ai) { av.innerHTML = ai; av._ai = ai; }
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
@@ -754,36 +756,22 @@
     $("#m-sum").textContent = dayEntries(selDay).length ? fmt(t.k) + " ккал" : "";
     renderMeals();
   }
-  function renderTrainChip() {
-    const c = $("#cal-tr"); if (!c) return;
-    const lbl = $("#c-cal .c-lbl");
-    if (!trainSet()) { c.hidden = true; if (lbl) lbl.hidden = false; return; }
-    const on = isTrainDay(selDay); c.hidden = false; if (lbl) lbl.hidden = true; c.classList.toggle("off", !on);
-    c.innerHTML = `${icon(on ? "dumbbell" : "sofa")}${on ? "Тренировка" : "Отдых"}`;
-    if (!c._b) { c._b = true; c.onclick = (e) => { e.stopPropagation(); toggleTrain(); }; }
-  }
-  function renderTrainDay() {
-    renderTrainChip();
-    const box = $("#t-train"); if (!box) return;
-    if (!trainSet()) { if (box.innerHTML) box.innerHTML = ""; return; }
-    const k = selDay, on = isTrainDay(k), plan = S.profile.train.days.includes(wdIdx(k)), d = Math.abs(trainDelta(k));
-    const sub = on ? `${plan ? "По плану" : "Перенесена"}, норма +${fmt(d)} ккал` : `${plan ? "Пропущена" : "Отдых"}, норма −${fmt(d)} ккал`;
-    let b = $("#t-tday");
-    if (!b) {
-      box.innerHTML = `<button class="tday" id="t-tday"><span class="td-ic">${icon("dumbbell")}</span><span class="td-t"><b></b><span></span></span><span class="toggle"></span></button>`;
-      b = $("#t-tday"); b.onclick = toggleTrain;
-    }
-    b.classList.toggle("on", on); $(".toggle", b).classList.toggle("on", on);
-    $(".td-t b", b).textContent = k === todayKey() ? "Тренировка сегодня" : "Тренировка в этот день";
-    $(".td-t span", b).textContent = sub;
-  }
-  function toggleTrain() {
-    const k = selDay, on = isTrainDay(k), days = S.profile.train.days, plan = days.includes(wdIdx(k));
-    const setOv = (key, v) => { S.trainOv = S.trainOv || {}; if (v === days.includes(wdIdx(key))) delete S.trainOv[key]; else S.trainOv[key] = v; };
-    haptic("sel"); setOv(k, !on); save(); renderWeek(); updateToday(); if (sheetOpen && $("#t-train")) { const sc = $("#sh-body").scrollTop; openCalDetail(); $("#sh-body").scrollTop = sc; }
-    // пропустил тренировку по плану: предложить перенести на следующий день
-    const nx = dkey(addDays(fromKey(k), 1));
-    if (on && plan && k >= todayKey() && !isTrainDay(nx)) toast("Тренировка снята", () => { setOv(nx, true); save(); updateToday(); renderWeek(); toast("Тренировка перенесена на завтра", null, "dumbbell"); }, "dumbbell", "На завтра");
+  // тренировки недели: дни из профиля стоят по умолчанию, любой день можно отметить или снять разово
+  function setTrainOv(key, v) { S.trainOv = S.trainOv || {}; if (v === planTrain(key)) delete S.trainOv[key]; else S.trainOv[key] = v; }
+  function renderTrainWeek() {
+    const box = $("#t-trw"); if (!box) return;
+    if (!trainSet()) { if (box.innerHTML) { box.innerHTML = ""; box._h = ""; } return; }
+    const mon = monday(weekAnchor || fromKey(selDay)), tk = todayKey();
+    const days = Array.from({ length: 7 }, (_, i) => { const k = dkey(addDays(mon, i)); return { k, on: isTrainDay(k), plan: planTrain(k), today: k === tk }; });
+    const n = days.filter((x) => x.on).length, up = Math.abs(trainDelta(days.find((x) => x.on) ? days.find((x) => x.on).k : tk));
+    const moved = days.some((x) => x.on !== x.plan);
+    const html = `<div class="gap"></div><div class="card trw">
+      <div class="trw-h"><div><div class="card-t">Тренировки на неделе</div><div class="card-s">${n} ${plural(n, "тренировка", "тренировки", "тренировок")}${n ? ` · +${fmt(up)} ккал в эти дни` : ""}</div></div>${moved ? `<button class="trw-r" id="trw-r">Как в плане</button>` : ""}</div>
+      <div class="trw-d">${days.map((x, i) => `<button class="trw-b${x.on ? " on" : ""}${x.today ? " now" : ""}" data-tk="${x.k}"><span>${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][i]}</span>${icon("dumbbell")}</button>`).join("")}</div>
+    </div>`;
+    if (box._h === html) return; box._h = html; box.innerHTML = html;
+    $$(".trw-b", box).forEach((b) => (b.onclick = () => { haptic("sel"); setTrainOv(b.dataset.tk, !isTrainDay(b.dataset.tk)); save(); renderWeek(); updateToday(); }));
+    const r = $("#trw-r", box); if (r) r.onclick = () => { haptic("light"); days.forEach((x) => S.trainOv && delete S.trainOv[x.k]); save(); renderWeek(); updateToday(); };
   }
   function setMonthLabel(d) { const el = $("#wk-mt"); if (el) { const m = addDays(monday(d), 3); el.textContent = cap(MONN[m.getMonth()]) + " " + m.getFullYear(); } }
   function selectDay(k) {
@@ -803,7 +791,7 @@
       const tr = trainSet() && isTrainDay(k);
       html += `<button class="day ${k === tk ? "today" : ""} ${k === selDay ? "sel" : ""} ${st ? "has st-" + st : ""} ${tr ? "trd" : ""}" data-k="${k}" ${fut ? "disabled" : ""}><span class="wd">${WD[d.getDay()]}</span><span class="dn">${d.getDate()}</span><span class="mark">${tr ? icon("dumbbell") : ""}</span></button>`;
     }
-    w.innerHTML = html; placePill(false);
+    w.innerHTML = html; placePill(false); renderTrainWeek();
     w.onclick = (e) => { const b = e.target.closest(".day"); if (!b || b.disabled) return; haptic("sel"); selectDay(b.dataset.k); };
     let x0 = null;
     w.ontouchstart = (e) => { x0 = e.touches[0].clientX; };
@@ -1290,7 +1278,6 @@
         <div class="big"><span class="num">${fmt(t.k)}</span><span class="of">из ${fmt(nm.k)} ккал</span></div>
         ${dotRow(24)}
       </div>
-      ${trainSet() ? `<div id="t-train"></div>` : ""}
       <div class="gap"></div>
       <div class="card"><div class="card-t">По приёмам пищи</div>
         ${byMeal.map((x) => `<div class="mbar"><span class="ml">${icon(x.m.i)}${x.m.n}</span>${dotRow(14, "ink")}<span class="mv">${x.k ? fmt(x.k) : "—"}</span></div>`).join("")}
@@ -1311,7 +1298,6 @@
     setDots($(".d-hero .drow"), t.k, nm.k, { over: true });
     $$(".mbar .drow").forEach((r, i) => setDots(r, byMeal[i].k, maxM));
     raf2(() => { $("#d-hours").classList.add("go"); $("#d-wbal").classList.add("go"); });
-    renderTrainDay();
   }
   const MACRO = {
     p: { n: "Белки", g: "белка", i: "protein", kind: "pro", tip: (nm) => `Раздели белок на 3–4 приёма примерно по ${Math.round(nm.p / 4 / 5) * 5} г: так он лучше идёт в мышцы, чем одна большая порция вечером.` },
@@ -1855,7 +1841,7 @@
     for (let i = 0; i < 42; i++) {
       const d = addDays(start, i); if (i >= 35 && d.getMonth() !== m) break;
       const k = dkey(d), out = d.getMonth() !== m, fut = d > now && k !== tk, st = status(k);
-      cells += `<button class="cd ${out ? "out" : ""} ${fut ? "fut" : ""} ${k === tk ? "today" : ""} ${k === calSel ? "sel" : ""} ${st}" data-k="${k}">${d.getDate()}<i></i></button>`;
+      cells += `<button class="cd ${out ? "out" : ""} ${fut ? "fut" : ""} ${k === tk ? "today" : ""} ${k === calSel ? "sel" : ""} ${st}${trainSet() && isTrainDay(k) ? " trd" : ""}" data-k="${k}">${d.getDate()}<i>${trainSet() && isTrainDay(k) ? icon("dumbbell") : ""}</i></button>`;
     }
     card.innerHTML = `<div class="cal-head"><b>${cap(MONN[m])} ${y}</b><div class="cal-nav"><button id="cal-p" aria-label="Предыдущий месяц">${icon("back")}</button><button id="cal-n" aria-label="Следующий месяц" ${canNext ? "" : "disabled"}>${icon("right")}</button></div></div>
       <div class="cal-wd">${["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((w) => `<span>${w}</span>`).join("")}</div>

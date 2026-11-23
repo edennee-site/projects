@@ -1226,8 +1226,8 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 /* цифра в красном кружке по центру */
 .sbadge { display: flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 5px; line-height: 1; font-feature-settings: "tnum" 1; letter-spacing: 0; box-sizing: border-box; }
 /* день тренировки в ленте недели: маленькая гантель вместо точки, цвет по статусу дня */
-.week .day.trd .mark { width: 12px; height: 8px; background: none; color: var(--g40); display: grid; place-items: center; }
-.week .day.trd .mark svg { width: 12px; height: 12px; }
+.week .day.trd .mark { width: 14px; height: 9px; background: none; color: var(--g40); display: grid; place-items: center; }
+.week .day.trd .mark svg { width: 14px; height: 14px; stroke-width: 2.3; }
 .week .day.trd.st-in .mark { color: var(--ok); }
 .week .day.trd.st-ov .mark { color: var(--pro-b); }
 .week .day.trd.st-un .mark { color: var(--g60); }
@@ -1238,3 +1238,19 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 .tchip.off { background: rgba(255,255,255,.12); color: rgba(255,255,255,.85); }
 .tchip:active { transform: scale(.94); }
 .tchip[hidden] { display: none; }
+
+/* календарь: гантель в дни тренировок */
+.cal-grid .cd.trd i { width: 14px; height: 9px; border-radius: 0; background: none !important; display: grid; place-items: center; color: var(--g40); }
+.cal-grid .cd.trd i svg { width: 14px; height: 14px; }
+.cal-grid .cd.trd.in i { color: var(--ok); } .cal-grid .cd.trd.ov i { color: var(--pro-b); } .cal-grid .cd.trd.un i { color: var(--g60); }
+.cal-grid .cd.trd.sel i { color: var(--ink-inv); }
+/* тренировки на неделе */
+.trw-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.trw-r { flex: none; font-size: 13px; font-weight: 500; height: 30px; padding: 0 12px; border-radius: 99px; background: var(--card-2); color: var(--ink); }
+.trw-d { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 14px; }
+.trw-b { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 9px 0 10px; border-radius: 14px; background: var(--card-2); color: var(--g60); font-size: 12.5px; font-weight: 500; transition: background-color .25s var(--ease), color .25s var(--ease), transform .25s var(--spring); }
+.trw-b svg { width: 18px; height: 18px; opacity: .35; transition: opacity .25s var(--ease); }
+.trw-b.on { background: var(--ink); color: var(--ink-inv); }
+.trw-b.on svg { opacity: 1; }
+.trw-b.now span { font-weight: 600; }
+.trw-b:active { transform: scale(.93); }
