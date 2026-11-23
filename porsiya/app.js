@@ -1929,7 +1929,7 @@
     }
     const ios = /iPhone|iPad/.test(navigator.userAgent);
     openSheet("На рабочий стол", `<div class="hs-big"><img src="logo.png?v=3" alt=""><b>Nomi</b></div>
-      <div class="card"><div class="card-t">Как добавить</div><div class="card-s" style="margin-top:8px;line-height:1.6">${inTg ? "Обнови Telegram до последней версии: тогда кнопка добавит иконку сама.<br><br>Или открой меню бота (три точки сверху) и выбери «Добавить на экран „Домой“»." : ios ? "1. Нажми «Поделиться» внизу Safari.<br>2. Выбери «На экран „Домой“».<br>3. Нажми «Добавить»." : "1. Открой меню браузера (три точки).<br>2. Выбери «Добавить на главный экран».<br>3. Подтверди."}</div></div>`, `<button class="btn" id="hs-ok">Понятно</button>`);
+      <div class="card"><div class="card-t">Как добавить</div><div class="card-s" style="margin-top:8px;line-height:1.6">${inTg ? "Обнови Telegram до последней версии: тогда кнопка добавит иконку сама.<br><br>Или открой меню бота (три точки сверху) и выбери «Добавить на экран Домой»." : ios ? "1. Нажми «Поделиться» внизу Safari.<br>2. Выбери «На экран Домой».<br>3. Нажми «Добавить»." : "1. Открой меню браузера (три точки).<br>2. Выбери «Добавить на главный экран».<br>3. Подтверди."}</div></div>`, `<button class="btn" id="hs-ok">Понятно</button>`);
     $("#hs-ok").onclick = closeSheet;
   }
   function nameSheet() {
