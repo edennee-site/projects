@@ -1279,3 +1279,4 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 
 /* подпись между карточками: отступ и снизу, чтобы не прилипала */
 .note + .list, .note + .card, .note + .grp { margin-top: 14px; }
+#p-res > .alert:first-child, #p-res > .card:first-child, #p-res > .loading:first-child { margin-top: 10px; }
