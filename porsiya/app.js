@@ -466,6 +466,7 @@
     }, { passive: true });
     sh.addEventListener("touchmove", (e) => {
       if (y0 == null) return;
+      if (!body.contains(e.target) && e.cancelable) e.preventDefault(); // фон под окном не прокручивается
       const y = e.touches[0].clientY, now = performance.now(); dy = y - y0;
       if (!decided) { if (Math.abs(dy) < 6) return; decided = true; drag = dy > 0 && (!body.contains(e.target) || body.scrollTop <= 0); if (drag) { sh.style.transition = "none"; scrim.style.transition = "none"; y0 = y; dy = 0; } }
       if (!drag) return;
