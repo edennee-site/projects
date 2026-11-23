@@ -486,8 +486,11 @@
     b.innerHTML = body; b.scrollTop = 0;
     sheetFoot(foot); setBack(back); freshSheet();
   }
+  // подтверждение закрытия бота, пока распознанная еда не сохранена
+  function closeGuard(on) { if (inTg && tg.enableClosingConfirmation && tg.isVersionAtLeast && tg.isVersionAtLeast("6.2")) try { on ? tg.enableClosingConfirmation() : tg.disableClosingConfirmation(); } catch (e) {} }
   function closeSheet() {
     if (!sheetOpen) return;
+    closeGuard(false);
     sheetOpen = false; setBack(null);
     $("#scrim").classList.remove("open"); $("#sheet").classList.remove("open"); $("#sheet").style.transform = "";
     if (cur !== "onboard") $("#tabbar").classList.remove("hide");
@@ -1512,7 +1515,7 @@
     try {
       const items = await recognize(add.photo, add.hint);
       if (my !== anReq) return;
-      add.items = items; add.done = true; add.cleared = false; add.lastHint = add.hint; haptic(items.length ? "ok" : "err");
+      add.items = items; add.done = true; add.cleared = false; closeGuard(true); add.lastHint = add.hint; haptic(items.length ? "ok" : "err");
       renderPhoto();
     } catch (err) {
       if (my !== anReq) return;
@@ -2110,6 +2113,8 @@
         tg.onEvent("themeChanged", () => { if (S.settings.theme === "auto") applyTheme(true); });
         const setTop = () => { const ci = tg.contentSafeAreaInset || {}; document.documentElement.style.setProperty("--tg-top", (ci.top || 0) + "px"); };
         setTop(); tg.onEvent("contentSafeAreaChanged", setTop);
+        // кнопка «Настройки» в меню Telegram ведёт в профиль
+        if (tg.SettingsButton && tg.isVersionAtLeast && tg.isVersionAtLeast("7.0")) { tg.SettingsButton.show(); tg.SettingsButton.onClick(() => { if (sheetOpen) closeSheet(); if (S.onboarded) show("profile"); }); }
       } catch (e) {}
     }
     applyTheme();
