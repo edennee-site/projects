@@ -1845,7 +1845,7 @@
       <div class="card p-card">
         <div class="p-row">
           <button class="p-ava" id="pr-ava" aria-label="Сменить фото">${avatarInner()}<span class="p-ava-edit">${icon("cam")}</span></button>
-          <div class="p-id"><b>${esc(p.name || "Без имени")}</b><span>${p.age} ${plural(p.age, "год", "года", "лет")} · ${p.height} см · ${dec(p.weight)} кг</span></div>
+          <div class="p-id"><b>${esc(p.name || "Без имени")}</b><span>${p.age}&nbsp;${plural(p.age, "год", "года", "лет")} · ${p.height}&nbsp;см · ${dec(p.weight)}&nbsp;кг</span></div>
           <button class="p-edit" id="pr-name" aria-label="Изменить имя">${icon("edit")}</button>
         </div>
         <div class="p-stats">
@@ -1915,7 +1915,7 @@
     if (!$("#pr-k")) return;
     $("#pr-chip").textContent = p.manual.on ? "Задана вручную" : GOALS[p.goal].n;
     countUp($("#pr-k"), nm.k, { key: "prk" }); countUp($("#pr-p"), nm.p, { key: "prp" }); countUp($("#pr-f"), nm.f, { key: "prf" }); countUp($("#pr-c"), nm.c, { key: "prc" });
-    $("#pr-tdee").textContent = p.manual.on ? "Расчётная норма " + fmt(auto.k) + " ккал" : "Расход около " + fmt(auto.tdee) + " ккал" + (adj ? (adj > 0 ? ". Профицит " : ". Дефицит ") + fmt(Math.abs(auto.k - auto.tdee)) + " ккал" : "");
+    $("#pr-tdee").textContent = p.manual.on ? "Расчётная норма " + fmt(auto.k) + " ккал" : "Расход около " + fmt(auto.tdee) + "\u00a0ккал" + (adj ? (adj > 0 ? ". Профицит " : ". Дефицит ") + fmt(Math.abs(auto.k - auto.tdee)) + "\u00a0ккал" : "");
   }
   const prow = (ed, ic, l, v) => `<button class="prow" data-ed="${ed}"><span class="pi">${icon(ic)}</span><span class="pl"><b>${l}</b></span><span class="pv">${esc(v)}${icon("right")}</span></button>`;
   $("#f-ava").addEventListener("change", async (e) => {
