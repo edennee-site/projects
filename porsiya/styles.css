@@ -1196,3 +1196,5 @@ input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 
 .portion .pn .pe-name + span { display: block; }
 .portion #pe-mb { margin-top: 12px; }
 .portion .re-grid .field { background: var(--card-2); }
+/* списки в карточках: последний ряд без нижнего отступа, чтобы поле снизу равнялось полю сверху */
+.card .src:last-child, .card .mbar:last-child, .card .fitem:last-child, .card .ps-row:last-child, .card .msl > div:last-child, .card .res-legend > div:last-child { padding-bottom: 0; }
