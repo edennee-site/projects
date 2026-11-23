@@ -97,7 +97,10 @@
       const lite = JSON.parse(JSON.stringify(S));
       Object.values(lite.days).forEach((arr) => arr.forEach((e) => delete e.img));
       delete lite.profile.avatar;
-      const str = JSON.stringify(lite); const parts = Math.ceil(str.length / 4000);
+      let str = JSON.stringify(lite);
+      // лимит облака Telegram: при переполнении оставляем последние 180 дней, затем 90
+      for (const keep of [180, 90]) { if (str.length <= 60 * 4000) break; const cut = dkey(addDays(new Date(), -keep)); Object.keys(lite.days).forEach((k) => { if (k < cut) delete lite.days[k]; }); str = JSON.stringify(lite); }
+      const parts = Math.ceil(str.length / 4000);
       if (parts > 60) return;
       for (let i = 0; i < parts; i++) CS.setItem("p" + i, str.slice(i * 4000, (i + 1) * 4000));
       CS.setItem("pn", String(parts));
