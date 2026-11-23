@@ -1,6 +1,7 @@
 name = "nomi"
 main = "worker.js"
 compatibility_date = "2026-11-01"
+workers_dev = true
 
 [vars]
 APP_URL = "https://edennee-site.github.io/projects/porsiya/"
@@ -11,7 +12,7 @@ MODEL = "gemini-flash-latest"
 [[d1_databases]]
 binding = "DB"
 database_name = "nomi"
-database_id = "ВСТАВИТЬ_ПОСЛЕ_СОЗДАНИЯ"
+database_id = "1b8ff482-d15a-42f9-b189-da7ba559fe44"
 
 [triggers]
 crons = ["0 * * * *"]
