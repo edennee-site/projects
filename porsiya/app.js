@@ -386,9 +386,9 @@
 
   // ---------- toast ----------
   let toastT;
-  function toast(text, undo, ic) {
+  function toast(text, undo, ic, label) {
     const t = $("#toast");
-    t.innerHTML = `<span class="tic ${ic ? "tic-" + ic : ""}">${icon(ic || "check")}</span><span class="tx">${esc(text)}</span>${undo ? '<button id="t-undo">Отменить</button>' : ""}`;
+    t.innerHTML = `<span class="tic ${ic ? "tic-" + ic : ""}">${icon(ic || "check")}</span><span class="tx">${esc(text)}</span>${undo ? `<button id="t-undo">${esc(label || "Отменить")}</button>` : ""}`;
     t.classList.add("show"); clearTimeout(toastT);
     toastT = setTimeout(() => t.classList.remove("show"), undo ? 4500 : 2300);
     if (undo) $("#t-undo").onclick = () => { undo(); t.classList.remove("show"); haptic("light"); };
@@ -757,16 +757,25 @@
   }
   function renderTrainDay() {
     const box = $("#t-train"); if (!box) return;
-    if (!trainSet()) { if (box._h !== "") { box._h = ""; box.innerHTML = ""; } return; }
-    const on = isTrainDay(selDay), d = trainDelta(selDay);
-    const html = `<button class="tday${on ? " on" : ""}" id="t-tday"><span class="td-ic">${icon(on ? "dumbbell" : "sofa")}</span><span class="td-t"><b>${on ? "День тренировки" : "День отдыха"}</b><span>${d >= 0 ? "+" : "−"}${fmt(Math.abs(d))} ккал к средней норме</span></span><span class="td-sw">${on ? "Отдыхаю" : "Тренируюсь"}</span></button>`;
-    if (box._h === html) return; box._h = html; box.innerHTML = html;
-    $("#t-tday").onclick = () => {
-      haptic("sel"); S.trainOv = S.trainOv || {};
-      const plan = S.profile.train.days.includes(wdIdx(selDay));
-      if (!on === plan) delete S.trainOv[selDay]; else S.trainOv[selDay] = !on;
-      save(); updateToday();
-    };
+    if (!trainSet()) { if (box.innerHTML) box.innerHTML = ""; return; }
+    const k = selDay, on = isTrainDay(k), plan = S.profile.train.days.includes(wdIdx(k)), d = Math.abs(trainDelta(k));
+    const sub = on ? `${plan ? "По плану" : "Перенесена"}, норма +${fmt(d)} ккал` : `${plan ? "Пропущена" : "Отдых"}, норма −${fmt(d)} ккал`;
+    let b = $("#t-tday");
+    if (!b) {
+      box.innerHTML = `<button class="tday" id="t-tday"><span class="td-ic">${icon("dumbbell")}</span><span class="td-t"><b></b><span></span></span><span class="toggle"></span></button>`;
+      b = $("#t-tday"); b.onclick = toggleTrain;
+    }
+    b.classList.toggle("on", on); $(".toggle", b).classList.toggle("on", on);
+    $(".td-t b", b).textContent = k === todayKey() ? "Тренировка сегодня" : "Тренировка в этот день";
+    $(".td-t span", b).textContent = sub;
+  }
+  function toggleTrain() {
+    const k = selDay, on = isTrainDay(k), days = S.profile.train.days, plan = days.includes(wdIdx(k));
+    const setOv = (key, v) => { S.trainOv = S.trainOv || {}; if (v === days.includes(wdIdx(key))) delete S.trainOv[key]; else S.trainOv[key] = v; };
+    haptic("sel"); setOv(k, !on); save(); updateToday();
+    // пропустил тренировку по плану: предложить перенести на следующий день
+    const nx = dkey(addDays(fromKey(k), 1));
+    if (on && plan && k >= todayKey() && !isTrainDay(nx)) toast("Тренировка снята", () => { setOv(nx, true); save(); updateToday(); toast("Тренировка перенесена на завтра", null, "dumbbell"); }, "dumbbell", "На завтра");
   }
   function setMonthLabel(d) { const el = $("#wk-mt"); if (el) { const m = addDays(monday(d), 3); el.textContent = cap(MONN[m.getMonth()]) + " " + m.getFullYear(); } }
   function selectDay(k) {
