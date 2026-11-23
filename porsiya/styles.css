@@ -1280,3 +1280,11 @@ html, body, button, a, input, textarea, label, [role="button"] { touch-action: m
 /* подпись между карточками: отступ и снизу, чтобы не прилипала */
 .note + .list, .note + .card, .note + .grp { margin-top: 14px; }
 #p-res > .alert:first-child, #p-res > .card:first-child, #p-res > .loading:first-child { margin-top: 10px; }
+/* тренд веса: спокойная пунктирная линия поверх графика */
+.wtrend { fill: none; stroke: var(--ink); stroke-opacity: .35; stroke-width: 1.5; stroke-dasharray: 3 4; stroke-linecap: round; opacity: 0; transition: opacity .6s var(--ease) .9s; }
+.wchart.go .wtrend { opacity: 1; }
+.w-leg { margin-top: 10px; }
+.legend .lg-dash { width: 14px; height: 0; border-radius: 0; background: none !important; border-top: 1.5px dashed var(--g60); }
+.tip-acts { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.tip-acts .btn { flex: none; }
+.lnk { color: inherit; text-decoration: underline; text-underline-offset: 2px; font: inherit; padding: 0; opacity: .9; }

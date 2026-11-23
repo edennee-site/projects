@@ -147,7 +147,9 @@
     const t = p.train || { n: 0, min: 0, type: "strength" };
     const train = (t.n * t.min * TTYPES[t.type || "strength"].met * 3.5 * p.weight) / 200 / 7;
     const steps = p.steps > 0 ? Math.max(0, p.steps - 4000) * 0.0005 * p.weight : 0;
-    const tdee = base + train + steps;
+    // расход, уточнённый по реальным данным человека (см. adaptInfo)
+    const ar = p === S.profile && p.adapt && p.adapt.r ? clamp(p.adapt.r, 0.8, 1.2) : 1;
+    const tdee = (base + train + steps) * ar;
     const g = GOALS[p.goal];
     let k = tdee * (1 + g.adj);
     if (p.goal === "lose") k = Math.max(k, tdee - 600);
@@ -158,7 +160,7 @@
     const pr = Math.min(220, Math.round(refW * g.pk));
     const fa = Math.round(Math.max(refW * 0.8, (k * 0.25) / 9));
     const ca = Math.max(0, Math.round((k - pr * 4 - fa * 9) / 4));
-    return { k, p: pr, f: fa, c: ca, tdee: Math.round(tdee), bmr: Math.round(bmr), train: Math.round(train), steps: Math.round(steps) };
+    return { k, p: pr, f: fa, c: ca, tdee: Math.round(tdee), bmr: Math.round(bmr), train: Math.round(train), steps: Math.round(steps), ar };
   }
   // ---------- цель по весу ----------
   const PACE = { lose: [0.35, 0.5, 0.75], gain: [0.15, 0.25, 0.4] };
@@ -166,6 +168,67 @@
   const planKgWeek = (pl) => (pl.start * PACE[pl.type][pl.pace]) / 100;
   const planAdj = (pl) => (pl.type === "lose" ? -1 : 1.2) * (planKgWeek(pl) * 7700) / 7;
   const curWeight = () => { const e = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0])); return e.length ? e[e.length - 1][1] : S.profile.weight; };
+  // ---------- тренд веса: сглаживание дневных скачков (вода, соль) ----------
+  // ежедневный ряд с интерполяцией между взвешиваниями и экспоненциальное сглаживание (α = 0,2)
+  let trendCache = null;
+  function trendSeries() {
+    const ent = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0]));
+    const sig = ent.length + ":" + (ent.length ? ent[ent.length - 1].join() + ent[0][0] : "") + todayKey();
+    if (trendCache && trendCache.sig === sig) return trendCache.map;
+    const map = {};
+    if (ent.length) {
+      let i = 0, t = ent[0][1];
+      const end = todayKey();
+      for (let d = fromKey(ent[0][0]); dkey(d) <= end; d = addDays(d, 1)) {
+        const k = dkey(d);
+        while (i < ent.length - 1 && ent[i + 1][0] <= k) i++;
+        let v = ent[i][1];
+        if (i < ent.length - 1 && ent[i][0] < k) { const a = fromKey(ent[i][0]), b = fromKey(ent[i + 1][0]); v = ent[i][1] + ((ent[i + 1][1] - ent[i][1]) * (d - a)) / (b - a); }
+        t = k === ent[0][0] ? v : t + 0.2 * (v - t);
+        map[k] = t;
+      }
+    }
+    trendCache = { sig, map };
+    return map;
+  }
+  // тренд надёжен, если за 4 недели не меньше 3 взвешиваний
+  function weightTrend() {
+    const ent = Object.keys(S.weights), since = dkey(addDays(new Date(), -28));
+    if (ent.filter((k) => k >= since).length < 3) return null;
+    const m = trendSeries(), tk = todayKey(), wk = dkey(addDays(new Date(), -7));
+    if (m[tk] == null || m[wk] == null) return null;
+    return { now: m[tk], perWeek: m[tk] - m[wk], at: (k) => m[k] };
+  }
+  // ---------- уточнение расхода по данным: что ел и как менялся тренд веса за 3 недели ----------
+  function adaptInfo() {
+    if (S.profile.manual.on) return null;
+    const N = 21, end = addDays(new Date(), -1), start = addDays(end, -(N - 1)), sk = dkey(start), ek = dkey(end);
+    const keys = []; for (let d = new Date(start); dkey(d) <= ek; d = addDays(d, 1)) { const k = dkey(d); if (isLogged(k)) keys.push(k); }
+    if (keys.length < 15) return null; // нужны почти все дни, иначе недозапись исказит расчёт
+    const wk = Object.keys(S.weights).filter((k) => k >= dkey(addDays(start, -3)) && k <= todayKey()).sort();
+    if (wk.length < 3 || (fromKey(wk[wk.length - 1]) - fromKey(wk[0])) / 864e5 < 12) return null;
+    const TS = trendSeries(); if (TS[sk] == null || TS[ek] == null) return null;
+    const avg = keys.reduce((a, k) => a + totals(k).k, 0) / keys.length, n = calcNorm();
+    if (avg < n.bmr * 0.95) return null; // явно записано не всё
+    const dW = TS[ek] - TS[sk], real = avg - (dW * 7700) / N, base = n.tdee / n.ar;
+    const r = clamp(real / base, 0.8, 1.2), cur = n.tdee, next = base * r;
+    if (Math.abs(next - cur) < Math.max(100, cur * 0.05)) return null;
+    // за один шаг меняем не больше чем на 10%
+    const rr = clamp(r, n.ar * 0.9, n.ar * 1.1);
+    return { avg: Math.round(avg / 10) * 10, dW, real: Math.round(real / 10) * 10, cur: Math.round(cur / 10) * 10, r: rr, days: keys.length };
+  }
+  // ---------- плато: 3 недели вес не идёт к цели ----------
+  function plateauInfo() {
+    const goal = S.plan ? S.plan.type : S.profile.goal; if (goal !== "lose" && goal !== "gain") return null;
+    const first = Object.keys(S.weights).sort()[0]; if (!first || (new Date() - fromKey(first)) / 864e5 < 28) return null;
+    if (S.plan && (new Date() - fromKey(S.plan.startDate)) / 864e5 < 21) return null;
+    const TS = trendSeries(), a = TS[dkey(addDays(new Date(), -21))], b = TS[todayKey()];
+    if (a == null || b == null || Object.keys(S.weights).filter((k) => k >= dkey(addDays(new Date(), -21))).length < 3) return null;
+    const dW = b - a, stuck = goal === "lose" ? dW > -0.2 : dW < 0.15;
+    if (!stuck) return null;
+    let logged = 0; for (let i = 1; i <= 21; i++) if (isLogged(dkey(addDays(new Date(), -i)))) logged++;
+    return { goal, dW, logged };
+  }
   const weightAt = (k) => { const e = Object.entries(S.weights).filter(([d]) => d <= k).sort((a, b) => a[0].localeCompare(b[0])); return e.length ? e[e.length - 1][1] : null; };
   const addMonths = (d, m) => { const x = new Date(d); x.setMonth(x.getMonth() + m); return x; };
   // реальный темп: если калорийность упёрлась в безопасный минимум, темп ниже выбранного
@@ -189,13 +252,15 @@
     const now = new Date(), wElapsed = Math.max(0, (now - sd) / 6048e5);
     const expected = pl.start + sign * Math.min(total, kw * wElapsed), cur = curWeight();
     const done = clamp((sign * (cur - pl.start)) / (total || 1), 0, 1);
-    const diff = sign * (cur - expected);
+    // отставание и «не в ту сторону» считаем по тренду, а не по одному взвешиванию
+    const T = weightTrend(), tw = T ? T.now : cur;
+    const diff = sign * (tw - expected);
     const months = Math.max(1, Math.ceil(weeks / 4.345));
     const ms = Array.from({ length: months }, (_, i) => { const d = addMonths(sd, i + 1), exp = pl.start + sign * Math.min(total, kw * ((d - sd) / 6048e5)); const past = d <= now; const w = past ? weightAt(dkey(d)) : null; return { d, exp: r1(exp), past, cur: false, ok: (past && w != null && sign * (w - exp) >= -0.3) || sign * (cur - exp) >= 0, w }; });
     const nx = ms.find((m) => !m.ok && !m.past) || ms.find((m) => !m.ok); if (nx) nx.cur = true;
     let stage = null;
     if (nx) { const i = ms.indexOf(nx), from = i ? ms[i - 1].exp : pl.start; stage = { n: i + 1, from, to: nx.exp, d: nx.d, last: i === ms.length - 1, frac: clamp((sign * (cur - from)) / (Math.abs(nx.exp - from) || 1), 0, 1) }; }
-    return { stage, sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wk: wElapsed, wrong: wElapsed >= 2 && sign * (cur - pl.start) <= -0.5 };
+    return { stage, sign, total, kw, km: kw * 4.345, weeks, end, expected, cur, done, diff, ms, reached: done >= 1, wk: wElapsed, tw, trend: T, wrong: wElapsed >= 2 && sign * (tw - pl.start) <= -0.5 };
   }
   function norm() { const m = S.profile.manual; return m.on ? { k: m.k, p: m.p, f: m.f, c: m.c } : calcNorm(); }
   // тренировочные дни: норма выше в день тренировки и ниже в день отдыха, недельная сумма та же. Разница идёт в углеводы
@@ -741,6 +806,7 @@
         ${dotRow(24, "anim")}
       </div>
       <div id="t-trw"></div>
+      <div id="t-smart"></div>
       <div id="t-ins"></div>
       <div class="section-h"><h2 id="m-title">Приёмы пищи</h2><span class="muted" id="m-sum"></span></div>
       <div id="meals"></div>`;
@@ -787,7 +853,7 @@
       $("#s-" + k).textContent = rest > 0 ? `из ${nm[k]} г` : "норма закрыта";
     });
     setDots($("#c-cal .drow"), t.k, kN, { over: true });
-    updWater(); renderTodayGoal(); renderTrainWeek();
+    updWater(); renderTodayGoal(); renderTrainWeek(); renderSmart();
     const av = $("#t-ava"), ai = avatarInner(); if (av && av._ai !== ai) { av.innerHTML = ai; av._ai = ai; }
     setDots($("#c-p .drow"), t.p, nm.p); setDots($("#c-c .drow"), t.c, nm.c); setDots($("#c-f .drow"), t.f, nm.f);
     if (first) raf2(() => $$("#s-today .drow").forEach((r) => r.classList.add("go")));
@@ -798,6 +864,35 @@
   }
   // тренировки недели: дни из профиля стоят по умолчанию, любой день можно отметить или снять разово
   function setTrainOv(key, v) { S.trainOv = S.trainOv || {}; if (v === planTrain(key)) delete S.trainOv[key]; else S.trainOv[key] = v; }
+  // ---------- умные подсказки: уточнение нормы и плато ----------
+  function renderSmart() {
+    const box = $("#t-smart"); if (!box) return;
+    let html = "";
+    const st = S.settings, tk = todayKey(), isToday = selDay === tk;
+    const ad = isToday && !(st.adaptSkip && st.adaptSkip > tk) ? adaptInfo() : null;
+    const pl = isToday && !ad && !(st.platSkip && st.platSkip > tk) ? plateauInfo() : null;
+    if (ad) {
+      const down = ad.real < ad.cur, goal = S.plan ? S.plan.type : S.profile.goal, step = Math.abs(ad.real - ad.cur) > ad.cur * 0.1 + 10;
+      const why = goal === "lose" ? (down ? "Поэтому вес стоит." : "Поэтому вес уходит быстрее плана, можно есть больше.") : goal === "gain" ? (down ? "Поэтому вес растёт быстрее плана, а лишний темп идёт в жир." : "Поэтому вес не растёт.") : (down ? "Поэтому вес понемногу растёт." : "Поэтому вес понемногу снижается.");
+      const nk = (() => { const save = S.profile.adapt; S.profile.adapt = { r: ad.r }; const k = calcNorm().k; S.profile.adapt = save; return k; })();
+      html = `<div class="gap"></div><div class="card tip c-cal smart"><div class="tip-h"><span class="tip-ic">${icon("target")}</span><b>Норму можно уточнить</b></div>
+        <p>За ${ad.days} ${plural(ad.days, "день", "дня", "дней")} с записями в среднем ${fmt(ad.avg)} ккал в день, а тренд веса за 3 недели ${ad.dW >= 0 ? "+" : "−"}${dec(Math.abs(r1(ad.dW)))} кг. Значит, реальный расход около ${fmt(ad.real)} ккал, а не ${fmt(ad.cur)}. ${why} Норма станет ${fmt(nk)} ккал${step ? ", дальше уточним ещё, если понадобится" : ""}.</p>
+        <div class="tip-acts"><button class="btn sm" id="sm-ok">Уточнить норму</button><button class="btn sm ghost" id="sm-no">Не сейчас</button></div></div>`;
+    } else if (pl) {
+      const lose = pl.goal === "lose", few = pl.logged < 17;
+      html = `<div class="gap"></div><div class="card tip c-${lose ? "carb" : "pro"} smart"><div class="tip-h"><span class="tip-ic">${icon("mountain")}</span><b>Вес стоит 3 недели</b></div>
+        <p>${few ? `Записано ${pl.logged} ${plural(pl.logged, "день", "дня", "дней")} из 21. Без полной картины не понять причину: записывай всё, включая напитки и перекусы, и через пару недель норма уточнится сама.`
+          : lose ? "Калории записаны почти каждый день, а вес не снижается. Так бывает: организм привыкает к дефициту. Помогает неделя на поддержании, затем возвращение к норме, или пересчёт плана от текущего веса."
+          : "Калории записаны почти каждый день, а вес не растёт. Добавь 150–200 ккал в день, лучше углеводами вокруг тренировок, и проверь, что силовые нагрузки растут."}</p>
+        <div class="tip-acts">${S.plan && !few ? `<button class="btn sm" id="sm-re">Пересчитать план</button>` : ""}<button class="btn sm ghost" id="sm-hide">Понятно</button></div></div>`;
+    }
+    if (box._h === html) return; box._h = html; box.innerHTML = html;
+    const later = (key, days) => { S.settings[key] = dkey(addDays(new Date(), days)); save(); renderSmart(); };
+    if ($("#sm-ok")) $("#sm-ok").onclick = () => { haptic("ok"); S.profile.adapt = { r: ad.r, date: tk }; S.settings.adaptSkip = dkey(addDays(new Date(), 14)); S.settings.platSkip = dkey(addDays(new Date(), 21)); save(); lastVals.clear(); refreshAll(); toast(`Норма уточнена: ${fmt(norm().k)} ккал`); };
+    if ($("#sm-no")) $("#sm-no").onclick = () => { haptic("light"); later("adaptSkip", 7); };
+    if ($("#sm-hide")) $("#sm-hide").onclick = () => { haptic("light"); later("platSkip", 14); };
+    if ($("#sm-re")) $("#sm-re").onclick = () => { haptic("ok"); const pi = planInfo(); S.plan.start = r1(pi.tw); S.plan.startDate = tk; save(); later("platSkip", 21); toast("План пересчитан от текущего веса"); refreshAll(); };
+  }
   function renderTrainWeek() {
     const box = $("#t-trw"); if (!box) return;
     if (!trainSet()) { if (box.innerHTML) { box.innerHTML = ""; box._h = ""; } return; }
@@ -1134,7 +1229,7 @@
         <span class="gk-t"><b>${pl.type === "lose" ? "Похудение" : "Набор массы"}</b><span>${st ? `Этап ${st.n} · до ${fmtDY(st.d)}` : `до ${fmtDY(pi.end)}`}</span></span>
         <span class="gk-p num">${Math.round((st ? st.frac : pi.done) * 100)}<small>%</small></span></div>
       <div class="gk-w"><span><em>Сейчас</em><b class="num">${dec(pi.cur)} кг</b></span>${dotRow(14, "ink gc-dots")}<span style="text-align:right"><em>${st && !st.last ? "Этап" : "Цель"}</em><b class="num">${dec(st ? st.to : pl.target)} кг</b></span></div>
-      ${pi.reached ? `<div class="gc-m gc-done">${icon("trophy")}<span>Цель достигнута</span><span class="gc-btn" data-next>Что дальше</span></div>` : weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : pi.wrong ? `<div class="gc-m gc-due">${icon("info")}<span>Вес ${pi.sign < 0 ? "выше" : "ниже"} старта на ${dec(Math.abs(pi.cur - pl.start))} кг</span><span class="gc-btn" data-check>Что делать</span></div>` : `<div class="gc-m">${icon("flag")}<span>${st && st.last ? `Последний этап, финиш к ${fmtDY(pi.end)}` : `Цель: ${dec(pl.target)} кг к ${fmtDY(pi.end)}`}</span></div>`}
+      ${pi.reached ? `<div class="gc-m gc-done">${icon("trophy")}<span>Цель достигнута</span><span class="gc-btn" data-next>Что дальше</span></div>` : weighDue() ? `<div class="gc-m gc-due">${icon("scale")}<span>Пора взвеситься</span><span class="gc-btn" data-weigh>Записать</span></div>` : pi.wrong ? `<div class="gc-m gc-due">${icon("info")}<span>Вес ${pi.sign < 0 ? "выше" : "ниже"} старта на ${dec(Math.abs(pi.tw - pl.start))} кг</span><span class="gc-btn" data-check>Что делать</span></div>` : `<div class="gc-m">${icon("flag")}<span>${st && st.last ? `Последний этап, финиш к ${fmtDY(pi.end)}` : `Цель: ${dec(pl.target)} кг к ${fmtDY(pi.end)}`}</span></div>`}
     </button>`;
   }
   function goalStatus(pi) {
@@ -1172,7 +1267,7 @@
     countUp($("#pd-p"), Math.round(pi.done * 100), { from: 0, dur: 900, force: true });
     setDots($(".d-hero .drow"), pi.done, 1);
     $("#pd-edit").onclick = () => planEdit(() => planDetail(back));
-    $("#pd-re").onclick = () => { S.plan.start = curWeight(); S.plan.startDate = todayKey(); save(); haptic("ok"); toast("План пересчитан"); planDetail(back); };
+    $("#pd-re").onclick = () => { S.plan.start = r1(planInfo().tw); S.plan.startDate = todayKey(); save(); haptic("ok"); toast("План пересчитан"); planDetail(back); };
     $("#pd-del").onclick = () => { S.plan = null; save(); haptic("medium"); toast("Цель удалена"); back(); };
   }
   function planEdit(back) {
@@ -1235,7 +1330,7 @@
       const wrong = pi.wrong, eat = recentEat(14), nk = norm().k;
       const over = eat && (lose ? eat.avg > nk * 1.05 : eat.avg < nk * 0.95);
       t = wrong ? "Вес идёт в другую сторону" : `Отстаёшь на ${dec(-pi.diff)} кг`;
-      txt = (wrong ? `${lose ? "+" : "−"}${dec(Math.abs(pi.cur - pl.start))} кг от старта, по плану сейчас ${dec(pi.expected)} кг. ` : `По плану сейчас ${dec(pi.expected)} кг. `)
+      txt = (wrong ? `${lose ? "+" : "−"}${dec(Math.abs(pi.tw - pl.start))} кг от старта, по плану сейчас ${dec(pi.expected)} кг. ` : `По плану сейчас ${dec(pi.expected)} кг. `)
         + (over ? `За последние ${eat.n} ${plural(eat.n, "день", "дня", "дней")} в среднем ${fmt(eat.avg)} ккал при норме ${fmt(nk)}. ${lose ? "Поэтому вес и не снижается. Держись нормы, и он пойдёт вниз." : "Добирай норму каждый день, иначе массе не из чего расти."}`
           : eat ? `Калории в норме, значит часть еды не попадает в дневник${lose ? ": соусы, масло, напитки, перекусы" : ""}. Пересчитай план от текущего веса, чтобы этапы снова стали реальными.`
           : "Записывай питание каждый день, тогда станет видно, в чём причина.");
@@ -1244,21 +1339,45 @@
     else if (pi.diff >= 0.6) { ic = "rocket"; t = `Впереди на ${dec(pi.diff)} кг`; txt = `Темп выше плана. ${lose ? "Если чувствуешь сильный голод или упадок сил, лучше немного замедлиться." : "Если вместе с весом заметно растёт талия, лучше немного замедлиться, чтобы набирать в основном мышцы."}`; acts = `${pl.pace > 0 ? `<button class="btn ghost" data-pc="slower">Замедлить темп</button>` : ""}<button class="btn" data-pc="ok">Продолжать</button>`; }
     else { t = "Всё по плану"; txt = `Сейчас ${dec(pi.cur)} кг, по плану ${dec(pi.expected)} кг. Норма остаётся прежней, продолжай в том же духе.`; acts = `<button class="btn" data-pc="ok">Отлично</button>`; }
     setSheet("Сверка с целью", `<div class="pc-hero"><span class="pc-ic ${tone}">${icon(ic)}</span><b>${t}</b><p>${txt}</p></div>
-      <div class="card"><div class="ps-row"><span>Сейчас</span><b>${dec(pi.cur)} кг</b></div><div class="ps-row"><span>По плану</span><b>${dec(pi.expected)} кг</b></div><div class="ps-row"><span>Цель</span><b>${dec(pl.target)} кг</b></div><div class="ps-row"><span>Пройдено</span><b>${Math.round(pi.done * 100)}%</b></div></div>`, `<div class="btn-row pc-acts" style="margin:0">${acts}</div>`, null, 1);
+      <div class="card"><div class="ps-row"><span>Сейчас</span><b>${dec(pi.cur)} кг</b></div>${pi.trend ? `<div class="ps-row"><span>Тренд веса</span><b>${dec(r1(pi.tw))} кг</b></div>` : ""}<div class="ps-row"><span>По плану</span><b>${dec(pi.expected)} кг</b></div><div class="ps-row"><span>Цель</span><b>${dec(pl.target)} кг</b></div><div class="ps-row"><span>Пройдено</span><b>${Math.round(pi.done * 100)}%</b></div></div>`, `<div class="btn-row pc-acts" style="margin:0">${acts}</div>`, null, 1);
     $$("[data-pc]").forEach((b) => (b.onclick = () => {
       const a = b.dataset.pc; haptic("ok");
-      if (a === "shift") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); toast("План пересчитан от текущего веса"); }
-      if (a === "faster") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); S.plan.pace++; toast("Темп ускорен, норма обновлена"); }
-      if (a === "slower") { S.plan.start = pi.cur; S.plan.startDate = todayKey(); S.plan.pace--; toast("Темп снижен, норма обновлена"); }
+      if (a === "shift") { S.plan.start = r1(pi.tw); S.plan.startDate = todayKey(); toast("План пересчитан от текущего веса"); }
+      if (a === "faster") { S.plan.start = r1(pi.tw); S.plan.startDate = todayKey(); S.plan.pace++; toast("Темп ускорен, норма обновлена"); }
+      if (a === "slower") { S.plan.start = r1(pi.tw); S.plan.startDate = todayKey(); S.plan.pace--; toast("Темп снижен, норма обновлена"); }
       if (a === "keep") { S.plan = null; S.profile.goal = "keep"; toast("Режим поддержания"); }
       save(); if (a === "new") { S.plan = null; save(); planTop = true; planEdit(closeSheet); return; }
       closeSheet(); if (cur === "today") updateToday(); if (cur === "history") drawWeight();
     }));
   }
+  // ---------- пройден месячный этап цели: короткий праздник ----------
+  function checkStage() {
+    const pl = S.plan; if (!pl || !S.game) return;
+    const pi = planInfo(), ok = pi.ms.filter((m) => m.ok).length, sig = [pl.type, pl.start, pl.startDate, pl.target, pl.pace].join("|");
+    // n не уменьшается: колебания веса вокруг границы этапа не дают повторных поздравлений
+    if (!pl.ms || pl.ms.sig !== sig) { pl.ms = { sig, n: ok }; save(); return; }
+    if (ok <= pl.ms.n || pi.reached) { if (pi.reached && ok > pl.ms.n) { pl.ms.n = ok; save(); } return; }
+    const passed = pi.ms[ok - 1], from = ok > 1 ? pi.ms[ok - 2].exp : pl.start, dw = Math.abs(passed.exp - from);
+    pl.ms.n = ok; save();
+    stageBanner(`Этап ${ok} пройден`, `${pl.type === "lose" ? "−" : "+"}${dec(r1(dw))} кг по плану${pi.stage ? `, дальше ${dec(pi.stage.to)} кг` : ""}`);
+  }
+  function stageBanner(t, d) {
+    setTimeout(() => {
+      haptic("ok");
+      const old = $(".ach-ban"); if (old) old.remove();
+      const el = document.createElement("button"); el.className = "ach-ban";
+      el.innerHTML = `<span class="ab-ic">${icon("flag")}</span><span class="ab-t"><em>${esc(d)}</em><b>${esc(t)}</b></span>${icon("right", "chev")}`;
+      document.body.appendChild(el); raf2(() => el.classList.add("on"));
+      const close = () => { el.classList.remove("on"); setTimeout(() => el.remove(), 500); };
+      const tm = setTimeout(close, 4500);
+      el.onclick = () => { clearTimeout(tm); close(); if (sheetOpen) closeSheet(); setTimeout(() => openGoal(), sheetOpen ? 300 : 0); };
+    }, 600);
+  }
   function renderTodayGoal() {
     const box = $("#t-goal"); if (!box) return;
     const html = `${goalCardHTML().replace('id="goal-open"', 'id="goal-open" data-home')}<div class="gap"></div>`;
     if (box._h !== html) { box._h = html; box.innerHTML = html; if (S.plan) { const pi = planInfo(); setDots($(".gc-dots", box), pi.stage && !pi.reached ? pi.stage.frac : pi.done, 1); } }
+    checkStage();
     if (!box._bound) { box._bound = true; box.addEventListener("click", (e) => { const c = e.target.closest("#goal-open"); if (!c || sheetOpen) return; if (e.target.closest("[data-weigh]")) { weightSheet(); return; } if (S.plan && (planInfo().reached || e.target.closest("[data-check]"))) { openSheet("Цель по весу", ""); planCheck(); return; } openGoal(); }); }
   }
   function streakSheet() {
@@ -1443,12 +1562,18 @@
     for (let i = 1; i <= 7; i++) { const d = dkey(addDays(new Date(), -i)); if (!isLogged(d)) continue; const t = totals(d); days++; k += t.k; p += t.p; if (Math.abs(t.k - nm.k) <= nm.k * 0.1) inN++; }
     return { days, avgK: days ? r0(k / days) : 0, avgP: days ? r0(p / days) : 0, inNorm: inN };
   }
+  // час вечернего напоминания: через час после того, как человек обычно делает последнюю запись (19…22)
+  function remindHour() {
+    const hs = Object.keys(S.days).filter(isLogged).sort().slice(-14).map((k) => { const d = new Date(Math.max(...S.days[k].map((e) => e.t))); return d.getHours() + d.getMinutes() / 60; }).filter((h) => h >= 12).sort((a, b) => a - b);
+    if (hs.length < 5) return 21;
+    return clamp(Math.round(hs[Math.floor(hs.length / 2)] + 1), 19, 22);
+  }
   function serverSync() {
     if (!API || !inTg || !tg.initData || !S.onboarded) return;
     const tk = todayKey(), t = totals(tk), nm = normFor(tk), st = streakInfo(), wk = Object.keys(S.weights).sort();
     const body = JSON.stringify({ tz: -new Date().getTimezoneOffset(), day: tk, logged: isLogged(tk), k: r0(t.k), p: r0(t.p), nk: nm.k, np: nm.p, streak: st.n, best: st.best,
       goal: S.profile.goal, plan: S.plan ? { type: S.plan.type, start: S.plan.start, target: S.plan.target } : null, weight: curWeight(), lastWeigh: wk[wk.length - 1] || null, week: weekSum(),
-      last: Object.keys(S.days).filter(isLogged).sort().pop() || null, name: S.profile.name || "",
+      last: Object.keys(S.days).filter(isLogged).sort().pop() || null, name: S.profile.name || "", rh: remindHour(),
       pf: (() => { const f = myProteinFoods()[0]; return f ? { n: f.n, g: f.g ? r0(f.g) : 0, p: r0(f.p) } : null; })(),
       stage: (() => { const pi = S.plan ? planInfo() : null; return pi && pi.stage && !pi.reached ? { n: pi.stage.n, to: pi.stage.to, d: dkey(pi.stage.d) } : null; })() });
     if (body === lastSync) return;
@@ -1814,12 +1939,13 @@
     const ent = Object.entries(S.weights).sort((a, b) => a[0].localeCompare(b[0]));
     const last = ent.length ? ent[ent.length - 1][1] : S.profile.weight;
     const m30 = ent.filter(([k]) => fromKey(k) >= addDays(new Date(), -30));
-    const delta = m30.length > 1 ? last - m30[0][1] : 0;
+    const delta = m30.length > 1 ? last - m30[0][1] : 0, wT = weightTrend();
     const pts = ent.slice(-14);
     let chart = "";
     if (pts.length > 1) {
       const W = 320, H = 150, PL = 40, PR = 12, PT = 16, PB = 16;
-      const vs = pts.map((p) => p[1]); let mn = Math.min(...vs), mx = Math.max(...vs);
+      const TS = trendSeries(), tv = pts.map((p) => TS[p[0]]), showT = !!weightTrend() && tv.every((v) => v != null);
+      const vs = pts.map((p) => p[1]).concat(showT ? tv : []); let mn = Math.min(...vs), mx = Math.max(...vs);
       if (mx - mn < 1) { const c = (mx + mn) / 2; mn = c - 0.5; mx = c + 0.5; }
       const X = (i) => PL + (i / (pts.length - 1)) * (W - PL - PR), Y = (v) => PT + (1 - (v - mn) / (mx - mn)) * (H - PT - PB);
       const xy = pts.map((p, i) => [X(i), Y(p[1])]);
@@ -1832,14 +1958,14 @@
       chart = `<div class="wchart" id="wch"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="wgrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--fat-b)" stop-opacity=".28"/><stop offset="1" stop-color="var(--fat-b)" stop-opacity="0"/></linearGradient></defs>
         <line class="wgrid" x1="${PL}" x2="${W - PR}" y1="${PT}" y2="${PT}"/><line class="wgrid" x1="${PL}" x2="${W - PR}" y1="${H - PB}" y2="${H - PB}"/>
         <path class="warea" fill="url(#wgrad)" d="${d} L${xy[xy.length - 1][0].toFixed(1)} ${H - PB} L${xy[0][0].toFixed(1)} ${H - PB} Z"/>
-        <path class="wline" d="${d}" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" vector-effect="non-scaling-stroke"/></svg>
+        <path class="wline" d="${d}" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" vector-effect="non-scaling-stroke"/>${showT ? `<path class="wtrend" d="${tv.map((v, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1)).join(" ")}" vector-effect="non-scaling-stroke"/>` : ""}</svg>
         <span class="wlab" style="top:${(PT / H) * 100}%">${dec(mx)}</span><span class="wlab" style="top:${((H - PB) / H) * 100}%">${dec(mn)}</span>
         ${xy.map((p, i) => `<span class="wdot ${i === xy.length - 1 ? "last" : ""}" style="left:${(p[0] / W) * 100}%;top:${(p[1] / H) * 100}%;transition-delay:${0.5 + i * 0.05}s"></span>`).join("")}</div>
-        <div class="axis" style="padding-left:${(PL / W) * 100}%;padding-right:${(PR / W) * 100}%"><span>${fromKey(pts[0][0]).getDate()} ${MONS[fromKey(pts[0][0]).getMonth()]}</span><span>${fromKey(pts[pts.length - 1][0]).getDate()} ${MONS[fromKey(pts[pts.length - 1][0]).getMonth()]}</span></div>`;
+        <div class="axis" style="padding-left:${(PL / W) * 100}%;padding-right:${(PR / W) * 100}%"><span>${fromKey(pts[0][0]).getDate()} ${MONS[fromKey(pts[0][0]).getMonth()]}</span><span>${fromKey(pts[pts.length - 1][0]).getDate()} ${MONS[fromKey(pts[pts.length - 1][0]).getMonth()]}</span></div>${showT ? `<div class="legend w-leg"><span><i style="background:var(--fat-a)"></i>взвешивания</span><span><i class="lg-dash"></i>тренд без скачков воды</span></div>` : ""}`;
     } else chart = `<p class="card-s" style="margin-top:16px">Отмечай вес раз в несколько дней утром натощак, и здесь появится график. Смотри на тренд, а не на отдельные дни.</p>`;
     box.innerHTML = `<div class="c-head"><span class="c-title"><span class="ins-ic t-fat sm">${icon("scale")}</span>Вес</span><button class="btn sm ghost" id="w-add">${icon("plus")}Записать</button></div>
       <div class="mid" style="margin-top:14px"><span class="num">${dec(last)}</span><span class="u muted">кг</span></div>
-      <div class="w-meta">${delta ? `<div><em>За 30 дней</em><b class="${(delta > 0) === (S.profile.goal !== "lose") ? "good" : "bad"}">${delta > 0 ? "+" : "−"}${dec(Math.abs(delta))} кг</b></div>` : ""}${S.plan ? `<div><em>Цель</em><b>${dec(S.plan.target)} кг</b></div><div><em>Пройдено</em><b>${Math.round(planInfo().done * 100)}%</b></div>` : ""}</div>${chart}`;
+      <div class="w-meta">${wT ? `<div><em>Тренд за неделю</em><b class="${Math.abs(wT.perWeek) < 0.05 || S.profile.goal === "keep" ? "" : (wT.perWeek > 0) === (S.profile.goal !== "lose") ? "good" : "bad"}">${Math.abs(wT.perWeek) < 0.05 ? "0 кг" : (wT.perWeek > 0 ? "+" : "−") + dec(Math.abs(r1(wT.perWeek))) + " кг"}</b></div>` : delta ? `<div><em>За 30 дней</em><b class="${(delta > 0) === (S.profile.goal !== "lose") ? "good" : "bad"}">${delta > 0 ? "+" : "−"}${dec(Math.abs(delta))} кг</b></div>` : ""}${S.plan ? `<div><em>Цель</em><b>${dec(S.plan.target)} кг</b></div><div><em>Пройдено</em><b>${Math.round(planInfo().done * 100)}%</b></div>` : ""}</div>${chart}`;
     if ($("#wch")) raf2(() => { $("#wch").classList.add("go"); $("#wch .wline").style.strokeDashoffset = 0; });
     $("#w-add").onclick = weightSheet;
   }
@@ -2004,7 +2130,8 @@
     if (!$("#pr-k")) return;
     $("#pr-chip").textContent = p.manual.on ? "Задана вручную" : GOALS[p.goal].n;
     countUp($("#pr-k"), nm.k, { key: "prk" }); countUp($("#pr-p"), nm.p, { key: "prp" }); countUp($("#pr-f"), nm.f, { key: "prf" }); countUp($("#pr-c"), nm.c, { key: "prc" });
-    $("#pr-tdee").textContent = p.manual.on ? "Расчётная норма " + fmt(auto.k) + " ккал" : "Расход около " + fmt(auto.tdee) + "\u00a0ккал" + (adj ? (adj > 0 ? ". Профицит " : ". Дефицит ") + fmt(Math.abs(auto.k - auto.tdee)) + "\u00a0ккал" : "");
+    $("#pr-tdee").innerHTML = p.manual.on ? "Расчётная норма " + fmt(auto.k) + " ккал" : "Расход около " + fmt(Math.round(auto.tdee / 10) * 10) + "\u00a0ккал" + (p.adapt && p.adapt.r ? ", уточнён по твоим данным" : "") + (adj ? (adj > 0 ? ". Профицит " : ". Дефицит ") + fmt(Math.abs(auto.k - auto.tdee)) + "\u00a0ккал" : "") + (p.adapt && p.adapt.r && !p.manual.on ? ` <button class="lnk" id="pr-unadapt">Сбросить уточнение</button>` : "");
+    const ua = $("#pr-unadapt"); if (ua) ua.onclick = (e) => { e.stopPropagation(); haptic("light"); delete p.adapt; save(); renderProfile(); toast(`Норма по формуле: ${fmt(norm().k)} ккал`); };
   }
   const prow = (ed, ic, l, v) => `<button class="prow" data-ed="${ed}"><span class="pi">${icon(ic)}</span><span class="pl"><b>${l}</b></span><span class="pv">${esc(v)}${icon("right")}</span></button>`;
   $("#f-ava").addEventListener("change", async (e) => {
@@ -2162,5 +2289,5 @@
   }
   if (/[?&]dev\b/.test(location.search)) { try { const d = JSON.parse(localStorage.getItem(KEY) || "{}"); d.settings = Object.assign(d.settings || {}, { dev: true }); localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
   init();
-  window.__porsiya = { get state() { return S; }, show, openAdd, calcNorm, planInfo, achList, streakInfo, gameStats };
+  window.__porsiya = { get state() { return S; }, show, openAdd, calcNorm, planInfo, achList, streakInfo, gameStats, adaptInfo, plateauInfo, weightTrend, remindHour };
 })();

@@ -90,6 +90,7 @@ function localNow(tz) { const d = new Date(Date.now() + tz * 60000); return { h:
 function pick(s, L, name) {
   const today = s.day === L.day, logged = today && s.logged, hi = name ? name + ", " : "";
   const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1), P = (t) => cap(hi + t);
+  const RH = s.rh >= 19 && s.rh <= 22 ? s.rh : 21;
   const daysSince = s.last ? Math.round((Date.parse(L.day) - Date.parse(s.last)) / 864e5) : 99;
   // воскресенье 20:00: итоги недели
   if (L.dow === 0 && L.h === 20 && s.week && s.week.days >= 3) {
@@ -100,15 +101,15 @@ function pick(s, L, name) {
     return t;
   }
   // 21:00: серия под угрозой
-  if (L.h === 21 && !logged && s.streak > 0) return P(`серия ${s.streak} ${plural(s.streak, "день", "дня", "дней")} сгорит в полночь. Добавь хотя бы один приём пищи, это займёт полминуты.`);
+  if (L.h === RH && !logged && s.streak > 0) return P(`серия ${s.streak} ${plural(s.streak, "день", "дня", "дней")} сгорит в полночь. Добавь хотя бы один приём пищи, это займёт полминуты.`);
   // 21:00: белок не добран
-  if (L.h === 21 && logged && s.np && s.p < s.np * 0.8) {
+  if (L.h === RH && logged && s.np && s.p < s.np * 0.8) {
     const left = Math.round(s.np - s.p);
     const tip = s.pf ? ` Из того, что ты обычно ешь, подойдёт ${s.pf.n.toLowerCase()}${s.pf.g ? `: ${s.pf.g} г дают ${s.pf.p} г белка` : ""}.` : "";
     return P(`до нормы белка сегодня ${left} г.${tip}`);
   }
   // 20:00: набор массы, калории сильно не добраны
-  if (L.h === 20 && logged && s.goal === "gain" && s.nk && s.k < s.nk * 0.65) return P(`до нормы ещё ${fmt(s.nk - s.k)} ккал. Для набора массы важно добирать калории каждый день, иначе вес стоит на месте.`);
+  if (L.h === RH - 1 && logged && s.goal === "gain" && s.nk && s.k < s.nk * 0.65) return P(`до нормы ещё ${fmt(s.nk - s.k)} ккал. Для набора массы важно добирать калории каждый день, иначе вес стоит на месте.`);
   // понедельник 9:00: взвешивание
   if (L.dow === 1 && L.h === 9 && s.plan && (!s.lastWeigh || (Date.parse(L.day) - Date.parse(s.lastWeigh)) / 864e5 >= 6)) return P(`пора взвеситься: утром натощак, после туалета. Так прогресс к цели будет точным.`);
   // 19:00: не заходил 3 дня, напоминаем один раз за перерыв
