@@ -254,7 +254,7 @@
   function runs(keys, pred) { let best = 0, cur = 0, prev = null; keys.forEach((k) => { const ok = pred(k); const cont = prev && dkey(addDays(fromKey(prev), 1)) === k; cur = ok ? (cont ? cur + 1 : 1) : 0; if (!ok) cur = 0; best = Math.max(best, cur); prev = k; }); return best; }
   function gameStats() {
     const keys = Object.keys(S.days).filter(isLogged).sort(), nm = norm();
-    let photos = 0, entries = 0, inNorm = 0, proDays = 0, xp = 0, todayXp = 0, bfDays = 0, fullDays = 0;
+    let photos = 0, entries = 0, inNorm = 0, proDays = 0, xp = 0, todayXp = 0, bfDays = 0, fullDays = 0, early = 0, lightEve = 0, sweetOk = 0, proMeals = 0;
     const T = {}; keys.forEach((k) => (T[k] = totals(k)));
     keys.forEach((k) => {
       const t = T[k], arr = S.days[k];
@@ -262,7 +262,18 @@
       const nk = trainSet() ? normFor(k).k : nm.k; if (Math.abs(t.k - nk) <= nk * 0.1) inNorm++; if (t.p >= nm.p * 0.95) proDays++;
       if (arr.some((e) => e.meal === "breakfast")) bfDays++;
       if (["breakfast", "lunch", "dinner"].every((m) => arr.some((e) => e.meal === m))) fullDays++;
+      if (arr.some((e) => e.meal === "breakfast" && new Date(e.t).getHours() < 10)) early++;
+      const mk = (m) => arr.filter((e) => e.meal === m).reduce((a, e) => a + e.k, 0), mp = (m) => arr.filter((e) => e.meal === m).reduce((a, e) => a + e.p, 0);
+      if (mk("dinner") > 0 && t.k >= nk * 0.6 && mk("dinner") <= t.k * 0.35) lightEve++;
+      if (t.k >= nk * 0.6 && arr.filter((e) => e.cat === "sweet").reduce((a, e) => a + e.k, 0) <= t.k * 0.1) sweetOk++;
+      if (["breakfast", "lunch", "dinner"].every((m) => mp(m) >= 20)) proMeals++;
     });
+    // выходные в норме: суббота и воскресенье одной недели
+    let weekends = 0; keys.forEach((k) => { const d = fromKey(k); if (d.getDay() !== 6) return; const sun = dkey(addDays(d, 1)); const ok = (x) => T[x] && Math.abs(T[x].k - normFor(x).k) <= normFor(x).k * 0.1; if (ok(k) && ok(sun)) weekends++; });
+    // разнообразие: разных блюд за 30 дней
+    const names = new Set(); for (let i = 0; i < 30; i++) dayEntries(dkey(addDays(new Date(), -i))).forEach((e) => names.add(e.n.trim().toLowerCase()));
+    // возвращения: после пропуска снова 3 дня подряд
+    let comeback = 0; { let gap = false, run = 0; const all0 = []; if (keys.length) for (let d = fromKey(keys[0]); dkey(d) <= todayKey(); d = addDays(d, 1)) all0.push(dkey(d)); all0.forEach((k) => { if (T[k]) { run++; if (gap && run === 3) { comeback++; gap = false; } } else { if (run) gap = true; run = 0; } }); }
     const all = []; if (keys.length) for (let d = fromKey(keys[0]); dkey(d) <= todayKey(); d = addDays(d, 1)) all.push(dkey(d));
     const has = (k) => !!T[k];
     const proRun = runs(all, (k) => has(k) && T[k].p >= nm.p * 0.95);
@@ -284,7 +295,9 @@
     const wAvg = {}; wk.forEach(([k, v]) => { const m = dkey(monday(fromKey(k))); (wAvg[m] = wAvg[m] || []).push(v); });
     const wl = Object.keys(wAvg).sort().map((m) => [m, wAvg[m].reduce((a, b) => a + b, 0) / wAvg[m].length]);
     let clean = 0; for (let i = 1; i < wl.length; i++) { if (dkey(addDays(fromKey(wl[i - 1][0]), 7)) !== wl[i][0]) continue; const ch = ((wl[i][1] - wl[i - 1][1]) / wl[i - 1][1]) * 100; if (ch >= 0.1 && ch <= 0.5) clean++; }
-    return { goodWeeks, precise, balanced, proKg, weighWeeks: Math.max(weighWeeks, bestWW), clean, w0,
+    // ровный вес: недели, где средний вес изменился не больше чем на 0,5%
+    let stableW = 0; for (let i = 1; i < wl.length; i++) { if (dkey(addDays(fromKey(wl[i - 1][0]), 7)) !== wl[i][0]) continue; if (Math.abs((wl[i][1] - wl[i - 1][1]) / wl[i - 1][1]) * 100 <= 0.5) stableW++; }
+    return { early, lightEve, sweetOk, proMeals, weekends, variety: names.size, comeback, stableW, goodWeeks, precise, balanced, proKg, weighWeeks: Math.max(weighWeeks, bestWW), clean, w0,
       lostPct: Math.max(0, ((w0 - wc) / w0) * 100), gainedPct: Math.max(0, ((wc - w0) / w0) * 100),
       own: S.my.length + S.combos.length, days: keys.length, photos, entries, inNorm, proDays, bfDays, fullDays, weights: wk.length, combos: S.combos.length,
       proRun, carbRun, fatRun, noOver, surplus, planMs: pi ? pi.ms.filter((m) => m.ok).length : 0, planDone: pi && pi.reached ? 1 : 0, todayXp: 0 };
@@ -312,20 +325,30 @@
       track("weigh", "scale", "fat", "Контроль веса", g.weighWeeks, [1, 2, 4, 8, 16], (x) => x === 1 ? "Взвесься на этой неделе" : `Взвешивайся каждую неделю: ${x} ${plural(x, "неделя", "недели", "недель")} подряд`, "нед."),
       track("photo", "cam", "cal", "Фотограф", g.photos, [1, 5, 15, 40, 100], (x) => `${x} ${plural(x, "блюдо", "блюда", "блюд")} по фото`, "фото"),
       track("own", "bookmark", "pro", "Своя кухня", g.own, [1, 3, 7, 15, 30], (x) => `Сохрани ${x} ${plural(x, "своё блюдо", "своих блюда", "своих блюд")} или набор`, "шт."),
+      track("early", "breakfast", "fat", "Ранний старт", g.early, [3, 7, 21, 50, 100], (x) => `${D(x)} с завтраком до 10:00`, "дн."),
+      track("weekend", "sparkles", "cal", "Выходные под контролем", g.weekends, [1, 2, 4, 8, 16], (x) => x === 1 ? "Суббота и воскресенье в норме калорий" : `Выходные в норме ${x} ${plural(x, "раз", "раза", "раз")}: суббота и воскресенье`, "раз"),
+      track("variety", "sprout", "carb", "Разнообразие", g.variety, [10, 20, 35, 50, 75], (x) => `${x} разных блюд за 30 дней`, "блюд"),
+      track("comeback", "refresh", "pro", "Возвращение", g.comeback, [1, 3, 5, 10, 20], (x) => x === 1 ? "После пропуска вернись и отметь 3 дня подряд" : `${x} ${plural(x, "возвращение", "возвращения", "возвращений")} после пропуска`, "раз"),
     ];
     const pctT = (x, verb) => `${verb} ${n(x)}% веса, это ${dec((g.w0 * x) / 100)} кг`;
     const G = mode === "lose" ? [
       track("minus", "down-trend", "carb", "Минус", r1(g.lostPct), [1, 2, 3, 5, 7, 10], (x) => pctT(x, "Сбрось"), "%"),
       track("calm", "check", "carb", "Без срывов", g.noOver, [3, 7, 14, 30, 60], (x) => `${D(x)} подряд без перебора калорий`, "дн."),
       track("keepm", "dumbbell", "pro", "Сохрани мышцы", g.proKg, [3, 7, 14, 30, 60], (x) => `${D(x)} с белком от 1,8 г на кг веса`, "дн."),
+      track("eve", "dinner", "cal", "Лёгкий вечер", g.lightEve, [3, 7, 14, 30, 60], (x) => `${D(x)}, где ужин не больше 35% калорий`, "дн."),
+      track("sweet", "sweet", "pro", "Сладкое в меру", g.sweetOk, [3, 7, 14, 30, 60], (x) => `${D(x)}, где сладкое не больше 10% калорий`, "дн."),
     ] : mode === "gain" ? [
       track("plus", "muscle", "carb", "Плюс", r1(g.gainedPct), [1, 2, 3, 5, 7, 10], (x) => pctT(x, "Набери"), "%"),
       track("surplus", "flame", "pro", "Профицит", g.surplus, [3, 7, 14, 30, 60], (x) => `Добирай калории ${D(x)} подряд`, "дн."),
       track("pro2", "dumbbell", "pro", "Строитель", g.proKg, [3, 7, 14, 30, 60], (x) => `${D(x)} с белком от 1,8 г на кг веса`, "дн."),
       track("clean", "up-trend", "carb", "Чистый набор", g.clean, [1, 2, 4, 8, 12], (x) => `${x} ${plural(x, "неделя", "недели", "недель")} с плавным ростом веса, до 0,5% в неделю`, "нед."),
+      track("pmeal", "medal", "pro", "Белок в каждом приёме", g.proMeals, [3, 7, 14, 30, 60], (x) => `${D(x)} от 20 г белка в завтрак, обед и ужин`, "дн."),
     ] : [
       track("calm", "check", "carb", "Стабильность", g.noOver, [3, 7, 14, 30, 60], (x) => `${D(x)} подряд без перебора калорий`, "дн."),
       track("keepm", "dumbbell", "pro", "Сохрани мышцы", g.proKg, [3, 7, 14, 30, 60], (x) => `${D(x)} с белком от 1,8 г на кг веса`, "дн."),
+      track("stablew", "equal", "fat", "Ровный вес", g.stableW, [1, 2, 4, 8, 16], (x) => `${x} ${plural(x, "неделя", "недели", "недель")}, где вес изменился не больше чем на 0,5%`, "нед."),
+      track("eve", "dinner", "cal", "Лёгкий вечер", g.lightEve, [3, 7, 14, 30, 60], (x) => `${D(x)}, где ужин не больше 35% калорий`, "дн."),
+      track("sweet", "sweet", "pro", "Сладкое в меру", g.sweetOk, [3, 7, 14, 30, 60], (x) => `${D(x)}, где сладкое не больше 10% калорий`, "дн."),
     ];
     if (S.plan) G.push(track("stage", "flag", "carb", "Этапы цели", g.planMs, [1, 2, 3, 6, 12], (x) => `Пройди ${x} ${plural(x, "месячный этап", "месячных этапа", "месячных этапов")}`, "эт."));
     L.common = L.slice(); L.goal = G; L.mode = mode;
@@ -337,6 +360,10 @@
     if (!S.game) return null;
     const A = achList();
     if (!S.game.seen2) { S.game.seen2 = {}; A.forEach((t) => (S.game.seen2[t.id] = t.st)); save(); return null; }
+    // сменилась цель: норма и набор достижений пересчитаны, баннеры не показываем, просто запоминаем новое состояние
+    if (S.game.mode !== A.mode) { S.game.mode = A.mode; A.forEach((t) => (S.game.seen2[t.id] = Math.max(t.st, S.game.seen2[t.id] || 0))); save(); return null; }
+    // трек, который раньше не показывался (сменили цель, новые достижения), принимаем молча: без баннера
+    A.forEach((t) => { if (S.game.seen2[t.id] == null) S.game.seen2[t.id] = t.st; });
     const ups = A.filter((t) => t.st > (S.game.seen2[t.id] || 0));
     A.forEach((t) => (S.game.seen2[t.id] = Math.max(t.st, S.game.seen2[t.id] || 0)));
     if (!ups.length) { save(); return null; }
